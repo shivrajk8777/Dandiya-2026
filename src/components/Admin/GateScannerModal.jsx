@@ -66,7 +66,7 @@ export default function GateScannerModal({ isOpen, onClose, onCheckInDone }) {
     setScanResult(null);
 
     try {
-      const res = await checkInAttendee(passId);
+      const res = await checkInAttendee(passId, { name: "Super Admin", gate: "Admin Console", username: "admin" });
 
       if (res.success) {
         playTone("success");

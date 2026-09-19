@@ -25,10 +25,24 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    if (initialPass) {
-      setSelectedPass(initialPass);
+    if (isOpen) {
+      setStep(1);
+      setErrorMsg("");
+      setLoading(false);
+      setFormData({
+        fullName: "",
+        phone: "",
+        email: "",
+        city: "Chomu",
+        quantity: 1,
+        transactionRef: "",
+        paymentMethod: "UPI (Google Pay / PhonePe / Paytm)"
+      });
+      if (initialPass) {
+        setSelectedPass(initialPass);
+      }
     }
-  }, [initialPass]);
+  }, [isOpen, initialPass]);
 
   const totalAmount = selectedPass.price * formData.quantity;
 
@@ -53,18 +67,57 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === "phone") {
+      const onlyNums = value.replace(/\D/g, "").slice(0, 10);
+      setFormData((prev) => ({ ...prev, phone: onlyNums }));
+      return;
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateStep1 = () => {
-    if (!formData.fullName.trim()) {
-      setErrorMsg("Please enter your full name");
+    const cleanName = formData.fullName.trim();
+    const cleanPhone = formData.phone.trim();
+    const cleanEmail = formData.email.trim();
+    const cleanCity = formData.city.trim();
+
+    if (!cleanName) {
+      setErrorMsg("Please enter your Full Name");
       return false;
     }
-    if (!formData.phone.trim() || formData.phone.length < 10) {
-      setErrorMsg("Please enter a valid 10-digit WhatsApp/Phone number");
+    if (cleanName.length < 3) {
+      setErrorMsg("Name must be at least 3 characters long");
       return false;
     }
+    if (!/^[a-zA-Z\s.-]+$/.test(cleanName)) {
+      setErrorMsg("Name should only contain letters");
+      return false;
+    }
+
+    if (!cleanPhone) {
+      setErrorMsg("Please enter 10-digit mobile number");
+      return false;
+    }
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setErrorMsg("Valid 10-digit mobile starting 6-9");
+      return false;
+    }
+
+    if (cleanEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setErrorMsg("Please enter Email id");
+      return false;
+    }
+
+    if (!cleanCity || cleanCity.length < 2) {
+      setErrorMsg("Please enter your city");
+      return false;
+    }
+
+    if (!selectedPass || !selectedPass.price) {
+      setErrorMsg("Select Pass Category");
+      return false;
+    }
+
     setErrorMsg("");
     return true;
   };
@@ -76,24 +129,33 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     }
   };
 
-  const handleSubmitRegistration = async (isInstantMock = false) => {
-    setLoading(true);
+  const handleSubmitRegistration = async () => {
     setErrorMsg("");
+
+    const cleanRef = formData.transactionRef.trim();
+    if (!cleanRef) {
+      setErrorMsg("Please enter your UPI Reference / UTR Number after completing payment");
+      return;
+    }
+    if (cleanRef.length < 6) {
+      setErrorMsg("Please enter a valid UPI Reference / UTR Number (minimum 6 digits)");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const payload = {
-        fullName: formData.fullName,
-        phone: formData.phone,
-        email: formData.email,
-        city: formData.city,
+        fullName: formData.fullName.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        city: formData.city.trim(),
         passType: selectedPass.name,
         quantity: Number(formData.quantity),
         unitPrice: selectedPass.price,
         totalAmount: totalAmount,
-        paymentMethod: isInstantMock ? "Demo Fast Checkout" : formData.paymentMethod,
-        transactionRef: isInstantMock
-          ? "INSTANT-" + Math.floor(100000 + Math.random() * 900000)
-          : formData.transactionRef || "UPI-REF-" + Math.floor(100000 + Math.random() * 900000),
+        paymentMethod: formData.paymentMethod,
+        transactionRef: cleanRef,
         paymentStatus: "Approved"
       };
 
@@ -142,7 +204,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
           <p className="text-[11px] sm:text-xs text-slate-400">
             {step === 1
               ? "Select tier & contact details to generate official E-Ticket"
-              : "Scan UPI QR code or use instant demo checkout"}
+              : "Scan UPI QR code & enter UTR number to generate official E-Ticket"}
           </p>
         </div>
 
@@ -166,11 +228,10 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                     type="button"
                     key={opt.id}
                     onClick={() => setSelectedPass(opt)}
-                    className={`p-2.5 sm:p-3 rounded-xl text-left border transition-all ${
-                      selectedPass.id === opt.id
+                    className={`p-2.5 sm:p-3 rounded-xl text-left border transition-all ${selectedPass.id === opt.id
                         ? "bg-gradient-to-r from-amber-500/20 to-rose-500/20 border-amber-400 text-white shadow-md shadow-amber-500/10"
                         : "bg-white/5 border-white/10 text-slate-300 hover:border-white/20"
-                    }`}
+                      }`}
                   >
                     <div className="text-[11px] sm:text-xs font-bold text-white truncate font-serif-royal">
                       {opt.name}
@@ -349,7 +410,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
             {/* Reference Number Input */}
             <div>
               <label className="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                UPI Reference / UTR Number (Optional for Demo)
+                UPI Reference / UTR Number *
               </label>
               <input
                 type="text"
@@ -357,6 +418,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                 placeholder="e.g. 329182049182"
                 value={formData.transactionRef}
                 onChange={handleInputChange}
+                required
                 className="w-full bg-[#1b0a38] border border-white/15 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono"
               />
             </div>
@@ -365,23 +427,12 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
             <div className="space-y-2.5 pt-1">
               <button
                 type="button"
-                onClick={() => handleSubmitRegistration(false)}
+                onClick={handleSubmitRegistration}
                 disabled={loading}
                 className="w-full py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider text-black bg-gradient-to-r from-emerald-400 to-teal-400 hover:opacity-95 shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 active:scale-95 transition-all"
               >
                 <CheckCircle2 className="w-4 h-4 text-black" />
                 {loading ? "Confirming Pass..." : "I Have Paid & Generate E-Pass"}
-              </button>
-
-              {/* Fast Instant Demo Checkout */}
-              <button
-                type="button"
-                onClick={() => handleSubmitRegistration(true)}
-                disabled={loading}
-                className="w-full py-2.5 rounded-xl text-xs font-bold text-amber-300 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all flex items-center justify-center gap-2"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                Instant Demo / 1-Click Fast Approval Checkout
               </button>
 
               <button

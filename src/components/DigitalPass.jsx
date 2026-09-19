@@ -5,9 +5,32 @@ import html2canvas from "html2canvas";
 import { Download, Printer, Share2, CheckCircle, Sparkles, MapPin, Calendar, Clock, Crown, ShieldCheck } from "lucide-react";
 
 export default function DigitalPass({ passData, onClose }) {
+  const [logoDataUrl, setLogoDataUrl] = useState("/logo.png");
   const [qrDataUrl, setQrDataUrl] = useState("");
   const [downloading, setDownloading] = useState(false);
   const ticketRef = useRef(null);
+
+  // Preload logo as Base64 Data URL to prevent CORS/taint issues in html2canvas
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = "/logo.png";
+      img.onload = () => {
+        try {
+          const cvs = document.createElement("canvas");
+          cvs.width = img.naturalWidth || img.width;
+          cvs.height = img.naturalHeight || img.height;
+          const ctx = cvs.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          const dataUrl = cvs.toDataURL("image/png");
+          setLogoDataUrl(dataUrl);
+        } catch (e) {
+          console.warn("Logo base64 conversion warning:", e);
+        }
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (passData && passData.passId) {
@@ -33,30 +56,428 @@ export default function DigitalPass({ passData, onClose }) {
     }
   }, [passData]);
 
+  // Native 2D Canvas Pass Generator (Produces exact ultra-HD print-matching design)
+  const generateNativeCanvasPass = async () => {
+    const cvs = document.createElement("canvas");
+    cvs.width = 1200;
+    cvs.height = 650;
+    const ctx = cvs.getContext("2d");
+
+    // 1. Background gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, 1200, 650);
+    bgGrad.addColorStop(0, "#1c0836");
+    bgGrad.addColorStop(0.5, "#100422");
+    bgGrad.addColorStop(1, "#240a44");
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 1200, 650);
+
+    // 2. Gold Top Bar
+    const goldGrad = ctx.createLinearGradient(0, 0, 1200, 0);
+    goldGrad.addColorStop(0, "#fcd34d");
+    goldGrad.addColorStop(0.5, "#fb7185");
+    goldGrad.addColorStop(1, "#fcd34d");
+    ctx.fillStyle = goldGrad;
+    ctx.fillRect(0, 0, 1200, 14);
+
+    // 3. Outer Border
+    ctx.strokeStyle = "#e5b869";
+    ctx.lineWidth = 5;
+    ctx.strokeRect(12, 12, 1176, 626);
+
+    // 4. Draw Logo Image
+    let textOffsetX = 60;
+    if (logoDataUrl) {
+      const logoImg = new Image();
+      logoImg.crossOrigin = "anonymous";
+      logoImg.src = logoDataUrl;
+      await new Promise((resolve) => {
+        logoImg.onload = resolve;
+        setTimeout(resolve, 150);
+      });
+      ctx.drawImage(logoImg, 55, 38, 130, 75);
+      textOffsetX = 200;
+    }
+
+    // 5. Header Title & Subtitle
+    ctx.fillStyle = "#e5b869";
+    ctx.font = "bold 13px sans-serif";
+    ctx.fillText("GRAND HERITAGE • SEASON 6", textOffsetX, 54);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 32px Georgia, serif";
+    ctx.fillText("RANG TARANG GARBA", textOffsetX, 88);
+
+    ctx.fillStyle = "#cbd5e1";
+    ctx.font = "13px sans-serif";
+    ctx.fillText("OFFICIAL DIGITAL ACCESS PASS 2026", textOffsetX, 110);
+
+    // 6. Pass Category Badge (Right top)
+    const badgeText = (passData.passType || "VIP PASS").toUpperCase();
+    ctx.font = "bold 15px sans-serif";
+    const badgeWidth = ctx.measureText(badgeText).width + 36;
+    const badgeX = 1145 - badgeWidth;
+
+    const bGrad = ctx.createLinearGradient(badgeX, 0, 1145, 0);
+    bGrad.addColorStop(0, "#fbbf24");
+    bGrad.addColorStop(1, "#f97316");
+    ctx.fillStyle = bGrad;
+
+    ctx.beginPath();
+    ctx.roundRect(badgeX, 50, badgeWidth, 38, 19);
+    ctx.fill();
+
+    ctx.fillStyle = "#000000";
+    ctx.font = "bold 14px sans-serif";
+    ctx.fillText(badgeText, badgeX + 18, 74);
+
+    // 7. Horizontal Divider
+    ctx.strokeStyle = "rgba(229, 184, 105, 0.4)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(55, 130);
+    ctx.lineTo(1145, 130);
+    ctx.stroke();
+
+    // 8. Attendee Name Section
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "13px sans-serif";
+    ctx.fillText("PASS HOLDER NAME", 60, 168);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 36px Georgia, serif";
+    ctx.fillText(passData.fullName || "Valued Guest", 60, 210);
+
+    // 9. Meta Grid (Phone, Tier, Qty, Paid)
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "13px sans-serif";
+    ctx.fillText("PHONE / WHATSAPP", 60, 260);
+    ctx.fillStyle = "#f1f5f9";
+    ctx.font = "bold 22px monospace";
+    ctx.fillText(passData.phone || "-", 60, 292);
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "13px sans-serif";
+    ctx.fillText("TIER CATEGORY", 360, 260);
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "bold 22px sans-serif";
+    ctx.fillText(passData.passType || "Single Entry", 360, 292);
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "13px sans-serif";
+    ctx.fillText("QUANTITY", 60, 335);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 22px sans-serif";
+    ctx.fillText(`${passData.quantity || 1} Persons`, 60, 367);
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "13px sans-serif";
+    ctx.fillText("TOTAL PAID", 360, 335);
+    ctx.fillStyle = "#4ade80";
+    ctx.font = "bold 22px sans-serif";
+    ctx.fillText(`₹${passData.totalAmount || passData.unitPrice || 0}`, 360, 367);
+
+    // 10. Venue & Date Box
+    ctx.fillStyle = "#160729";
+    ctx.strokeStyle = "rgba(229, 184, 105, 0.3)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(55, 400, 680, 105, 14);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "#fcd34d";
+    ctx.font = "bold 17px sans-serif";
+    ctx.fillText("📅  Oct 17 - 19, 2026  (07:00 PM Onwards)", 80, 438);
+
+    ctx.fillStyle = "#f1f5f9";
+    ctx.font = "15px sans-serif";
+    ctx.fillText("📍  Raj Vilas Garden, Main Highway Road, Chomu, Rajasthan", 80, 478);
+
+    // 11. Draw QR Code Box (Right Side)
+    if (qrDataUrl) {
+      const qrImg = new Image();
+      qrImg.src = qrDataUrl;
+      await new Promise((resolve) => {
+        qrImg.onload = resolve;
+        setTimeout(resolve, 200);
+      });
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.roundRect(790, 155, 355, 350, 20);
+      ctx.fill();
+
+      ctx.drawImage(qrImg, 825, 175, 285, 285);
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 17px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(passData.passId || "", 967, 475);
+
+      ctx.fillStyle = "#64748b";
+      ctx.font = "bold 11px sans-serif";
+      ctx.fillText("SCAN AT GATE FOR ENTRY", 967, 492);
+      ctx.textAlign = "left";
+    }
+
+    // 12. Bottom Security Strip
+    ctx.strokeStyle = "rgba(229, 184, 105, 0.4)";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.moveTo(55, 535);
+    ctx.lineTo(1145, 535);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "#cbd5e1";
+    ctx.font = "13px monospace";
+    ctx.fillText(`PASS ID: ${passData.passId || "DND-2026"}`, 60, 575);
+    ctx.fillText(`STATUS: ${passData.status || "CONFIRMED"}`, 450, 575);
+    ctx.fillText("AUTHENTICATED • NON-TRANSFERABLE", 780, 575);
+
+    // 13. Trigger PNG Download
+    const image = cvs.toDataURL("image/png", 1.0);
+    const link = document.createElement("a");
+    link.download = `RangTarangGarba_Pass_${passData?.passId || "2026"}.png`;
+    link.href = image;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleDownloadImage = async () => {
-    if (!ticketRef.current) return;
+    if (!passData) return;
     setDownloading(true);
     try {
-      const canvas = await html2canvas(ticketRef.current, {
-        scale: 3,
-        backgroundColor: "#07020f",
-        useCORS: true
-      });
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = `RangTarangGarba_Pass_${passData.passId || "2026"}.png`;
-      link.click();
+      await generateNativeCanvasPass();
     } catch (err) {
       console.error("Pass download error:", err);
-      alert("Could not download pass image. You can take a screenshot.");
+      alert("Could not download pass image automatically. Please take a screenshot.");
     } finally {
       setDownloading(false);
     }
   };
 
   const handlePrint = () => {
-    window.print();
+    try {
+      const printWindow = window.open("", "_blank", "width=850,height=900");
+      if (printWindow) {
+        const logoSrc = logoDataUrl || "/logo.png";
+        const qrSrc = qrDataUrl || "";
+
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Print Pass - ${passData.passId || "Rang Tarang Garba"}</title>
+              <style>
+                @page {
+                  size: A4 portrait;
+                  margin: 10mm;
+                }
+                * {
+                  box-sizing: border-box;
+                  margin: 0;
+                  padding: 0;
+                }
+                body {
+                  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+                  background-color: #ffffff;
+                  color: #000000;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  min-height: 100vh;
+                  padding: 10px;
+                }
+                .ticket-card {
+                  width: 100%;
+                  max-width: 680px;
+                  background: linear-gradient(135deg, #1c0836 0%, #100422 50%, #240a44 100%);
+                  border: 3px solid #e5b869;
+                  border-radius: 20px;
+                  padding: 24px;
+                  color: #ffffff;
+                  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                  position: relative;
+                  overflow: hidden;
+                  -webkit-print-color-adjust: exact;
+                  print-color-adjust: exact;
+                  page-break-inside: avoid;
+                  page-break-after: avoid;
+                }
+                .top-bar {
+                  height: 6px;
+                  background: linear-gradient(to right, #fcd34d, #fb7185, #fcd34d);
+                  margin: -24px -24px 20px -24px;
+                }
+                .header {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  border-bottom: 1px solid rgba(229, 184, 105, 0.4);
+                  padding-bottom: 14px;
+                  margin-bottom: 20px;
+                }
+                .logo-img {
+                  height: 48px;
+                  width: auto;
+                  object-fit: contain;
+                }
+                .badge {
+                  background: linear-gradient(to right, #fbbf24, #f97316);
+                  color: #000000;
+                  font-weight: 900;
+                  font-size: 11px;
+                  padding: 6px 14px;
+                  border-radius: 20px;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                }
+                .details-grid {
+                  display: grid;
+                  grid-template-columns: 2fr 1fr;
+                  gap: 20px;
+                  align-items: center;
+                }
+                .label {
+                  font-size: 10px;
+                  font-weight: 700;
+                  color: #94a3b8;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                  margin-bottom: 3px;
+                }
+                .val-title {
+                  font-size: 26px;
+                  font-weight: 900;
+                  font-family: Georgia, serif;
+                  color: #ffffff;
+                  margin-bottom: 12px;
+                }
+                .val-meta {
+                  font-size: 14px;
+                  color: #f1f5f9;
+                  font-weight: 600;
+                  margin-bottom: 8px;
+                }
+                .meta-row {
+                  display: flex;
+                  gap: 20px;
+                  margin-bottom: 12px;
+                }
+                .venue-box {
+                  border-top: 1px solid rgba(255,255,255,0.15);
+                  padding-top: 10px;
+                  margin-top: 10px;
+                  font-size: 12px;
+                  color: #fcd34d;
+                  font-weight: 600;
+                }
+                .qr-box {
+                  background: #ffffff;
+                  border-radius: 16px;
+                  padding: 12px;
+                  text-align: center;
+                  color: #0f172a;
+                }
+                .qr-img {
+                  width: 140px;
+                  height: 140px;
+                  object-fit: contain;
+                }
+                .pass-id {
+                  font-family: monospace;
+                  font-weight: 900;
+                  font-size: 12px;
+                  margin-top: 4px;
+                  color: #1e1b4b;
+                }
+                .footer-strip {
+                  border-top: 1px dashed rgba(229, 184, 105, 0.4);
+                  margin-top: 16px;
+                  padding-top: 10px;
+                  display: flex;
+                  justify-content: space-between;
+                  font-family: monospace;
+                  font-size: 11px;
+                  color: #cbd5e1;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="ticket-card">
+                <div class="top-bar"></div>
+                <div class="header">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="${logoSrc}" class="logo-img" />
+                    <div>
+                      <div style="font-size: 10px; color: #fcd34d; font-weight: 800; text-transform: uppercase;">Grand Heritage • Season 6</div>
+                      <div style="font-size: 11px; color: #cbd5e1;">Official Access Badge 2026</div>
+                    </div>
+                  </div>
+                  <div class="badge">${passData.passType || "VIP PASS"}</div>
+                </div>
+
+                <div class="details-grid">
+                  <div>
+                    <div class="label">Pass Holder Name</div>
+                    <div class="val-title">${passData.fullName || "Valued Guest"}</div>
+
+                    <div class="meta-row">
+                      <div>
+                        <div class="label">Phone / WhatsApp</div>
+                        <div class="val-meta">${passData.phone || "-"}</div>
+                      </div>
+                      <div>
+                        <div class="label">Total Paid</div>
+                        <div class="val-meta" style="color: #4ade80;">₹${passData.totalAmount || passData.unitPrice || 0}</div>
+                      </div>
+                      <div>
+                        <div class="label">Quantity</div>
+                        <div class="val-meta">${passData.quantity || 1} Persons</div>
+                      </div>
+                    </div>
+
+                    <div class="venue-box">
+                      <div>📅 Oct 17 - 19, 2026 (07:00 PM Onwards)</div>
+                      <div>📍 Raj Vilas Garden, Chomu, Rajasthan</div>
+                    </div>
+                  </div>
+
+                  <div class="qr-box">
+                    <img src="${qrSrc}" class="qr-img" />
+                    <div class="pass-id">${passData.passId || "DND-2026"}</div>
+                    <div style="font-size: 9px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-top: 2px;">Scan At Gate</div>
+                  </div>
+                </div>
+
+                <div class="footer-strip">
+                  <div>ID: <strong style="color: #fcd34d;">${passData.passId || "-"}</strong></div>
+                  <div>STATUS: ${passData.status || "CONFIRMED"}</div>
+                  <div>NON-TRANSFERABLE</div>
+                </div>
+              </div>
+
+              <script>
+                window.onload = function() {
+                  setTimeout(function() {
+                    window.print();
+                    window.close();
+                  }, 300);
+                };
+              </script>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+      } else {
+        window.print();
+      }
+    } catch (e) {
+      console.warn("Popup window blocked, fallback to window.print()", e);
+      window.print();
+    }
   };
 
   const handleShare = () => {
@@ -83,6 +504,7 @@ export default function DigitalPass({ passData, onClose }) {
 
         {/* Printable / Downloadable Luxury Concert Pass Badge */}
         <div
+          id="printable-ticket"
           ref={ticketRef}
           className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-br from-[#1c0836] via-[#100422] to-[#240a44] border-2 border-amber-400/60 shadow-2xl p-4 sm:p-6 text-white"
         >
@@ -98,9 +520,10 @@ export default function DigitalPass({ passData, onClose }) {
           <div className="flex items-start justify-between border-b border-amber-500/30 pb-3 mb-4">
             <div className="flex items-center gap-3">
               <img
-                src="/rang-tarang-logo.png"
+                src={logoDataUrl}
                 alt="Rang Tarang Garba"
-                className="w-11 h-11 object-contain bg-black/40 rounded-xl p-1 border border-amber-400/30 shrink-0"
+                crossOrigin="anonymous"
+                className="h-11 sm:h-13 w-auto object-contain drop-shadow-md shrink-0"
               />
               <div>
                 <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold text-amber-400 uppercase tracking-widest font-serif-royal">

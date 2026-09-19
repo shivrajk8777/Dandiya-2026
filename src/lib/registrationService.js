@@ -141,14 +141,14 @@ export const registerAttendee = async (formData) => {
     fullName: formData.fullName.trim(),
     phone: formData.phone.trim(),
     email: formData.email?.trim() || "",
-    city: formData.city?.trim() || "Local",
+    city: formData.city?.trim() || "Chomu",
     passType: formData.passType || "Single Entry",
     quantity: Number(formData.quantity) || 1,
     unitPrice: Number(formData.unitPrice) || 299,
     totalAmount: Number(formData.totalAmount) || 299,
     paymentMethod: formData.paymentMethod || "UPI",
-    transactionRef: formData.transactionRef?.trim() || "MOCK-" + Math.floor(100000 + Math.random() * 900000),
-    status: formData.paymentStatus || "Approved", // Instant approval or pending based on setup
+    transactionRef: formData.transactionRef?.trim() || "UPI-REF-" + Math.floor(100000 + Math.random() * 900000),
+    status: formData.paymentStatus || "Approved",
     checkedIn: false,
     checkInTime: null,
     createdAt: new Date().toISOString()
@@ -238,10 +238,14 @@ export const updateStatus = async (id, newStatus) => {
   return { success: true };
 };
 
-// Check-In Attendee at Gate by Pass ID or record ID
-export const checkInAttendee = async (identifier) => {
+// Check-In Attendee at Gate by Pass ID or record ID (tracks Staff User)
+export const checkInAttendee = async (identifier, staffInfo = null) => {
   const { db, isConnected } = getFirebaseInstance();
   const cleanId = identifier.trim().toUpperCase();
+
+  const checkedByStaff = staffInfo ? `${staffInfo.name}` : "Super Admin";
+  const checkedByStaffId = staffInfo ? (staffInfo.username || staffInfo.id) : "admin";
+  const checkedByGate = staffInfo ? (staffInfo.gate || "Main Gate") : "Admin Portal";
 
   // Try Firebase first
   if (isConnected && db) {
@@ -258,20 +262,24 @@ export const checkInAttendee = async (identifier) => {
             success: false,
             alreadyCheckedIn: true,
             data: { id: targetDoc.id, ...data },
-            message: `Already Checked-In at ${new Date(data.checkInTime).toLocaleTimeString()}`
+            message: `Already Checked-In at ${new Date(data.checkInTime).toLocaleTimeString()} by ${data.checkedByStaff || "Gate Staff"}`
           };
         }
 
         const now = new Date().toISOString();
-        await updateDoc(doc(db, COLLECTION_NAME, targetDoc.id), {
+        const updatePayload = {
           checkedIn: true,
-          checkInTime: now
-        });
+          checkInTime: now,
+          checkedByStaff,
+          checkedByStaffId,
+          checkedByGate
+        };
+        await updateDoc(doc(db, COLLECTION_NAME, targetDoc.id), updatePayload);
         return {
           success: true,
           alreadyCheckedIn: false,
-          data: { id: targetDoc.id, ...data, checkedIn: true, checkInTime: now },
-          message: "Check-in Successful! Welcome to Rang Tarang Garba!"
+          data: { id: targetDoc.id, ...data, ...updatePayload },
+          message: `Check-in Successful by ${checkedByStaff} (${checkedByGate})!`
         };
       }
     } catch (e) {
@@ -295,14 +303,17 @@ export const checkInAttendee = async (identifier) => {
       success: false,
       alreadyCheckedIn: true,
       data: item,
-      message: `Already Checked-In at ${new Date(item.checkInTime).toLocaleTimeString()}`
+      message: `Already Checked-In at ${new Date(item.checkInTime).toLocaleTimeString()} by ${item.checkedByStaff || "Gate Staff"}`
     };
   }
 
   const updatedItem = {
     ...item,
     checkedIn: true,
-    checkInTime: new Date().toISOString()
+    checkInTime: new Date().toISOString(),
+    checkedByStaff,
+    checkedByStaffId,
+    checkedByGate
   };
 
   list[targetIndex] = updatedItem;
@@ -312,7 +323,7 @@ export const checkInAttendee = async (identifier) => {
     success: true,
     alreadyCheckedIn: false,
     data: updatedItem,
-    message: "Check-in Successful! Welcome to Rang Tarang Garba!"
+    message: `Check-in Successful by ${checkedByStaff} (${checkedByGate})!`
   };
 };
 
@@ -388,6 +399,8 @@ export const exportRegistrationsToExcel = (registrations) => {
     "Status": r.status,
     "Checked In": r.checkedIn ? "Yes" : "No",
     "Check-in Time": r.checkInTime ? new Date(r.checkInTime).toLocaleString() : "-",
+    "Checked In By Staff": r.checkedByStaff || (r.checkedIn ? "Super Admin" : "-"),
+    "Gate Location": r.checkedByGate || (r.checkedIn ? "Main Gate" : "-"),
     "Registration Date": new Date(r.createdAt).toLocaleString()
   }));
 
