@@ -15,7 +15,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     fullName: "",
     phone: "",
     email: "",
-    city: "Ahmedabad",
+    city: "Chomu",
     quantity: 1,
     transactionRef: "",
     paymentMethod: "UPI (Google Pay / PhonePe / Paytm)"
@@ -35,7 +35,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   // Generate real UPI payment string and QR Code
   useEffect(() => {
     if (step === 2) {
-      const upiString = `upi://pay?pa=utsavraas2026@okhdfcbank&pn=UtsavRaasMahotsav&am=${totalAmount}&cu=INR&tn=UtsavPass_${formData.phone}`;
+      const upiString = `upi://pay?pa=rangtaranggarba2026@okhdfcbank&pn=RangTarangGarbaMahotsav&am=${totalAmount}&cu=INR&tn=RangTarangPass_${formData.phone}`;
       QRCode.toDataURL(upiString, {
         width: 280,
         margin: 1,
@@ -281,7 +281,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                   <input
                     type="text"
                     name="city"
-                    placeholder="e.g. Ahmedabad"
+                    placeholder="e.g. Chomu / Jaipur"
                     value={formData.city}
                     onChange={handleInputChange}
                     className="w-full bg-[#1b0a38] border border-white/15 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
@@ -338,10 +338,10 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                   Google Pay • PhonePe • Paytm • BHIM • CRED
                 </div>
                 <div className="p-2 rounded-lg bg-black/50 border border-white/10 font-mono text-[10px] text-amber-300 select-all break-all">
-                  UPI ID: utsavraas2026@okhdfcbank
+                  UPI ID: rangtaranggarba2026@okhdfcbank
                 </div>
                 <div className="text-[10px] text-slate-400">
-                  Recipient: <strong className="text-white">Utsav Raas Cultural Fest</strong>
+                  Recipient: <strong className="text-white">Rang Tarang Garba Mahotsav</strong>
                 </div>
               </div>
             </div>

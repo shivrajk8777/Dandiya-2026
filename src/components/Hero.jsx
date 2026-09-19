@@ -37,15 +37,40 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[600px] h-[350px] sm:h-[600px] bg-gradient-to-tr from-[#3b0d61]/25 via-[#e11d48]/15 to-[#e5b869]/20 rounded-full blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center z-10 w-full">
+        {/* Logo Badge Display */}
+        <div className="flex justify-center mb-6">
+          <div className="relative group inline-block">
+            <div className="absolute -inset-1.5 bg-gradient-to-r from-[#e5b869] via-orange-500 to-[#e11d48] rounded-3xl blur-md opacity-50 group-hover:opacity-80 transition duration-500 animate-pulse"></div>
+            <div className="relative px-5 py-3.5 bg-[#0d041c]/90 border border-[#e5b869]/50 rounded-2xl backdrop-blur-md flex items-center gap-4 shadow-2xl">
+              <img
+                src="/rang-tarang-logo.png"
+                alt="Rang Tarang Garba"
+                className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_0_20px_rgba(249,115,22,0.7)]"
+              />
+              <div className="text-left">
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#e5b869] block font-sans">
+                  Official Navratri Mahotsav
+                </span>
+                <span className="text-xl sm:text-2xl font-black text-white font-serif-royal block leading-tight">
+                  RANG TARANG <span className="text-gold-gradient font-sans-modern font-black">GARBA</span>
+                </span>
+                <span className="text-[10px] text-slate-300 font-medium tracking-wider">
+                  Season 6 • Chomu, Rajasthan
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Top festival badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#160829] border border-[#e5b869]/30 mb-6 shadow-lg">
           <span className="w-2 h-2 rounded-full bg-[#e5b869]" />
           <span className="text-[11px] sm:text-xs font-semibold tracking-widest uppercase text-[#e5b869] font-sans">
-            6th Annual Navratri Mahotsav
+            6th Annual Grand Garba Mahotsav
           </span>
           <span className="text-slate-600">|</span>
           <span className="text-[11px] sm:text-xs text-slate-300 font-medium">
-            October 18 – 20, 2026
+            October 17 – 19, 2026
           </span>
         </div>
 
@@ -56,23 +81,23 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
 
         {/* Main Headline */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.08] mb-6 font-serif-royal">
-          <span className="text-white">ROYAL HERITAGE </span>
+          <span className="text-white">RANG TARANG </span>
           <br />
           <span className="text-gold-gradient font-sans-modern font-black">
-            DANDIYA RAAS
+            GARBA 2026
           </span>
         </h1>
 
         {/* Subtitle */}
         <p className="max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-slate-300 font-light mb-8 leading-relaxed">
-          Experience Gujarat’s most prestigious Navratri cultural festival. 3 grand evenings with 100-piece live Dhol symphony, celebrity headliners, 40,000 sq.ft wooden arena, and royal Kathiyawadi dining.
+          Experience Rajasthan’s most prestigious and electric Rang Tarang Garba festival at Raj Vilas Garden, Chomu. 3 grand evenings with 100-piece live Dhol symphony, celebrity headliners, 40,000 sq.ft wooden arena, and royal dining.
         </p>
 
         {/* Event Meta Badges */}
         <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 mb-10 text-xs sm:text-sm text-slate-300">
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl editorial-card">
             <Calendar className="w-4 h-4 text-[#e5b869]" />
-            <span className="font-medium">Oct 18 - 20, 2026</span>
+            <span className="font-medium">Oct 17 - 19, 2026</span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl editorial-card">
             <Clock className="w-4 h-4 text-[#fb7185]" />
@@ -80,7 +105,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl editorial-card">
             <MapPin className="w-4 h-4 text-purple-400" />
-            <span className="font-medium">Royal Palace Lawns, Ahmedabad</span>
+            <span className="font-medium">Raj Vilas Garden, Chomu, Rajasthan</span>
           </div>
         </div>
 

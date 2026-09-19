@@ -25,7 +25,7 @@ const SEED_DATA = [
     fullName: "Aarav Sharma",
     phone: "9876543210",
     email: "aarav.sharma@example.com",
-    city: "Ahmedabad",
+    city: "Chomu",
     passType: "Couple Pass",
     quantity: 1,
     unitPrice: 499,
@@ -271,7 +271,7 @@ export const checkInAttendee = async (identifier) => {
           success: true,
           alreadyCheckedIn: false,
           data: { id: targetDoc.id, ...data, checkedIn: true, checkInTime: now },
-          message: "Check-in Successful! Welcome to Dandiya Raas!"
+          message: "Check-in Successful! Welcome to Rang Tarang Garba!"
         };
       }
     } catch (e) {
@@ -312,7 +312,7 @@ export const checkInAttendee = async (identifier) => {
     success: true,
     alreadyCheckedIn: false,
     data: updatedItem,
-    message: "Check-in Successful! Welcome to Dandiya Raas!"
+    message: "Check-in Successful! Welcome to Rang Tarang Garba!"
   };
 };
 
@@ -393,8 +393,8 @@ export const exportRegistrationsToExcel = (registrations) => {
 
   const worksheet = XLSX.utils.json_to_sheet(dataToExport);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Dandiya_Registrations");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Rang_Tarang_Garba");
 
   // Generate Excel file and trigger download
-  XLSX.writeFile(workbook, `Dandiya_Raas_Registrations_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  XLSX.writeFile(workbook, `Rang_Tarang_Garba_Registrations_${new Date().toISOString().slice(0, 10)}.xlsx`);
 };

@@ -16,31 +16,19 @@ export default function Navbar({ onOpenRegister, onOpenLookup, onOpenAdmin }) {
 
   return (
     <header
-      className={`sticky top-0 left-0 right-0 z-40 transition-all duration-300 w-full ${
-        scrolled
+      className={`sticky top-0 left-0 right-0 z-40 transition-all duration-300 w-full ${scrolled
           ? "bg-[#07030e]/95 backdrop-blur-xl border-b border-[#e5b869]/20 py-3 shadow-2xl"
           : "bg-[#07030e]/80 backdrop-blur-md border-b border-white/5 py-4"
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Brand Royal Monogram */}
-        <a href="#" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e5b869]/20 to-[#e11d48]/20 border border-[#e5b869]/40 flex items-center justify-center text-[#e5b869] shadow-lg group-hover:border-[#e5b869] transition-colors shrink-0">
-            <Crown className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl sm:text-2xl font-bold tracking-wider text-white font-serif-royal leading-none">
-                UTSAV <span className="text-gold-gradient font-sans-modern font-black">RAAS</span>
-              </span>
-              <span className="text-[10px] font-bold tracking-widest text-[#e5b869] bg-[#e5b869]/10 border border-[#e5b869]/30 px-1.5 py-0.5 rounded uppercase font-sans">
-                2026
-              </span>
-            </div>
-            <p className="text-[10px] text-slate-400 font-medium tracking-widest uppercase mt-0.5 hidden xs:block">
-              Royal Heritage Festival
-            </p>
-          </div>
+        {/* Brand Logo Only */}
+        <a href="#" className="flex items-center group">
+          <img
+            src="/logo.png"
+            alt="Rang Tarang Garba"
+            className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-[0_2px_12px_rgba(249,115,22,0.5)] group-hover:scale-105 transition-all duration-300"
+          />
         </a>
 
         {/* Desktop Nav Links */}

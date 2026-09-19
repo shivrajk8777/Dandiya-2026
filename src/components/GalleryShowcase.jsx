@@ -54,7 +54,7 @@ export default function GalleryShowcase() {
             The <span className="text-gold-gradient font-sans-modern font-black">Festival Atmosphere</span>
           </h2>
           <p className="mt-4 text-slate-300 text-base font-light">
-            A glimpse into the sheer energy, royal heritage attires, and electrifying celebration that defines Utsav Raas.
+            A glimpse into the sheer energy, royal heritage attires, and electrifying celebration that defines Rang Tarang Garba.
           </p>
         </div>
 
@@ -97,7 +97,7 @@ export default function GalleryShowcase() {
         <div className="mt-14 p-7 sm:p-9 rounded-3xl editorial-card max-w-4xl mx-auto text-center relative overflow-hidden">
           <Quote className="w-8 h-8 text-[#e5b869] mx-auto mb-3 opacity-80" />
           <p className="text-base sm:text-lg text-slate-200 font-light italic leading-relaxed max-w-2xl mx-auto">
-            "The combination of the 40,000 sq.ft shock-absorbing wooden arena, the acoustic balance of the 100-piece live Dhol symphony, and the hospitality of the royal cabanas makes Utsav Raas a cultural landmark for Indian festival productions."
+            "The combination of the 40,000 sq.ft shock-absorbing wooden arena, the acoustic balance of the 100-piece live Dhol symphony, and the hospitality of the royal cabanas makes Rang Tarang Garba a cultural landmark for Indian festival productions."
           </p>
           <div className="mt-4 font-bold text-[#e5b869] text-sm font-serif-royal tracking-wide">
             — Times of India Lifestyle & Culture Review

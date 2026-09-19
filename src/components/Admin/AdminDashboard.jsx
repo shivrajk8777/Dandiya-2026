@@ -19,7 +19,9 @@ import {
   UserCheck,
   Filter,
   Sparkles,
-  Building2
+  Building2,
+  User,
+  Lock
 } from "lucide-react";
 import {
   subscribeToRegistrations,
@@ -35,7 +37,8 @@ import SponsorManagerModal from "./SponsorManagerModal";
 export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [pin, setPin] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
 
   // Registrations state
@@ -77,19 +80,26 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (["dandiya2026", "admin123", "admin", "1234"].includes(pin.trim().toLowerCase())) {
+    const u = username.trim().toLowerCase();
+    const p = password.trim();
+
+    if (
+      (u === "admin" && (p === "rangtarang2026" || p === "RangTarang@2026" || p === "admin2026" || p === "dandiya2026")) ||
+      (u === "rangtarang" && (p === "rangtarang2026" || p === "RangTarang@2026"))
+    ) {
       setIsAuthenticated(true);
       sessionStorage.setItem("dandiya_admin_auth", "true");
       setAuthError("");
     } else {
-      setAuthError("Incorrect PIN. Try: 'dandiya2026' or 'admin123'");
+      setAuthError("Invalid Admin ID or Password. Please check and try again.");
     }
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     sessionStorage.removeItem("dandiya_admin_auth");
-    setPin("");
+    setUsername("");
+    setPassword("");
   };
 
   // Metrics calculation
@@ -167,58 +177,84 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
               Enter Administrator PIN to manage passes, sponsors & gate check-in
             </p>
 
-            <form onSubmit={handleLogin} className="space-y-3.5">
-              <input
-                type="password"
-                placeholder="Enter PIN (e.g. dandiya2026)"
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                autoFocus
-                className="w-full bg-[#0d0316] border border-amber-500/40 rounded-xl px-4 py-3 text-center text-lg tracking-widest text-white focus:outline-none focus:border-amber-400"
-              />
+            <form onSubmit={handleLogin} className="space-y-3.5 text-left">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
+                  Admin ID
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-amber-400 absolute left-3.5 top-3" />
+                  <input
+                    type="text"
+                    placeholder="Enter Admin ID"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    autoFocus
+                    className="w-full bg-[#0d0316] border border-amber-500/40 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-amber-400 absolute left-3.5 top-3" />
+                  <input
+                    type="password"
+                    placeholder="Enter Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-[#0d0316] border border-amber-500/40 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
 
               {authError && (
-                <div className="p-2.5 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs">
-                  {authError}
+                <div className="p-2.5 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs text-center font-medium">
+                  ⚠️ {authError}
                 </div>
               )}
 
               <button
                 type="submit"
-                className="w-full py-3 sm:py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:opacity-95 shadow-lg shadow-amber-500/20 active:scale-95 transition-all"
+                className="w-full py-3 sm:py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:opacity-95 shadow-lg shadow-amber-500/20 active:scale-95 transition-all mt-1"
               >
                 Unlock Dashboard
               </button>
             </form>
-
-            <div className="mt-4 text-[11px] text-slate-500">
-              Demo Access PIN: <span className="font-mono text-amber-400 font-bold">dandiya2026</span>
-            </div>
           </div>
         ) : (
           /* AUTHENTICATED DASHBOARD */
           <div className="flex flex-col h-full overflow-hidden">
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3 mb-3 pr-8">
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-lg sm:text-2xl font-black text-white font-serif-royal">
-                    UTSAV RAAS <span className="gold-foil-text font-sans-modern font-black">Admin Center</span>
-                  </h2>
-                  <span
-                    className={`text-[9px] sm:text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${
-                      isFirebaseLive
+              <div className="flex items-center gap-3">
+                <img
+                  src="/rang-tarang-logo.png"
+                  alt="Rang Tarang Garba"
+                  className="w-10 h-10 object-contain bg-black/40 rounded-xl p-1 border border-amber-400/30 shrink-0"
+                />
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-lg sm:text-2xl font-black text-white font-serif-royal">
+                      RANG TARANG <span className="gold-foil-text font-sans-modern font-black">GARBA Admin</span>
+                    </h2>
+                    <span
+                      className={`text-[9px] sm:text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${isFirebaseLive
                         ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
                         : "bg-amber-500/20 border-amber-500/40 text-amber-300"
-                    }`}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
-                    {isFirebaseLive ? "Firebase Live" : "Local Mode"}
-                  </span>
+                        }`}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
+                      {isFirebaseLive ? "Firebase Live" : "Local Mode"}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Real-time attendee database, sponsor manager & gate check-in
+                  </p>
                 </div>
-                <p className="text-[11px] text-slate-400">
-                  Real-time attendee database, sponsor manager & gate check-in
-                </p>
               </div>
 
               {/* Action Toolbar */}
@@ -247,13 +283,13 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                   Export Excel
                 </button>
 
-                <button
+                {/* <button
                   onClick={() => setShowFirebaseModal(true)}
                   className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 flex items-center gap-1.5"
                 >
                   <Database className="w-3.5 h-3.5" />
                   Firebase Config
-                </button>
+                </button> */}
 
                 <button
                   onClick={handleLogout}
@@ -432,13 +468,12 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                             value={item.status || "Approved"}
                             onChange={(e) => handleStatusChange(item.id, e.target.value)}
                             disabled={actionLoading}
-                            className={`rounded-lg px-2 py-1 text-[11px] font-bold border focus:outline-none ${
-                              item.status === "Approved"
-                                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
-                                : item.status === "Pending"
+                            className={`rounded-lg px-2 py-1 text-[11px] font-bold border focus:outline-none ${item.status === "Approved"
+                              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                              : item.status === "Pending"
                                 ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
                                 : "bg-rose-500/10 border-rose-500/30 text-rose-300"
-                            }`}
+                              }`}
                           >
                             <option value="Approved">Approved</option>
                             <option value="Pending">Pending</option>
@@ -503,7 +538,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                 Showing <strong className="text-white">{filteredList.length}</strong> of {registrations.length} registrations
               </div>
               <div className="text-slate-500">
-                UTSAV RAAS Gate Control v2.6
+                RANG TARANG GARBA Gate Control v2.6
               </div>
             </div>
           </div>
@@ -520,7 +555,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
       <GateScannerModal
         isOpen={showScannerModal}
         onClose={() => setShowScannerModal(false)}
-        onCheckInDone={() => {}}
+        onCheckInDone={() => { }}
       />
 
       <SponsorManagerModal

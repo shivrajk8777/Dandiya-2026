@@ -16,21 +16,22 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: "UTSAV RAAS 2026 | The Royal Heritage Dandiya & Garba Festival",
+  title: "RANG TARANG GARBA 2026 | The Grand Heritage Dandiya & Garba Mahotsav",
   description:
-    "Step into India's most prestigious and electric Dandiya Mahotsav. Featuring celebrity headliners, 100-piece live Dhol symphony, royal VIP cabanas, and instant digital QR passes.",
+    "Step into Gujarat's most prestigious Rang Tarang Garba Mahotsav 2026. Featuring celebrity headliners, 100-piece live Dhol symphony, royal VIP cabanas, and instant digital QR passes.",
   keywords: [
-    "Utsav Raas 2026",
+    "Rang Tarang Garba 2026",
+    "Rang Tarang Garba",
     "Royal Heritage Dandiya",
     "Luxury Garba Festival",
     "Dandiya Passes Online",
     "Navratri VIP Passes",
     "Celebrity Garba Night"
   ],
-  authors: [{ name: "Royal Heritage Cultural Foundation" }],
+  authors: [{ name: "Rang Tarang Cultural Foundation" }],
   openGraph: {
-    title: "UTSAV RAAS 2026 | Royal Heritage Dandiya & Garba Festival",
-    description: "Book exclusive passes for India's biggest royal Dandiya & Garba celebration. Instant QR digital passes!",
+    title: "RANG TARANG GARBA 2026 | Grand Heritage Dandiya & Garba Mahotsav",
+    description: "Book exclusive passes for India's biggest Rang Tarang Garba celebration. Instant QR digital passes!",
     type: "website"
   }
 };

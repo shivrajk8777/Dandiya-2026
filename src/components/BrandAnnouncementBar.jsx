@@ -10,11 +10,11 @@ export default function BrandAnnouncementBar({ onOpenRegister }) {
         <div className="flex items-center gap-2">
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#e5b869] animate-ping" />
           <span className="font-semibold tracking-wider uppercase text-[#e5b869] font-sans">
-            Season 6 Passes Live
+            Rang Tarang Garba 2026 Passes Live
           </span>
           <span className="text-slate-600 hidden md:inline">|</span>
           <span className="hidden md:inline text-slate-400 font-light">
-            India’s Premier Royal Heritage Dandiya & Garba Mahotsav • Oct 18–20
+            India’s Premier Grand Heritage Rang Tarang Garba Mahotsav • Oct 17–19 • Raj Vilas Garden, Chomu
           </span>
         </div>
 

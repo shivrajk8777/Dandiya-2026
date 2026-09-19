@@ -13,14 +13,18 @@ export default function Footer({ onOpenAdmin, onOpenRegister, onOpenLookup }) {
           {/* Col 1: Brand & Legacy */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600 p-[2px] shadow-lg">
-                <div className="w-full h-full bg-[#0d041c] rounded-[14px] flex items-center justify-center">
-                  <Crown className="w-6 h-6 text-amber-400" />
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600 p-[2px] shadow-lg shrink-0">
+                <div className="w-full h-full bg-[#0d041c] rounded-[14px] flex items-center justify-center p-1">
+                  <img
+                    src="/rang-tarang-logo.png"
+                    alt="Rang Tarang Garba"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
               </div>
               <div>
                 <span className="text-xl font-black text-white font-serif-royal">
-                  UTSAV <span className="gold-foil-text font-sans-modern font-black">RAAS</span>
+                  RANG TARANG <span className="gold-foil-text font-sans-modern font-black">GARBA</span>
                 </span>
                 <p className="text-[10px] text-amber-300/80 font-bold uppercase tracking-widest">
                   Season 6 • Navratri 2026
@@ -116,16 +120,16 @@ export default function Footer({ onOpenAdmin, onOpenRegister, onOpenLookup }) {
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                 <span className="text-slate-300 font-normal">
-                  Royal Palace Lawns, SG Highway & Ring Road, Ahmedabad, Gujarat
+                  Raj Vilas Garden, Main Highway Road, Chomu, Rajasthan
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="text-slate-200 font-mono">+91 98765 43210 / +91 79 4000 8900</span>
+                <a href="tel:+918690979046" className="text-slate-200 font-mono hover:text-amber-400 transition-colors">+91 8690979046</a>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-purple-400 shrink-0" />
-                <span>concierge@utsavraas.com</span>
+                <a href="mailto:rangtaranggarbaofficial@gmail.com" className="hover:text-amber-400 transition-colors">rangtaranggarbaofficial@gmail.com</a>
               </div>
             </div>
           </div>
@@ -134,7 +138,7 @@ export default function Footer({ onOpenAdmin, onOpenRegister, onOpenLookup }) {
         {/* Bottom copyright & accreditation */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div>
-            © 2026 UTSAV RAAS Cultural Foundation & Regal Events. All Rights Reserved. Powered by Firebase Realtime.
+            © 2026 RANG TARANG GARBA Cultural Foundation & Regal Events. All Rights Reserved. Powered by Firebase Realtime.
           </div>
           <div className="flex items-center gap-2 text-slate-400">
             <span className="flex items-center gap-1">
@@ -142,7 +146,7 @@ export default function Footer({ onOpenAdmin, onOpenRegister, onOpenLookup }) {
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
-              <Award className="w-3.5 h-3.5 text-amber-400" /> Gujarat Heritage Grade A
+              <Award className="w-3.5 h-3.5 text-amber-400" /> Rajasthan Heritage Grade A
             </span>
           </div>
         </div>

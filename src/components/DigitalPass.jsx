@@ -17,7 +17,7 @@ export default function DigitalPass({ passData, onClose }) {
         type: passData.passType,
         qty: passData.quantity,
         status: passData.status,
-        v: "utsav-raas-2026-auth"
+        v: "rang-tarang-garba-2026-auth"
       });
 
       QRCode.toDataURL(payload, {
@@ -45,7 +45,7 @@ export default function DigitalPass({ passData, onClose }) {
       const image = canvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.href = image;
-      link.download = `UtsavRaas_Pass_${passData.passId || "2026"}.png`;
+      link.download = `RangTarangGarba_Pass_${passData.passId || "2026"}.png`;
       link.click();
     } catch (err) {
       console.error("Pass download error:", err);
@@ -60,7 +60,7 @@ export default function DigitalPass({ passData, onClose }) {
   };
 
   const handleShare = () => {
-    const text = `Hey! I have booked my VIP pass for UTSAV RAAS 2026 (The Royal Heritage Dandiya & Garba Festival). Pass ID: ${passData.passId}. See you at the arena!`;
+    const text = `Hey! I have booked my VIP pass for RANG TARANG GARBA 2026 (The Grand Heritage Dandiya & Garba Mahotsav). Pass ID: ${passData.passId}. See you at the arena!`;
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
   };
@@ -77,7 +77,7 @@ export default function DigitalPass({ passData, onClose }) {
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white font-serif-royal">Pass Issued Successfully!</h2>
           <p className="text-[11px] sm:text-xs text-amber-300 font-medium mt-0.5">
-            Your Official UTSAV RAAS 2026 E-Pass is ready
+            Your Official RANG TARANG GARBA 2026 E-Pass is ready
           </p>
         </div>
 
@@ -96,17 +96,24 @@ export default function DigitalPass({ passData, onClose }) {
 
           {/* Header */}
           <div className="flex items-start justify-between border-b border-amber-500/30 pb-3 mb-4">
-            <div>
-              <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold text-amber-400 uppercase tracking-widest font-serif-royal">
-                <Crown className="w-3 h-3 text-amber-400" />
-                Royal Heritage • Season 6
+            <div className="flex items-center gap-3">
+              <img
+                src="/rang-tarang-logo.png"
+                alt="Rang Tarang Garba"
+                className="w-11 h-11 object-contain bg-black/40 rounded-xl p-1 border border-amber-400/30 shrink-0"
+              />
+              <div>
+                <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold text-amber-400 uppercase tracking-widest font-serif-royal">
+                  <Crown className="w-3 h-3 text-amber-400" />
+                  Grand Heritage • Season 6
+                </div>
+                <h3 className="text-lg sm:text-xl font-black tracking-wider text-white font-serif-royal leading-tight">
+                  RANG TARANG <span className="gold-foil-text font-sans-modern font-black">GARBA</span>
+                </h3>
+                <p className="text-[9px] sm:text-[10px] text-slate-400 tracking-wider uppercase">
+                  Official Access Badge 2026
+                </p>
               </div>
-              <h3 className="text-xl sm:text-2xl font-black tracking-wider text-white font-serif-royal leading-tight">
-                UTSAV <span className="gold-foil-text font-sans-modern font-black">RAAS</span>
-              </h3>
-              <p className="text-[9px] sm:text-[10px] text-slate-400 tracking-wider uppercase">
-                Official Access Badge
-              </p>
             </div>
 
             <div className="text-right shrink-0">
@@ -171,11 +178,11 @@ export default function DigitalPass({ passData, onClose }) {
               <div className="pt-2 border-t border-white/10 space-y-1 text-[10px] sm:text-[11px] text-slate-300">
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>Oct 18 - 20, 2026 (07:00 PM Onwards)</span>
+                  <span>Oct 17 - 19, 2026 (07:00 PM Onwards)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                  <span>Royal Palace Lawns, Ahmedabad</span>
+                  <span>Raj Vilas Garden, Chomu, Rajasthan</span>
                 </div>
               </div>
             </div>
