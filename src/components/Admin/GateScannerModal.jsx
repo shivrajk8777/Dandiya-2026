@@ -40,6 +40,8 @@ const playTone = (type) => {
   }
 };
 
+import MobileCameraScanner from "./MobileCameraScanner";
+
 export default function GateScannerModal({ isOpen, onClose, onCheckInDone }) {
   const [inputCode, setInputCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,12 +50,10 @@ export default function GateScannerModal({ isOpen, onClose, onCheckInDone }) {
 
   if (!isOpen) return null;
 
-  const handleCheckIn = async (e) => {
-    if (e) e.preventDefault();
-    const clean = inputCode.trim();
+  const handleScanCode = async (rawCode) => {
+    const clean = rawCode.trim();
     if (!clean) return;
 
-    // Extract passId if full QR json string was pasted
     let passId = clean;
     if (clean.startsWith("{") && clean.includes("id")) {
       try {
@@ -118,6 +118,11 @@ export default function GateScannerModal({ isOpen, onClose, onCheckInDone }) {
     }
   };
 
+  const handleCheckIn = async (e) => {
+    if (e) e.preventDefault();
+    await handleScanCode(inputCode);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
       <div className="relative max-w-xl w-full bg-[#120524] border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl my-8">
@@ -137,9 +142,17 @@ export default function GateScannerModal({ isOpen, onClose, onCheckInDone }) {
           </div>
           <h2 className="text-2xl font-black text-white">Attendee Check-In Scanner</h2>
           <p className="text-xs sm:text-sm text-slate-300">
-            Scan QR code or type Pass ID / Phone Number to mark gate attendance.
+            Scan QR code with phone camera, photo upload or type Pass ID / Phone.
           </p>
         </div>
+
+        {/* Live Mobile Camera Scanner */}
+        <MobileCameraScanner
+          onScanResult={(scannedCode) => {
+            setInputCode(scannedCode);
+            handleScanCode(scannedCode);
+          }}
+        />
 
         {/* Input Form */}
         <form onSubmit={handleCheckIn} className="space-y-4 mb-6">

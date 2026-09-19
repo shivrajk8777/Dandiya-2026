@@ -38,6 +38,7 @@ import FirebaseConfigModal from "./FirebaseConfigModal";
 import GateScannerModal from "./GateScannerModal";
 import SponsorManagerModal from "./SponsorManagerModal";
 import GateStaffManagerModal, { getGateStaffUsers } from "./GateStaffManagerModal";
+import MobileCameraScanner from "./MobileCameraScanner";
 
 // Audio sound feedback helper using Web Audio API
 const playTone = (type) => {
@@ -426,6 +427,38 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                 </span>
               </div>
             </div>
+
+            {/* Live Mobile Camera Scanner for Gate Staff */}
+            <MobileCameraScanner
+              onScanResult={(scannedCode) => {
+                setInputPassCode(scannedCode);
+                let passId = scannedCode;
+                if (scannedCode.startsWith("{") && scannedCode.includes("id")) {
+                  try {
+                    const parsed = JSON.parse(scannedCode);
+                    if (parsed.id) passId = parsed.id;
+                  } catch {}
+                }
+                setGateScanLoading(true);
+                setGateScanResult(null);
+                checkInAttendee(passId, activeStaffUser).then((res) => {
+                  if (res.success) {
+                    playTone("success");
+                    setGateScanResult({ type: "success", title: "ENTRY APPROVED ✅", message: res.message, data: res.data });
+                    setRecentGateScans((prev) => [{ id: passId, name: res.data?.fullName || "Guest", time: new Date().toLocaleTimeString(), status: "Approved", type: res.data?.passType, gate: activeStaffUser?.gate || "Gate 1" }, ...prev.slice(0, 9)]);
+                  } else if (res.alreadyCheckedIn) {
+                    playTone("warning");
+                    setGateScanResult({ type: "warning", title: "ALREADY CHECKED IN ⚠️", message: res.message, data: res.data });
+                  } else {
+                    playTone("error");
+                    setGateScanResult({ type: "error", title: "INVALID PASS ❌", message: res.message || "Pass not found in system.", data: null });
+                  }
+                }).finally(() => {
+                  setGateScanLoading(false);
+                  setInputPassCode("");
+                });
+              }}
+            />
 
             {/* Main Pass Scanner Input */}
             <form onSubmit={handleGateStaffCheckIn} className="space-y-3 mb-6">
