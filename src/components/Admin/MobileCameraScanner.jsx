@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Camera, Image, X, RefreshCw, Sparkles, CheckCircle2 } from "lucide-react";
+import { Camera, Image, X, RefreshCw, Sparkles, CheckCircle2, Zap } from "lucide-react";
 import { Html5Qrcode } from "html5-qrcode";
 
 export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
@@ -9,6 +9,7 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
   const [scanningStatus, setScanningStatus] = useState("Initializing...");
   const scannerRef = useRef(null);
   const fileInputRef = useRef(null);
+  const isProcessingRef = useRef(false);
   const elementId = "html5-mobile-qr-reader";
 
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
     if (cameraActive) {
       setCameraError("");
       setScanningStatus("Starting rear camera...");
+      isProcessingRef.current = false;
 
       try {
         html5Qrcode = new Html5Qrcode(elementId);
@@ -26,30 +28,35 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
           .start(
             { facingMode: "environment" },
             {
-              fps: 12,
-              qrbox: { width: 240, height: 240 }
+              fps: 25, // Ultra-fast 25 FPS frame parsing
+              qrbox: (w, h) => {
+                const min = Math.min(w, h);
+                const size = Math.max(180, Math.floor(min * 0.75));
+                return { width: size, height: size };
+              },
+              aspectRatio: 1.0
             },
             (decodedText) => {
-              // Successfully scanned QR!
-              if (html5Qrcode.isScanning) {
-                html5Qrcode.stop().then(() => {
-                  setCameraActive(false);
-                  onScanResult(decodedText);
-                }).catch(() => {
-                  setCameraActive(false);
-                  onScanResult(decodedText);
-                });
-              } else {
-                setCameraActive(false);
-                onScanResult(decodedText);
-              }
+              if (isProcessingRef.current) return;
+              isProcessingRef.current = true;
+
+              // Fire callback IMMEDIATELY without waiting for camera stop delay
+              onScanResult(decodedText);
+              setCameraActive(false);
+
+              // Stop camera asynchronously in background
+              try {
+                if (html5Qrcode && html5Qrcode.isScanning) {
+                  html5Qrcode.stop().catch(() => {});
+                }
+              } catch (e) {}
             },
             () => {
-              // Frame parse ignore
+              // Ignore unparsed frames
             }
           )
           .then(() => {
-            setScanningStatus("Point camera at visitor's ticket QR code");
+            setScanningStatus("⚡ Ready! Point camera at ticket QR code");
           })
           .catch((err) => {
             console.error("Camera start failed:", err);
@@ -121,10 +128,10 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
             <button
               type="button"
               onClick={() => setCameraActive(true)}
-              className="flex-1 py-3 px-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 active:scale-95 transition-all"
+              className="flex-1 py-3.5 px-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 active:scale-95 transition-all"
             >
-              <Camera className="w-5 h-5 text-black animate-pulse" />
-              Open Mobile Camera Scanner
+              <Zap className="w-5 h-5 text-black fill-black animate-bounce" />
+              Open Instant Camera Scanner ⚡
             </button>
 
             {/* Photo Upload / Camera Capture Button */}
@@ -134,7 +141,7 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
               className="py-3 px-4 rounded-xl font-bold text-xs text-amber-300 hover:text-white bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 flex items-center justify-center gap-2 active:scale-95 transition-all"
             >
               <Image className="w-4 h-4" />
-              Take Photo / Upload QR
+              Upload QR / Photo
             </button>
 
             <input
@@ -147,8 +154,9 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
             />
           </div>
 
-          <p className="text-[11px] text-slate-400">
-            Supports iOS & Android phone rear camera scanning
+          <p className="text-[11px] text-emerald-400 font-semibold flex items-center justify-center gap-1">
+            <Zap className="w-3 h-3 text-amber-400 fill-amber-400 inline" />
+            Fast Scan Enabled (iOS & Android Compatible)
           </p>
         </div>
       ) : (

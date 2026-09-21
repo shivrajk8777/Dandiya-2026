@@ -220,19 +220,94 @@ export const updateStatus = async (id, newStatus) => {
   return { success: true };
 };
 
-// Check-In Attendee at Gate by Pass ID or record ID (tracks Staff User)
+// Check-In Attendee at Gate by Pass ID or record ID (Ultra-fast instant verification)
 export const checkInAttendee = async (identifier, staffInfo = null) => {
-  const { db, isConnected } = getFirebaseInstance();
-  const cleanId = identifier.trim().toUpperCase();
+  if (!identifier) {
+    return { success: false, notFound: true, message: "Empty Pass ID or QR Code payload" };
+  }
+
+  // Sanitize & extract pass ID from JSON or URL if raw scan string
+  let cleanId = identifier.trim();
+  if (cleanId.startsWith("{") && cleanId.includes("id")) {
+    try {
+      const parsed = JSON.parse(cleanId);
+      if (parsed.id) cleanId = parsed.id;
+    } catch (e) {}
+  }
+  cleanId = cleanId.toUpperCase();
 
   const checkedByStaff = staffInfo ? `${staffInfo.name}` : "Super Admin";
   const checkedByStaffId = staffInfo ? (staffInfo.username || staffInfo.id) : "admin";
   const checkedByGate = staffInfo ? (staffInfo.gate || "Main Gate") : "Admin Portal";
+  const now = new Date().toISOString();
 
-  // Try Firebase first
+  // ⚡ 1. INSTANT LOCAL CHECK: Zero delay lookup
+  const list = getLocalRegistrations();
+  const targetIndex = list.findIndex(
+    (item) =>
+      (item.passId && item.passId.toUpperCase() === cleanId) ||
+      (item.id && item.id.toUpperCase() === cleanId) ||
+      item.phone === identifier
+  );
+
+  let localMatch = null;
+  if (targetIndex !== -1) {
+    localMatch = list[targetIndex];
+    if (localMatch.checkedIn) {
+      return {
+        success: false,
+        alreadyCheckedIn: true,
+        data: localMatch,
+        message: `Already Checked-In at ${new Date(localMatch.checkInTime).toLocaleTimeString()} by ${localMatch.checkedByStaff || "Gate Staff"}`
+      };
+    }
+
+    // Instant local mark checked in
+    const updatedItem = {
+      ...localMatch,
+      checkedIn: true,
+      checkInTime: now,
+      checkedByStaff,
+      checkedByStaffId,
+      checkedByGate
+    };
+    list[targetIndex] = updatedItem;
+    saveLocalRegistrations(list);
+
+    // Sync to Firebase in background (Non-blocking)
+    const { db, isConnected } = getFirebaseInstance();
+    if (isConnected && db) {
+      (async () => {
+        try {
+          const q = query(collection(db, COLLECTION_NAME), where("passId", "==", cleanId));
+          const snapshot = await getDocs(q);
+          if (!snapshot.empty) {
+            await updateDoc(doc(db, COLLECTION_NAME, snapshot.docs[0].id), {
+              checkedIn: true,
+              checkInTime: now,
+              checkedByStaff,
+              checkedByStaffId,
+              checkedByGate
+            });
+          }
+        } catch (e) {
+          console.warn("Background Firebase check-in sync failed:", e);
+        }
+      })();
+    }
+
+    return {
+      success: true,
+      alreadyCheckedIn: false,
+      data: updatedItem,
+      message: `Check-in Successful by ${checkedByStaff} (${checkedByGate})!`
+    };
+  }
+
+  // ⚡ 2. FIREBASE CHECK (if not found in local cache)
+  const { db, isConnected } = getFirebaseInstance();
   if (isConnected && db) {
     try {
-      // Find matching passId
       const q = query(collection(db, COLLECTION_NAME), where("passId", "==", cleanId));
       const snapshot = await getDocs(q);
 
@@ -248,7 +323,6 @@ export const checkInAttendee = async (identifier, staffInfo = null) => {
           };
         }
 
-        const now = new Date().toISOString();
         const updatePayload = {
           checkedIn: true,
           checkInTime: now,
@@ -257,56 +331,25 @@ export const checkInAttendee = async (identifier, staffInfo = null) => {
           checkedByGate
         };
         await updateDoc(doc(db, COLLECTION_NAME, targetDoc.id), updatePayload);
+
+        const fullRecord = { id: targetDoc.id, ...data, ...updatePayload };
+        // Save to local list for future instant checks
+        const updatedList = [fullRecord, ...list.filter((x) => x.id !== targetDoc.id)];
+        saveLocalRegistrations(updatedList);
+
         return {
           success: true,
           alreadyCheckedIn: false,
-          data: { id: targetDoc.id, ...data, ...updatePayload },
+          data: fullRecord,
           message: `Check-in Successful by ${checkedByStaff} (${checkedByGate})!`
         };
       }
     } catch (e) {
-      console.warn("Firebase check-in failed, checking local:", e);
+      console.warn("Firebase check-in lookup failed:", e);
     }
   }
 
-  // Local fallback check
-  const list = getLocalRegistrations();
-  const targetIndex = list.findIndex(
-    (item) => item.passId.toUpperCase() === cleanId || item.id === identifier || item.phone === identifier
-  );
-
-  if (targetIndex === -1) {
-    return { success: false, notFound: true, message: "No registration found with this Pass ID / Phone" };
-  }
-
-  const item = list[targetIndex];
-  if (item.checkedIn) {
-    return {
-      success: false,
-      alreadyCheckedIn: true,
-      data: item,
-      message: `Already Checked-In at ${new Date(item.checkInTime).toLocaleTimeString()} by ${item.checkedByStaff || "Gate Staff"}`
-    };
-  }
-
-  const updatedItem = {
-    ...item,
-    checkedIn: true,
-    checkInTime: new Date().toISOString(),
-    checkedByStaff,
-    checkedByStaffId,
-    checkedByGate
-  };
-
-  list[targetIndex] = updatedItem;
-  saveLocalRegistrations(list);
-
-  return {
-    success: true,
-    alreadyCheckedIn: false,
-    data: updatedItem,
-    message: `Check-in Successful by ${checkedByStaff} (${checkedByGate})!`
-  };
+  return { success: false, notFound: true, message: "No registration found with this Pass ID / QR code." };
 };
 
 // Lookup pass by phone or Pass ID
