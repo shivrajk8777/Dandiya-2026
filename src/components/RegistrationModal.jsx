@@ -1,15 +1,16 @@
-"use client";
 import React, { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
 import QRCode from "qrcode";
-import { X, Sparkles, User, Phone, Mail, MapPin, CreditCard, CheckCircle2, ArrowRight, ShieldCheck, Ticket } from "lucide-react";
+import { X, Sparkles, User, Phone, Mail, MapPin, CreditCard, CheckCircle2, ArrowRight, ShieldCheck, Ticket, Users, Tag, Clock } from "lucide-react";
 import { registerAttendee } from "@/lib/registrationService";
 import { PASS_OPTIONS } from "./PassTiers";
+import { subscribeToDiscountConfig, calculateTicketPrice } from "@/lib/discountService";
 
 export default function RegistrationModal({ initialPass, isOpen, onClose, onSuccess }) {
   const [selectedPass, setSelectedPass] = useState(
     initialPass || PASS_OPTIONS[0]
   );
+  const [discountConfig, setDiscountConfig] = useState(null);
   const [step, setStep] = useState(1); // 1: Attendee details, 2: Payment
   const [formData, setFormData] = useState({
     fullName: "",
@@ -23,6 +24,15 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   const [upiQrUrl, setUpiQrUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = subscribeToDiscountConfig((cfg) => {
+      setDiscountConfig(cfg);
+    });
+    return () => {
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -44,7 +54,11 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     }
   }, [isOpen, initialPass]);
 
-  const totalAmount = selectedPass.price * formData.quantity;
+  const pricing = calculateTicketPrice(discountConfig);
+  const unitPrice = pricing.finalPrice;
+  const totalAmount = unitPrice * formData.quantity;
+  const originalTotal = pricing.basePrice * formData.quantity;
+  const totalSavings = originalTotal - totalAmount;
 
   // Generate real UPI payment string and QR Code
   useEffect(() => {
@@ -152,7 +166,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         city: formData.city.trim(),
         passType: selectedPass.name,
         quantity: Number(formData.quantity),
-        unitPrice: selectedPass.price,
+        unitPrice: unitPrice,
         totalAmount: totalAmount,
         paymentMethod: formData.paymentMethod,
         transactionRef: cleanRef,
@@ -217,30 +231,39 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         {/* STEP 1: Attendee Info & Pass selection */}
         {step === 1 && (
           <form onSubmit={handleNextStep} className="space-y-3.5 sm:space-y-4">
-            {/* Pass Category Selector */}
+            {/* Pass Category Display */}
             <div>
               <label className="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase tracking-wider">
-                Select Pass Category
+                Event Ticket Pass (Couple Entry Only)
               </label>
-              <div className="grid grid-cols-2 gap-2">
-                {PASS_OPTIONS.map((opt) => (
-                  <button
-                    type="button"
-                    key={opt.id}
-                    onClick={() => setSelectedPass(opt)}
-                    className={`p-2.5 sm:p-3 rounded-xl text-left border transition-all ${selectedPass.id === opt.id
-                        ? "bg-gradient-to-r from-amber-500/20 to-rose-500/20 border-amber-400 text-white shadow-md shadow-amber-500/10"
-                        : "bg-white/5 border-white/10 text-slate-300 hover:border-white/20"
-                      }`}
-                  >
-                    <div className="text-[11px] sm:text-xs font-bold text-white truncate font-serif-royal">
-                      {opt.name}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#2a0e4a] via-[#1c0830] to-[#120522] border-2 border-amber-400 text-white flex items-center justify-between shadow-lg shadow-amber-500/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs sm:text-sm font-extrabold text-white font-serif-royal flex items-center gap-2">
+                      <span>{selectedPass.name}</span>
+                      {pricing.isDiscounted && pricing.discountBadge && (
+                        <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded-full">
+                          {pricing.discountBadge}
+                        </span>
+                      )}
                     </div>
-                    <div className="text-sm font-black text-amber-400 mt-0.5">
-                      ₹{opt.price}
+                    <div className="text-[10px] text-amber-300/90 font-medium">
+                      {selectedPass.tier || "Couple Exclusive Entry (2 Persons)"}
                     </div>
-                  </button>
-                ))}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-base sm:text-lg font-black text-amber-400 font-sans flex items-baseline justify-end gap-1.5">
+                    <span>₹{unitPrice}</span>
+                    {pricing.isDiscounted && (
+                      <span className="text-xs text-slate-400 line-through">₹{pricing.basePrice}</span>
+                    )}
+                  </div>
+                  <div className="text-[9px] text-slate-400">All taxes incl.</div>
+                </div>
               </div>
             </div>
 
@@ -248,7 +271,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
             <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
               <div>
                 <label className="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                  Quantity
+                  Quantity (Couple Passes)
                 </label>
                 <select
                   name="quantity"
@@ -258,7 +281,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                 >
                   {[1, 2, 3, 4, 5, 8, 10].map((num) => (
                     <option key={num} value={num}>
-                      {num} {num === 1 ? "Pass" : "Passes"}
+                      {num} {num === 1 ? "Couple Pass (2 Pax)" : `Couple Passes (${num * 2} Pax)`}
                     </option>
                   ))}
                 </select>
@@ -270,10 +293,23 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                 </label>
                 <div className="w-full bg-[#1b0a38] border border-amber-500/40 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-black text-amber-400 flex items-center justify-between">
                   <span>₹{totalAmount}</span>
-                  <span className="text-[9px] text-slate-400 font-normal">All taxes incl.</span>
+                  {totalSavings > 0 && (
+                    <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      Save ₹{totalSavings}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
+
+            {/* Price Savings Badge if Discounted */}
+            {totalSavings > 0 && (
+              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-300 font-semibold flex items-center justify-between">
+                <span>Original Price: <line className="line-through text-slate-400">₹{originalTotal}</line></span>
+                <span className="font-bold">Early Bird Discount: -₹{totalSavings}</span>
+                <span className="text-amber-400 font-extrabold">Final: ₹{totalAmount}</span>
+              </div>
+            )}
 
             {/* Full Name */}
             <div>

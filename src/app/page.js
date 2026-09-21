@@ -15,11 +15,12 @@ import RegistrationModal from "@/components/RegistrationModal";
 import DigitalPass from "@/components/DigitalPass";
 import PassLookupModal from "@/components/PassLookupModal";
 import AdminDashboard from "@/components/Admin/AdminDashboard";
+import BackgroundMusicPlayer from "@/components/BackgroundMusicPlayer";
 
 export default function Home() {
   // Modal states
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [selectedPassTier, setSelectedPassTier] = useState(PASS_OPTIONS[1]); // Default to Gold Couple
+  const [selectedPassTier, setSelectedPassTier] = useState(PASS_OPTIONS[0]); // Default to Royal VIP Pass (₹1599)
   const [activePassData, setActivePassData] = useState(null); // For DigitalPass view
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
@@ -121,6 +122,8 @@ export default function Home() {
           setActivePassData(pass);
         }}
       />
+      {/* 5. Background Festive Music Player */}
+      <BackgroundMusicPlayer />
     </main>
   );
 }

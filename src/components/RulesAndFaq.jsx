@@ -12,7 +12,7 @@ export default function RulesAndFaq() {
     },
     {
       q: "Will Dandiya sticks be provided at the venue?",
-      a: "Yes! Every single pass tier (Single, Couple, VIP, Group) includes a complimentary pair of decorated Dandiya sticks provided at the entry reception."
+      a: "Yes! Every Royal VIP Couple Pass includes 2 pairs of complimentary decorated wooden Dandiya sticks provided at the entry reception."
     },
     {
       q: "What is the dress code for the event?",
@@ -20,7 +20,7 @@ export default function RulesAndFaq() {
     },
     {
       q: "Are kids allowed and do they require separate tickets?",
-      a: "Children below 5 years of age get free entry with their parents. Children aged 5 and above will require a Single Entry pass."
+      a: "Children below 5 years of age get free entry with their parents. Entry to the venue is strictly for Couples."
     },
     {
       q: "Can I retrieve my pass if I lose the download link?",

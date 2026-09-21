@@ -25,7 +25,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  ShieldCheck
+  ShieldCheck,
+  Tag
 } from "lucide-react";
 import {
   subscribeToRegistrations,
@@ -39,6 +40,7 @@ import GateScannerModal from "./GateScannerModal";
 import SponsorManagerModal from "./SponsorManagerModal";
 import GateStaffManagerModal, { getGateStaffUsers } from "./GateStaffManagerModal";
 import MobileCameraScanner from "./MobileCameraScanner";
+import DiscountManagerModal from "./DiscountManagerModal";
 
 // Audio sound feedback helper using Web Audio API
 const playTone = (type) => {
@@ -98,6 +100,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
   const [showScannerModal, setShowScannerModal] = useState(false);
   const [showSponsorModal, setShowSponsorModal] = useState(false);
   const [showGateStaffModal, setShowGateStaffModal] = useState(false);
+  const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
   // Gate staff scanner state
@@ -608,6 +611,14 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                 </button>
 
                 <button
+                  onClick={() => setShowDiscountModal(true)}
+                  className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5"
+                >
+                  <Tag className="w-3.5 h-3.5" />
+                  Discounts & Coupons
+                </button>
+
+                <button
                   onClick={() => setShowSponsorModal(true)}
                   className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 flex items-center gap-1.5"
                 >
@@ -719,10 +730,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                   className="bg-[#0b0314] border border-white/10 rounded-xl px-2 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
                 >
                   <option value="ALL">All Categories</option>
-                  <option value="Silver">Silver General</option>
-                  <option value="Gold">Gold Couple</option>
-                  <option value="Platinum">Platinum VIP</option>
-                  <option value="Diamond">Diamond Emperor</option>
+                  <option value="Royal VIP">Royal VIP Pass</option>
                 </select>
 
                 <select
@@ -909,6 +917,11 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
       <GateStaffManagerModal
         isOpen={showGateStaffModal}
         onClose={() => setShowGateStaffModal(false)}
+      />
+
+      <DiscountManagerModal
+        isOpen={showDiscountModal}
+        onClose={() => setShowDiscountModal(false)}
       />
     </div>
   );
