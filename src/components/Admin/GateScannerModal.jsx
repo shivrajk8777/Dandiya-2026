@@ -229,6 +229,17 @@ export default function GateScannerModal({ isOpen, onClose, onCheckInDone }) {
                 </div>
               </div>
             )}
+
+            {/* OK Action Button */}
+            <div className="mt-4 pt-3 border-t border-white/20 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setScanResult(null)}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-black font-black text-xs uppercase tracking-wider shadow-lg hover:opacity-95 active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                OK - Continue Next Scan ➔
+              </button>
+            </div>
           </div>
         )}
 
