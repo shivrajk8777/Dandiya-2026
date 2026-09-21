@@ -5,19 +5,20 @@ import { Volume2, VolumeX, Music, Sparkles, Play, Pause, SkipForward, SkipBack, 
 // Trending Garba & Dandiya Playlist tracks with high quality MP3 streams
 const TRENDING_GARBA_PLAYLIST = [
   {
-    id: 2,
-    title: "Chogada Tara - Top Trending Garba",
-    artist: "Loveratri Special Garba",
-    src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=indian-percussion-festive-113271.mp3",
-    tag: "🔥 #1 Trending"
-  },
-  {
     id: 1,
     title: "Nagada Sang Dhol - Energy Dandiya",
     artist: "Ram-Leela Festive Mix",
     src: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=indian-instrumental-festive-19124.mp3",
     tag: "💥 High Energy"
   },
+  {
+    id: 2,
+    title: "Chogada Tara - Top Trending Garba",
+    artist: "Loveratri Special Garba",
+    src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=indian-percussion-festive-113271.mp3",
+    tag: "🔥 #1 Trending"
+  },
+
 
   {
     id: 3,
