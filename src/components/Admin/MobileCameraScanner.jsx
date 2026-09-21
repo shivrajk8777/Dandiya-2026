@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Camera, Image, X, RefreshCw, Sparkles, CheckCircle2, Zap, AlertCircle } from "lucide-react";
+import { Camera, Image, X, RefreshCw, Sparkles, CheckCircle2, Zap, AlertCircle, QrCode, Search, UserCheck } from "lucide-react";
 import { Html5Qrcode } from "html5-qrcode";
 
 export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
@@ -9,8 +9,8 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
   const [cameraError, setCameraError] = useState("");
   const [scanningStatus, setScanningStatus] = useState("Initializing...");
   const [scanFlash, setScanFlash] = useState(false);
+  const [manualCodeInput, setManualCodeInput] = useState("");
   const scannerRef = useRef(null);
-  const fileInputRef = useRef(null);
   const directCamInputRef = useRef(null);
   const isProcessingRef = useRef(false);
   const elementId = "html5-mobile-qr-reader";
@@ -20,7 +20,6 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
     setScanningStatus("Requesting camera permission...");
     isProcessingRef.current = false;
 
-    // Ensure DOM element is present before creating Html5Qrcode instance
     const targetElement = document.getElementById(elementId);
     if (!targetElement) {
       setTimeout(startCameraStream, 100);
@@ -47,7 +46,7 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
         fps: 25,
         qrbox: (w, h) => {
           const min = Math.min(w, h);
-          const size = Math.max(160, Math.floor(min * 0.75));
+          const size = Math.max(180, Math.floor(min * 0.75));
           return { width: size, height: size };
         },
         aspectRatio: 1.0
@@ -76,22 +75,19 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
         }
       };
 
-      // Try Environment (Rear) facing mode first
       try {
         await html5Qrcode.start({ facingMode: "environment" }, qrConfig, handleSuccess, () => {});
-        setScanningStatus("⚡ Camera Active! Point at visitor's QR code");
+        setScanningStatus("⚡ Camera Active! Point camera at ticket QR code");
         return;
       } catch (err1) {
         console.warn("FacingMode environment failed, checking camera list:", err1);
       }
 
-      // Fallback: Query available video devices
       const cameras = await Html5Qrcode.getCameras();
       if (cameras && cameras.length > 0) {
-        // Find back camera if available, else use first camera
         const rearCam = cameras.find((c) => c.label.toLowerCase().includes("back") || c.label.toLowerCase().includes("rear")) || cameras[0];
         await html5Qrcode.start(rearCam.id, qrConfig, handleSuccess, () => {});
-        setScanningStatus("⚡ Camera Active! Point at visitor's QR code");
+        setScanningStatus("⚡ Camera Active! Point camera at ticket QR code");
       } else {
         throw new Error("No camera devices detected on this phone.");
       }
@@ -99,9 +95,9 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
       console.error("Camera start exception:", err);
       let msg = "Could not access mobile camera. ";
       if (location.protocol !== "https:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
-        msg += "Mobile browsers block camera on unsecure HTTP links. Please use HTTPS or use the 'Take Snap / Photo' button below!";
+        msg += "Mobile browsers block camera on unsecure HTTP links. Please use HTTPS or type Pass ID / Phone below!";
       } else {
-        msg += "Please allow camera permission in your browser or use the 'Take Snap / Photo' button!";
+        msg += "Please allow camera permission in your browser or type Pass ID / Phone below!";
       }
       setCameraError(msg);
       setCameraActive(false);
@@ -148,12 +144,19 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
         })
         .catch((err) => {
           console.warn("File scan error", err);
-          setCameraError("No QR Code detected in this photo. Please take a clearer photo or try again.");
+          setCameraError("No QR Code detected in this photo. Please take a clearer photo or enter Pass ID manually.");
         });
     } catch (err) {
       console.error("File scanner error", err);
       setCameraError("Error reading image file: " + err.message);
     }
+  };
+
+  const handleManualSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (!manualCodeInput.trim()) return;
+    onScanResult(manualCodeInput.trim());
+    setManualCodeInput("");
   };
 
   const stopCamera = () => {
@@ -167,13 +170,13 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
   };
 
   return (
-    <div className="w-full bg-[#170733] border-2 border-amber-500/40 rounded-2xl p-3 sm:p-4 mb-4 text-center space-y-3">
+    <div className="w-full bg-[#170733] border-2 border-amber-500/40 rounded-2xl p-3 sm:p-5 mb-4 text-center space-y-4">
       <div id="html5-file-qr-temp" className="hidden" />
 
-      {/* Control Action Buttons */}
-      <div className="space-y-2.5">
+      {/* Primary Camera & Snap Controls */}
+      <div className="space-y-3">
         <div className="flex flex-col sm:flex-row gap-2">
-          {/* Live Camera Button */}
+          {/* Main Live Camera Button */}
           {!cameraActive ? (
             <button
               type="button"
@@ -181,7 +184,7 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
               className="flex-1 py-3.5 px-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 active:scale-95 transition-all"
             >
               <Zap className="w-5 h-5 text-black fill-black animate-bounce shrink-0" />
-              Open Phone Camera Scanner ⚡
+              Open Live Camera Scanner ⚡
             </button>
           ) : (
             <button
@@ -194,17 +197,16 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
             </button>
           )}
 
-          {/* Native Phone Camera Snap / Photo Upload Button (Guaranteed Fallback) */}
+          {/* Quick Photo Upload Button */}
           <button
             type="button"
             onClick={() => directCamInputRef.current?.click()}
             className="py-3.5 px-4 rounded-xl font-bold text-xs text-amber-300 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 flex items-center justify-center gap-2 active:scale-95 transition-all"
           >
             <Camera className="w-4 h-4 text-amber-400" />
-            Take Quick Snap / Upload
+            Upload QR / Photo
           </button>
 
-          {/* Hidden File / Camera Inputs */}
           <input
             type="file"
             ref={directCamInputRef}
@@ -215,10 +217,11 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
           />
         </div>
 
+        {/* Status Bar */}
         <div className="flex items-center justify-between text-[11px] text-slate-300 px-1 pt-1 border-t border-white/10">
           <span className="text-emerald-400 font-semibold flex items-center gap-1">
             <Zap className="w-3 h-3 text-amber-400 fill-amber-400" />
-            Instant 0ms Gate Verification
+            Instant 0ms Gate Check-In Active
           </span>
 
           <button
@@ -235,7 +238,7 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
         </div>
       </div>
 
-      {/* Permanent Live Camera Container in DOM (Avoids unmounted element bug) */}
+      {/* Permanent Live Camera Container with Laser Finder */}
       <div className={`space-y-3 ${cameraActive ? "block" : "hidden"}`}>
         <div className="flex items-center justify-between text-xs text-amber-300 font-bold px-1">
           <span className="flex items-center gap-1.5">
@@ -245,6 +248,15 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
         </div>
 
         <div className="relative rounded-2xl overflow-hidden border-2 border-amber-400 bg-black min-h-[260px] flex items-center justify-center shadow-2xl">
+          {/* Corner Crosshairs */}
+          <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-amber-400 z-10" />
+          <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-amber-400 z-10" />
+          <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-amber-400 z-10" />
+          <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-amber-400 z-10" />
+
+          {/* Red Laser Scanning Beam */}
+          <div className="absolute left-6 right-6 h-0.5 bg-gradient-to-r from-transparent via-rose-500 to-transparent shadow-[0_0_15px_#f43f5e] z-10 animate-scan-laser pointer-events-none" />
+
           {scanFlash && (
             <div className="absolute inset-0 bg-emerald-500/40 backdrop-blur-sm z-20 flex items-center justify-center animate-out fade-out duration-500">
               <CheckCircle2 className="w-16 h-16 text-emerald-300 animate-bounce" />
@@ -254,11 +266,50 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
         </div>
       </div>
 
+      {/* Manual Pass ID Input (Integrated inside scanner view so it's always accessible) */}
+      <form onSubmit={handleManualSubmit} className="pt-2 border-t border-white/10 space-y-2">
+        <label className="block text-left text-[11px] font-bold text-amber-300 uppercase tracking-wider">
+          🔍 Pass ID / Phone Se Check-In Karein:
+        </label>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-amber-400 absolute left-3 top-3" />
+            <input
+              type="text"
+              placeholder="Pass ID Enter Karein (e.g. DND-RAAS-8942)"
+              value={manualCodeInput}
+              onChange={(e) => setManualCodeInput(e.target.value)}
+              className="w-full bg-[#110426] border border-amber-500/40 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={!manualCodeInput.trim()}
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold text-xs uppercase tracking-wider hover:opacity-95 disabled:opacity-40 flex items-center gap-1.5 shrink-0"
+          >
+            <UserCheck className="w-4 h-4" />
+            Verify
+          </button>
+        </div>
+
+        {/* 1-Tap Demo Test Pass Button for quick verification testing */}
+        <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1">
+          <span>Quick Demo Test Pass:</span>
+          <button
+            type="button"
+            onClick={() => onScanResult("DND-RAAS-8942")}
+            className="px-2 py-0.5 rounded bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/30 text-amber-300 font-mono font-bold"
+          >
+            DND-RAAS-8942 (Click to Test)
+          </button>
+        </div>
+      </form>
+
       {cameraError && (
         <div className="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs font-medium text-left space-y-2">
           <div className="flex items-center gap-2 font-bold text-rose-300">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-            Camera Access Notice
+            Camera Access Info
           </div>
           <p>{cameraError}</p>
           <div className="pt-1">
@@ -268,7 +319,7 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
               className="px-3 py-1.5 rounded-lg bg-amber-400 text-black font-bold text-xs hover:bg-amber-300 flex items-center gap-1.5"
             >
               <Camera className="w-3.5 h-3.5" />
-              Use Quick Snap Camera Instead
+              Use Camera Photo Upload
             </button>
           </div>
         </div>
