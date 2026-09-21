@@ -5,35 +5,22 @@ import { Volume2, VolumeX, Music, Sparkles, Play, Pause, SkipForward, SkipBack, 
 // Trending Garba & Dandiya Playlist tracks with high quality MP3 streams
 const TRENDING_GARBA_PLAYLIST = [
   {
-    id: 1,
+    id: 2,
     title: "Chogada Tara - Top Trending Garba",
     artist: "Loveratri Special Garba",
     src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=indian-percussion-festive-113271.mp3",
     tag: "🔥 #1 Trending"
   },
   {
-    id: 2,
+    id: 1,
     title: "Nagada Sang Dhol - Energy Dandiya",
     artist: "Ram-Leela Festive Mix",
     src: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=indian-instrumental-festive-19124.mp3",
     tag: "💥 High Energy"
   },
+
   {
     id: 3,
-    title: "Dholida - Navratri Special Mix",
-    artist: "Gangubai Garba Beat",
-    src: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_993df75791.mp3?filename=indian-festive-dance-122754.mp3",
-    tag: "✨ Popular"
-  },
-  {
-    id: 4,
-    title: "Kamariya - Bollywood Garba Hit",
-    artist: "Mitron Navratri Mix",
-    src: "https://cdn.pixabay.com/download/audio/2023/08/17/audio_8b284ea465.mp3?filename=indian-bollywood-dance-162837.mp3",
-    tag: "🎉 Party Hit"
-  },
-  {
-    id: 5,
     title: "Odhani & Sanedo - Non-Stop Dandiya",
     artist: "Traditional Folk Beats",
     src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8702c2e.mp3?filename=indian-fusion-festive-10254.mp3",
@@ -58,7 +45,7 @@ class GarbaDholSynthesizer {
       }
     }
     if (this.ctx && this.ctx.state === "suspended") {
-      this.ctx.resume().catch(() => {});
+      this.ctx.resume().catch(() => { });
     }
   }
 
@@ -76,7 +63,7 @@ class GarbaDholSynthesizer {
       gain.connect(this.ctx.destination);
       osc.start(time);
       osc.stop(time + 0.18);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   playTaali(time) {
@@ -93,7 +80,7 @@ class GarbaDholSynthesizer {
       gain.connect(this.ctx.destination);
       osc.start(time);
       osc.stop(time + 0.1);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   start() {
@@ -121,7 +108,7 @@ class GarbaDholSynthesizer {
     this.isPlaying = false;
     if (this.timer) clearInterval(this.timer);
     if (this.ctx && this.ctx.state !== "closed") {
-      this.ctx.suspend().catch(() => {});
+      this.ctx.suspend().catch(() => { });
     }
   }
 }
@@ -296,11 +283,10 @@ export default function BackgroundMusicPlayer() {
                   <button
                     key={track.id}
                     onClick={() => selectTrack(idx)}
-                    className={`flex items-center justify-between p-2 rounded-xl text-left transition-all ${
-                      isSelected
-                        ? "bg-gradient-to-r from-amber-500/20 to-rose-500/20 border border-amber-400/50 text-amber-300"
-                        : "hover:bg-white/10 text-slate-200"
-                    }`}
+                    className={`flex items-center justify-between p-2 rounded-xl text-left transition-all ${isSelected
+                      ? "bg-gradient-to-r from-amber-500/20 to-rose-500/20 border border-amber-400/50 text-amber-300"
+                      : "hover:bg-white/10 text-slate-200"
+                      }`}
                   >
                     <div className="flex items-center gap-2 overflow-hidden">
                       <span className="text-[10px] font-mono text-amber-400/70 w-4">{idx + 1}.</span>
@@ -391,9 +377,8 @@ export default function BackgroundMusicPlayer() {
             {/* Playlist Menu Toggle Button */}
             <button
               onClick={() => setShowPlaylistMenu(!showPlaylistMenu)}
-              className={`p-1.5 rounded-full transition-colors ml-0.5 ${
-                showPlaylistMenu ? "bg-amber-500/30 text-amber-300" : "hover:bg-white/10 text-slate-300 hover:text-white"
-              }`}
+              className={`p-1.5 rounded-full transition-colors ml-0.5 ${showPlaylistMenu ? "bg-amber-500/30 text-amber-300" : "hover:bg-white/10 text-slate-300 hover:text-white"
+                }`}
               title="View Trending Garba Playlist"
             >
               <ListMusic className="w-4 h-4" />
