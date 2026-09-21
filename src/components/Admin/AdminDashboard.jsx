@@ -111,9 +111,9 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const logged = sessionStorage.getItem("dandiya_admin_auth");
-      const role = sessionStorage.getItem("dandiya_admin_role") || "SUPER_ADMIN";
-      const staffRaw = sessionStorage.getItem("dandiya_gate_staff_active");
+      const logged = localStorage.getItem("dandiya_admin_auth") || sessionStorage.getItem("dandiya_admin_auth");
+      const role = localStorage.getItem("dandiya_admin_role") || sessionStorage.getItem("dandiya_admin_role") || "SUPER_ADMIN";
+      const staffRaw = localStorage.getItem("dandiya_gate_staff_active") || sessionStorage.getItem("dandiya_gate_staff_active");
 
       if (logged === "true") {
         setIsAuthenticated(true);
@@ -154,6 +154,8 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
     ) {
       setIsAuthenticated(true);
       setAuthRole("SUPER_ADMIN");
+      localStorage.setItem("dandiya_admin_auth", "true");
+      localStorage.setItem("dandiya_admin_role", "SUPER_ADMIN");
       sessionStorage.setItem("dandiya_admin_auth", "true");
       sessionStorage.setItem("dandiya_admin_role", "SUPER_ADMIN");
       setAuthError("");
@@ -170,6 +172,9 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
       setIsAuthenticated(true);
       setAuthRole("GATE_STAFF");
       setActiveStaffUser(matchedStaff);
+      localStorage.setItem("dandiya_admin_auth", "true");
+      localStorage.setItem("dandiya_admin_role", "GATE_STAFF");
+      localStorage.setItem("dandiya_gate_staff_active", JSON.stringify(matchedStaff));
       sessionStorage.setItem("dandiya_admin_auth", "true");
       sessionStorage.setItem("dandiya_admin_role", "GATE_STAFF");
       sessionStorage.setItem("dandiya_gate_staff_active", JSON.stringify(matchedStaff));
@@ -184,11 +189,15 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
     setIsAuthenticated(false);
     setAuthRole(null);
     setActiveStaffUser(null);
+    localStorage.removeItem("dandiya_admin_auth");
+    localStorage.removeItem("dandiya_admin_role");
+    localStorage.removeItem("dandiya_gate_staff_active");
     sessionStorage.removeItem("dandiya_admin_auth");
     sessionStorage.removeItem("dandiya_admin_role");
     sessionStorage.removeItem("dandiya_gate_staff_active");
     setUsername("");
     setPassword("");
+    if (onClose) onClose();
   };
 
   // Metrics calculation
@@ -490,63 +499,82 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
               </button>
             </form>
 
-            {/* Live Scan Result Banner */}
+            {/* Live Scan Result Alert Popup Modal */}
             {gateScanResult && (
-              <div
-                className={`p-5 rounded-2xl border-2 mb-6 transition-all ${gateScanResult.type === "success"
-                    ? "bg-emerald-950/70 border-emerald-500 text-emerald-100 shadow-xl shadow-emerald-500/20 animate-fade-in"
-                    : gateScanResult.type === "warning"
-                      ? "bg-amber-950/70 border-amber-500 text-amber-100 shadow-xl shadow-amber-500/20 animate-fade-in"
-                      : "bg-rose-950/70 border-rose-500 text-rose-100 shadow-xl shadow-rose-500/20 animate-fade-in"
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+                <div
+                  className={`max-w-md w-full p-6 sm:p-8 rounded-3xl border-4 shadow-2xl space-y-5 text-center ${
+                    gateScanResult.type === "success"
+                      ? "bg-[#0b1d12] border-emerald-500 text-emerald-100 shadow-emerald-500/30"
+                      : gateScanResult.type === "warning"
+                      ? "bg-[#231704] border-amber-500 text-amber-100 shadow-amber-500/30"
+                      : "bg-[#24080e] border-rose-500 text-rose-100 shadow-rose-500/30"
                   }`}
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  {gateScanResult.type === "success" && (
-                    <CheckCircle2 className="w-8 h-8 text-emerald-400 shrink-0 animate-bounce" />
-                  )}
-                  {gateScanResult.type === "warning" && (
-                    <AlertTriangle className="w-8 h-8 text-amber-400 shrink-0" />
-                  )}
-                  {gateScanResult.type === "error" && (
-                    <XCircle className="w-8 h-8 text-rose-400 shrink-0" />
-                  )}
-                  <div>
-                    <h3 className="text-xl font-black tracking-wide font-serif-royal">{gateScanResult.title}</h3>
-                    <p className="text-xs opacity-90">{gateScanResult.message}</p>
+                >
+                  {/* Status Header Badge */}
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    {gateScanResult.type === "success" && (
+                      <div className="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center animate-bounce">
+                        <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+                      </div>
+                    )}
+                    {gateScanResult.type === "warning" && (
+                      <div className="w-16 h-16 rounded-full bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center">
+                        <AlertTriangle className="w-10 h-10 text-amber-400" />
+                      </div>
+                    )}
+                    {gateScanResult.type === "error" && (
+                      <div className="w-16 h-16 rounded-full bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center">
+                        <XCircle className="w-10 h-10 text-rose-400" />
+                      </div>
+                    )}
+                    <h3 className="text-2xl font-black tracking-wide font-serif-royal mt-1">
+                      {gateScanResult.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm font-semibold opacity-90">{gateScanResult.message}</p>
                   </div>
-                </div>
 
-                {gateScanResult.data && (
-                  <div className="mt-3 pt-3 border-t border-white/15 grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="opacity-70">Guest Name:</span>
-                      <div className="font-bold text-white text-base font-serif-royal">{gateScanResult.data.fullName}</div>
-                    </div>
-                    <div>
-                      <span className="opacity-70">Pass Category:</span>
-                      <div className="font-bold text-amber-300 text-sm">{gateScanResult.data.passType}</div>
-                    </div>
-                    <div>
-                      <span className="opacity-70">Quantity:</span>
-                      <div className="font-bold text-white text-sm">
-                        {gateScanResult.data.quantity} {gateScanResult.data.quantity > 1 ? "Persons" : "Person"}
+                  {/* Guest Ticket Details Card */}
+                  {gateScanResult.data && (
+                    <div className="p-4 rounded-2xl bg-black/40 border border-white/10 grid grid-cols-2 gap-3 text-left text-xs">
+                      <div className="col-span-2 pb-2 border-b border-white/10">
+                        <span className="text-[10px] text-amber-300 font-bold uppercase tracking-wider block">Guest Name</span>
+                        <div className="font-black text-white text-lg font-serif-royal">{gateScanResult.data.fullName}</div>
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Pass Category</span>
+                        <div className="font-bold text-amber-300 text-xs">{gateScanResult.data.passType}</div>
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Entry Allowed</span>
+                        <div className="font-black text-emerald-400 text-sm">
+                          {gateScanResult.data.quantity} {gateScanResult.data.quantity > 1 ? "Persons Entry" : "Person Entry"}
+                        </div>
+                      </div>
+
+                      <div className="col-span-2 pt-2 border-t border-white/10 flex justify-between items-center">
+                        <div>
+                          <span className="text-[10px] text-slate-400 uppercase block">Pass Code</span>
+                          <span className="font-mono font-bold text-amber-400 text-sm">{gateScanResult.data.passId}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[10px] text-slate-400 uppercase block">Status</span>
+                          <span className="font-bold text-emerald-300 text-xs">✓ Verified</span>
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <span className="opacity-70">Pass ID:</span>
-                      <div className="font-mono font-bold text-amber-400 text-sm">{gateScanResult.data.passId}</div>
-                    </div>
-                  </div>
-                )}
+                  )}
 
-                {/* OK Action Button */}
-                <div className="mt-4 pt-3 border-t border-white/20 flex justify-end">
+                  {/* Giant OK Dismiss Button */}
                   <button
                     type="button"
+                    autoFocus
                     onClick={() => setGateScanResult(null)}
-                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-black font-black text-xs uppercase tracking-wider shadow-lg hover:opacity-95 active:scale-95 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-black font-black text-sm uppercase tracking-wider shadow-xl shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
                   >
-                    OK - Continue Next Scan ➔
+                    <span>OK - Next Scan ➔</span>
                   </button>
                 </div>
               </div>

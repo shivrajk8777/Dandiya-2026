@@ -25,6 +25,18 @@ export default function Home() {
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
+  // Auto-open Gate Staff Portal if session exists so user never gets redirected back to home
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isLogged =
+        localStorage.getItem("dandiya_admin_auth") === "true" ||
+        sessionStorage.getItem("dandiya_admin_auth") === "true";
+      if (isLogged) {
+        setIsAdminOpen(true);
+      }
+    }
+  }, []);
+
   // Handlers
   const handleOpenRegister = (tier = null) => {
     if (tier) {

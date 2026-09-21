@@ -180,64 +180,82 @@ export default function GateScannerModal({ isOpen, onClose, onCheckInDone }) {
           </div>
         </form>
 
-        {/* Live Result Banner */}
+        {/* Live Scan Result Alert Popup Modal */}
         {scanResult && (
-          <div
-            className={`p-5 rounded-2xl border-2 mb-6 transition-all ${
-              scanResult.type === "success"
-                ? "bg-emerald-950/60 border-emerald-500 text-emerald-100 shadow-xl shadow-emerald-500/10"
-                : scanResult.type === "warning"
-                ? "bg-amber-950/60 border-amber-500 text-amber-100 shadow-xl shadow-amber-500/10"
-                : "bg-rose-950/60 border-rose-500 text-rose-100 shadow-xl shadow-rose-500/10"
-            }`}
-          >
-            <div className="flex items-center gap-3 mb-2">
-              {scanResult.type === "success" && (
-                <CheckCircle2 className="w-7 h-7 text-emerald-400 shrink-0" />
-              )}
-              {scanResult.type === "warning" && (
-                <AlertTriangle className="w-7 h-7 text-amber-400 shrink-0" />
-              )}
-              {scanResult.type === "error" && (
-                <XCircle className="w-7 h-7 text-rose-400 shrink-0" />
-              )}
-              <div>
-                <h3 className="text-lg font-black tracking-wide">{scanResult.title}</h3>
-                <p className="text-xs opacity-90">{scanResult.message}</p>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+            <div
+              className={`max-w-md w-full p-6 sm:p-8 rounded-3xl border-4 shadow-2xl space-y-5 text-center ${
+                scanResult.type === "success"
+                  ? "bg-[#0b1d12] border-emerald-500 text-emerald-100 shadow-emerald-500/30"
+                  : scanResult.type === "warning"
+                  ? "bg-[#231704] border-amber-500 text-amber-100 shadow-amber-500/30"
+                  : "bg-[#24080e] border-rose-500 text-rose-100 shadow-rose-500/30"
+              }`}
+            >
+              {/* Status Header Badge */}
+              <div className="flex flex-col items-center justify-center gap-2">
+                {scanResult.type === "success" && (
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center animate-bounce">
+                    <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+                  </div>
+                )}
+                {scanResult.type === "warning" && (
+                  <div className="w-16 h-16 rounded-full bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center">
+                    <AlertTriangle className="w-10 h-10 text-amber-400" />
+                  </div>
+                )}
+                {scanResult.type === "error" && (
+                  <div className="w-16 h-16 rounded-full bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center">
+                    <XCircle className="w-10 h-10 text-rose-400" />
+                  </div>
+                )}
+                <h3 className="text-2xl font-black tracking-wide font-serif-royal mt-1">
+                  {scanResult.title}
+                </h3>
+                <p className="text-xs sm:text-sm font-semibold opacity-90">{scanResult.message}</p>
               </div>
-            </div>
 
-            {scanResult.data && (
-              <div className="mt-3 pt-3 border-t border-white/10 grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <span className="opacity-70">Guest Name:</span>
-                  <div className="font-bold text-white text-sm">{scanResult.data.fullName}</div>
-                </div>
-                <div>
-                  <span className="opacity-70">Pass Category:</span>
-                  <div className="font-bold text-amber-300">{scanResult.data.passType}</div>
-                </div>
-                <div>
-                  <span className="opacity-70">Quantity:</span>
-                  <div className="font-bold text-white">
-                    {scanResult.data.quantity} {scanResult.data.quantity > 1 ? "Pax" : "Pax"}
+              {/* Guest Ticket Details Card */}
+              {scanResult.data && (
+                <div className="p-4 rounded-2xl bg-black/40 border border-white/10 grid grid-cols-2 gap-3 text-left text-xs">
+                  <div className="col-span-2 pb-2 border-b border-white/10">
+                    <span className="text-[10px] text-amber-300 font-bold uppercase tracking-wider block">Guest Name</span>
+                    <div className="font-black text-white text-lg font-serif-royal">{scanResult.data.fullName}</div>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Pass Category</span>
+                    <div className="font-bold text-amber-300 text-xs">{scanResult.data.passType}</div>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Entry Allowed</span>
+                    <div className="font-black text-emerald-400 text-sm">
+                      {scanResult.data.quantity} {scanResult.data.quantity > 1 ? "Persons Entry" : "Person Entry"}
+                    </div>
+                  </div>
+
+                  <div className="col-span-2 pt-2 border-t border-white/10 flex justify-between items-center">
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase block">Pass Code</span>
+                      <span className="font-mono font-bold text-amber-400 text-sm">{scanResult.data.passId}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-400 uppercase block">Status</span>
+                      <span className="font-bold text-emerald-300 text-xs">✓ Verified</span>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <span className="opacity-70">Pass ID:</span>
-                  <div className="font-mono font-bold">{scanResult.data.passId}</div>
-                </div>
-              </div>
-            )}
+              )}
 
-            {/* OK Action Button */}
-            <div className="mt-4 pt-3 border-t border-white/20 flex justify-end">
+              {/* Giant OK Dismiss Button */}
               <button
                 type="button"
+                autoFocus
                 onClick={() => setScanResult(null)}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-black font-black text-xs uppercase tracking-wider shadow-lg hover:opacity-95 active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-black font-black text-sm uppercase tracking-wider shadow-xl shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
               >
-                OK - Continue Next Scan ➔
+                <span>OK - Next Scan ➔</span>
               </button>
             </div>
           </div>
