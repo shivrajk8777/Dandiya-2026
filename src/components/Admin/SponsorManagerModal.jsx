@@ -199,6 +199,46 @@ export default function SponsorManagerModal({ isOpen, onClose }) {
             </div>
           </div>
 
+          <div>
+            <label className="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
+              Sponsor Logo Image URL / Upload (Optional)
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                name="logoUrl"
+                placeholder="https://... or upload image"
+                value={formData.logoUrl}
+                onChange={handleInputChange}
+                className="flex-1 bg-[#0e031c] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
+              />
+              <label className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-semibold text-amber-300 cursor-pointer shrink-0 transition-all">
+                Upload
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (evt) => {
+                        setFormData((prev) => ({ ...prev, logoUrl: evt.target?.result || "" }));
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </label>
+            </div>
+            {formData.logoUrl && (
+              <div className="mt-2 p-2 rounded-xl bg-black/40 border border-amber-500/30 flex items-center gap-3">
+                <span className="text-[10px] text-amber-400 font-bold uppercase">Logo Preview:</span>
+                <img src={formData.logoUrl} alt="Preview" className="h-7 w-auto object-contain bg-white/10 rounded p-1" />
+              </div>
+            )}
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -231,17 +271,26 @@ export default function SponsorManagerModal({ isOpen, onClose }) {
                   key={sp.id}
                   className="p-3 rounded-2xl bg-[#0e031c] border border-white/10 flex items-center justify-between gap-3"
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-white text-xs sm:text-sm font-serif-royal">
-                        {sp.name}
-                      </span>
-                      <span className="text-[9px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase">
-                        {sp.tier}
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">
-                      {sp.tagline || "Official Partner"}
+                  <div className="flex items-center gap-3">
+                    {sp.logoUrl && (
+                      <img
+                        src={sp.logoUrl}
+                        alt={sp.name}
+                        className="h-8 w-auto max-w-[80px] object-contain rounded bg-white/5 p-1 border border-white/10"
+                      />
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-white text-xs sm:text-sm font-serif-royal">
+                          {sp.name}
+                        </span>
+                        <span className="text-[9px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase">
+                          {sp.tier}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {sp.tagline || "Official Partner"}
+                      </div>
                     </div>
                   </div>
 
