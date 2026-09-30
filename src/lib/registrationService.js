@@ -85,6 +85,11 @@ const updateFastCache = (list) => {
     if (item.passId) FAST_PASS_CACHE.set(item.passId.toUpperCase(), item);
     if (item.id) FAST_PASS_CACHE.set(item.id.toUpperCase(), item);
     if (item.phone) FAST_PASS_CACHE.set(item.phone.trim(), item);
+    if (Array.isArray(item.attendees)) {
+      item.attendees.forEach((a) => {
+        if (a.aadhaar) FAST_PASS_CACHE.set(a.aadhaar.trim(), item);
+      });
+    }
   });
 };
 
@@ -151,6 +156,7 @@ export const registerAttendee = async (formData) => {
     status: formData.paymentStatus || "Approved",
     checkedIn: false,
     checkInTime: null,
+    attendees: Array.isArray(formData.attendees) ? formData.attendees : [],
     createdAt: new Date().toISOString()
   };
 
@@ -414,9 +420,13 @@ export const lookupPass = async (queryStr) => {
   const list = getLocalRegistrations();
   return list.filter(
     (item) =>
-      item.phone.includes(clean) ||
-      item.passId.toUpperCase().includes(clean.toUpperCase()) ||
-      item.fullName.toLowerCase().includes(clean.toLowerCase())
+      item.phone?.includes(clean) ||
+      item.passId?.toUpperCase().includes(clean.toUpperCase()) ||
+      item.fullName?.toLowerCase().includes(clean.toLowerCase()) ||
+      (Array.isArray(item.attendees) &&
+        item.attendees.some(
+          (a) => a.name?.toLowerCase().includes(clean.toLowerCase()) || a.aadhaar?.includes(clean)
+        ))
   );
 };
 
@@ -442,25 +452,37 @@ export const deleteRegistration = async (id) => {
 export const exportRegistrationsToExcel = (registrations) => {
   if (!registrations || registrations.length === 0) return;
 
-  const dataToExport = registrations.map((r, index) => ({
-    "S.No": index + 1,
-    "Pass ID": r.passId,
-    "Full Name": r.fullName,
-    "Phone Number": r.phone,
-    "Email": r.email || "N/A",
-    "City": r.city || "N/A",
-    "Pass Category": r.passType,
-    "Quantity": r.quantity,
-    "Total Amount (₹)": r.totalAmount,
-    "Payment Method": r.paymentMethod,
-    "Transaction Ref": r.transactionRef,
-    "Status": r.status,
-    "Checked In": r.checkedIn ? "Yes" : "No",
-    "Check-in Time": r.checkInTime ? new Date(r.checkInTime).toLocaleString() : "-",
-    "Checked In By Staff": r.checkedByStaff || (r.checkedIn ? "Super Admin" : "-"),
-    "Gate Location": r.checkedByGate || (r.checkedIn ? "Main Gate" : "-"),
-    "Registration Date": new Date(r.createdAt).toLocaleString()
-  }));
+  const dataToExport = registrations.map((r, index) => {
+    const attendeesStr = Array.isArray(r.attendees) && r.attendees.length > 0
+      ? r.attendees.map((a, i) => `T${i + 1}: ${a.name} (${a.aadhaar})`).join("; ")
+      : r.fullName;
+
+    const aadhaarListStr = Array.isArray(r.attendees) && r.attendees.length > 0
+      ? r.attendees.map((a) => a.aadhaar).join(", ")
+      : "N/A";
+
+    return {
+      "S.No": index + 1,
+      "Pass ID": r.passId,
+      "Full Name": r.fullName,
+      "Phone Number": r.phone,
+      "Email": r.email || "N/A",
+      "City": r.city || "N/A",
+      "Pass Category": r.passType,
+      "Quantity": r.quantity,
+      "Total Amount (₹)": r.totalAmount,
+      "All Attendees & Aadhaar": attendeesStr,
+      "Aadhaar Numbers": aadhaarListStr,
+      "Payment Method": r.paymentMethod,
+      "Transaction Ref": r.transactionRef,
+      "Status": r.status,
+      "Checked In": r.checkedIn ? "Yes" : "No",
+      "Check-in Time": r.checkInTime ? new Date(r.checkInTime).toLocaleString() : "-",
+      "Checked In By Staff": r.checkedByStaff || (r.checkedIn ? "Super Admin" : "-"),
+      "Gate Location": r.checkedByGate || (r.checkedIn ? "Main Gate" : "-"),
+      "Registration Date": new Date(r.createdAt).toLocaleString()
+    };
+  });
 
   const worksheet = XLSX.utils.json_to_sheet(dataToExport);
   const workbook = XLSX.utils.book_new();

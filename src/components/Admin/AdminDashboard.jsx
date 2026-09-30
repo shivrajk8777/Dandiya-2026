@@ -538,8 +538,18 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                   {gateScanResult.data && (
                     <div className="p-4 rounded-2xl bg-black/40 border border-white/10 grid grid-cols-2 gap-3 text-left text-xs">
                       <div className="col-span-2 pb-2 border-b border-white/10">
-                        <span className="text-[10px] text-amber-300 font-bold uppercase tracking-wider block">Guest Name</span>
+                        <span className="text-[10px] text-amber-300 font-bold uppercase tracking-wider block">Primary Guest Name</span>
                         <div className="font-black text-white text-lg font-serif-royal">{gateScanResult.data.fullName}</div>
+                        {Array.isArray(gateScanResult.data.attendees) && gateScanResult.data.attendees.length > 0 && (
+                          <div className="mt-1.5 space-y-1">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">All Ticket Holders & Aadhaar:</span>
+                            {gateScanResult.data.attendees.map((a, idx) => (
+                              <div key={idx} className="text-[11px] font-mono text-amber-300">
+                                Ticket #{idx + 1}: <strong className="text-white font-sans">{a.name}</strong> (Aadhaar: {a.aadhaar})
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       <div>
@@ -817,6 +827,15 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                           <div className="font-mono text-[11px] text-amber-400 font-semibold">
                             {item.passId}
                           </div>
+                          {Array.isArray(item.attendees) && item.attendees.length > 0 && (
+                            <div className="text-[10px] text-amber-300/80 font-mono mt-0.5 space-y-0.5">
+                              {item.attendees.map((att, i) => (
+                                <div key={i}>
+                                  T{i + 1}: {att.name} ({att.aadhaar})
+                                </div>
+                              ))}
+                            </div>
+                          )}
                           <div className="text-[10px] text-slate-400">{item.city || "N/A"}</div>
                         </td>
 
@@ -831,8 +850,8 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                         {/* Tier & Qty */}
                         <td className="p-3">
                           <span className="font-semibold text-amber-300">{item.passType}</span>
-                          <div className="text-[10px] text-slate-400">
-                            {item.quantity} {item.quantity > 1 ? "Persons" : "Person"}
+                          <div className="text-[10px] text-slate-400 font-medium">
+                            {item.quantity} {item.quantity === 1 ? "Pass (2 Persons)" : `Passes (${item.quantity * 2} Persons)`}
                           </div>
                         </td>
 

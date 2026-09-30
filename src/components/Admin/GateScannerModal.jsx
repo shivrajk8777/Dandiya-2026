@@ -219,8 +219,18 @@ export default function GateScannerModal({ isOpen, onClose, onCheckInDone }) {
               {scanResult.data && (
                 <div className="p-4 rounded-2xl bg-black/40 border border-white/10 grid grid-cols-2 gap-3 text-left text-xs">
                   <div className="col-span-2 pb-2 border-b border-white/10">
-                    <span className="text-[10px] text-amber-300 font-bold uppercase tracking-wider block">Guest Name</span>
+                    <span className="text-[10px] text-amber-300 font-bold uppercase tracking-wider block">Primary Guest Name</span>
                     <div className="font-black text-white text-lg font-serif-royal">{scanResult.data.fullName}</div>
+                    {Array.isArray(scanResult.data.attendees) && scanResult.data.attendees.length > 0 && (
+                      <div className="mt-1.5 space-y-1">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">All Ticket Holders & Aadhaar:</span>
+                        {scanResult.data.attendees.map((a, idx) => (
+                          <div key={idx} className="text-[11px] font-mono text-amber-300">
+                            Ticket #{idx + 1}: <strong className="text-white font-sans">{a.name}</strong> (Aadhaar: {a.aadhaar})
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div>

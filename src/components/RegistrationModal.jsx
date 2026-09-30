@@ -18,9 +18,15 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     email: "",
     city: "Chomu",
     quantity: 1,
+    childrenCount: 0,
     transactionRef: "",
     paymentMethod: "UPI (Google Pay / PhonePe / Paytm)"
   });
+  const [attendees, setAttendees] = useState([
+    { name: "", aadhaar: "" },
+    { name: "", aadhaar: "" }
+  ]);
+  const [childrenList, setChildrenList] = useState([]);
   const [upiQrUrl, setUpiQrUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -45,14 +51,56 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         email: "",
         city: "Chomu",
         quantity: 1,
+        childrenCount: 0,
         transactionRef: "",
         paymentMethod: "UPI (Google Pay / PhonePe / Paytm)"
       });
+      setAttendees([
+        { name: "", aadhaar: "" },
+        { name: "", aadhaar: "" }
+      ]);
+      setChildrenList([]);
       if (initialPass) {
         setSelectedPass(initialPass);
       }
     }
   }, [isOpen, initialPass]);
+
+  // Keep attendees array length in sync with ticket quantity (1 Couple Pass = 2 Persons)
+  useEffect(() => {
+    const qtyPasses = Number(formData.quantity) || 1;
+    const totalPersons = qtyPasses * 2;
+    setAttendees((prev) => {
+      const next = [...prev];
+      if (next.length < totalPersons) {
+        while (next.length < totalPersons) {
+          next.push({ name: "", aadhaar: "" });
+        }
+      } else if (next.length > totalPersons) {
+        next.splice(totalPersons);
+      }
+      if (next.length > 0 && formData.fullName.trim() && (!next[0].name || next[0].name === formData.fullName)) {
+        next[0].name = formData.fullName;
+      }
+      return next;
+    });
+  }, [formData.quantity, formData.fullName]);
+
+  // Keep children list in sync with childrenCount
+  useEffect(() => {
+    const count = Number(formData.childrenCount) || 0;
+    setChildrenList((prev) => {
+      const next = [...prev];
+      if (next.length < count) {
+        while (next.length < count) {
+          next.push({ name: "", age: "6", aadhaar: "" });
+        }
+      } else if (next.length > count) {
+        next.splice(count);
+      }
+      return next;
+    });
+  }, [formData.childrenCount]);
 
   const pricing = calculateTicketPrice(discountConfig);
   const unitPrice = pricing.finalPrice;
@@ -89,6 +137,22 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleAttendeeChange = (index, field, value) => {
+    setAttendees((prev) => {
+      const updated = [...prev];
+      if (field === "aadhaar") {
+        const cleanDigits = value.replace(/\D/g, "").slice(0, 12);
+        updated[index] = { ...updated[index], aadhaar: cleanDigits };
+      } else {
+        updated[index] = { ...updated[index], [field]: value };
+        if (index === 0 && field === "name") {
+          setFormData((f) => ({ ...f, fullName: value }));
+        }
+      }
+      return updated;
+    });
+  };
+
   const validateStep1 = () => {
     const cleanName = formData.fullName.trim();
     const cleanPhone = formData.phone.trim();
@@ -96,11 +160,11 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     const cleanCity = formData.city.trim();
 
     if (!cleanName) {
-      setErrorMsg("Please enter your Full Name");
+      setErrorMsg("Please enter Primary Contact Full Name");
       return false;
     }
     if (cleanName.length < 3) {
-      setErrorMsg("Name must be at least 3 characters long");
+      setErrorMsg("Primary Name must be at least 3 characters long");
       return false;
     }
     if (!/^[a-zA-Z\s.-]+$/.test(cleanName)) {
@@ -130,6 +194,33 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     if (!selectedPass || !selectedPass.price) {
       setErrorMsg("Select Pass Category");
       return false;
+    }
+
+    // MANDATORY NAME & 12-DIGIT AADHAAR FOR ALL ATTENDEES (2 Persons per Couple Pass)
+    for (let i = 0; i < attendees.length; i++) {
+      const att = attendees[i] || {};
+      const pNum = i + 1;
+      const passIndex = Math.floor(i / 2) + 1;
+      const personLetter = i % 2 === 0 ? "Person 1" : "Person 2";
+      const attName = (att.name || "").trim();
+      const attAadhaar = (att.aadhaar || "").trim();
+
+      if (!attName) {
+        setErrorMsg(`Please enter Full Name for Person #${pNum} (Pass ${passIndex} - ${personLetter})`);
+        return false;
+      }
+      if (attName.length < 3) {
+        setErrorMsg(`Full Name for Person #${pNum} must be at least 3 characters`);
+        return false;
+      }
+      if (!attAadhaar) {
+        setErrorMsg(`Please enter 12-digit Aadhaar Card Number for Person #${pNum} (${personLetter})`);
+        return false;
+      }
+      if (!/^\d{12}$/.test(attAadhaar)) {
+        setErrorMsg(`Aadhaar Card Number for Person #${pNum} must be exactly 12 numeric digits`);
+        return false;
+      }
     }
 
     setErrorMsg("");
@@ -170,7 +261,11 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         totalAmount: totalAmount,
         paymentMethod: formData.paymentMethod,
         transactionRef: cleanRef,
-        paymentStatus: "Approved"
+        paymentStatus: "Approved",
+        attendees: attendees.map((a) => ({
+          name: a.name.trim(),
+          aadhaar: a.aadhaar.trim()
+        }))
       };
 
       const result = await registerAttendee(payload);
@@ -384,6 +479,86 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                     className="w-full bg-[#1b0a38] border border-white/15 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Mandatory Attendees & Aadhaar Card Numbers Section */}
+            <div className="space-y-3 pt-2.5 border-t border-white/10">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5 font-serif-royal">
+                  <ShieldCheck className="w-4 h-4 text-amber-400" />
+                  Pass Holder Info & Aadhaar ({attendees.length} Persons Entry - {formData.quantity} {formData.quantity === 1 ? "Couple Pass" : "Couple Passes"})
+                </label>
+                <span className="text-[9px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full border border-rose-500/30 font-bold uppercase tracking-wider">
+                  * Mandatory for Venue Entry
+                </span>
+              </div>
+
+              <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1">
+                {attendees.map((att, idx) => {
+                  const passNum = Math.floor(idx / 2) + 1;
+                  const personLabel = idx % 2 === 0 ? "Person 1" : "Person 2";
+                  return (
+                    <div
+                      key={idx}
+                      className="p-3.5 rounded-2xl bg-[#180733] border border-amber-500/30 space-y-2.5 relative shadow-md"
+                    >
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-200">
+                        <span className="flex items-center gap-1.5 text-amber-300 font-serif-royal">
+                          <Ticket className="w-3.5 h-3.5 text-amber-400" />
+                          Person #{idx + 1} (Pass #{passNum} • {personLabel})
+                        </span>
+                        <span className={`text-[10px] font-mono ${att.aadhaar.length === 12 ? "text-emerald-400 font-bold" : "text-amber-400"}`}>
+                          {att.aadhaar.length === 12 ? "✓ Aadhaar Verified" : "12 Digits Required"}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {/* Attendee Name */}
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
+                            Full Name (Person #{idx + 1}) *
+                          </label>
+                          <div className="relative">
+                            <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                            <input
+                              type="text"
+                              placeholder="e.g. Aarav Sharma"
+                              value={att.name}
+                              onChange={(e) => handleAttendeeChange(idx, "name", e.target.value)}
+                              required
+                              className="w-full bg-[#0e0320] border border-white/15 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Attendee Aadhaar */}
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider flex items-center justify-between">
+                            <span>Aadhaar Number *</span>
+                            <span className={`font-mono text-[9px] ${att.aadhaar.length === 12 ? "text-emerald-400 font-bold" : "text-slate-400"}`}>
+                              {att.aadhaar.length}/12
+                            </span>
+                          </label>
+                          <div className="relative">
+                            <ShieldCheck className={`w-3.5 h-3.5 absolute left-3 top-2.5 ${att.aadhaar.length === 12 ? "text-emerald-400" : "text-slate-400"}`} />
+                            <input
+                              type="text"
+                              placeholder="12-digit Aadhaar No."
+                              value={att.aadhaar}
+                              onChange={(e) => handleAttendeeChange(idx, "aadhaar", e.target.value)}
+                              maxLength={12}
+                              required
+                              className={`w-full bg-[#0e0320] border rounded-xl pl-9 pr-3 py-2 text-xs font-mono tracking-wider text-white placeholder-slate-500 focus:outline-none ${
+                                att.aadhaar.length === 12 ? "border-emerald-500/60 text-emerald-300" : "border-white/15 focus:border-amber-400"
+                              }`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

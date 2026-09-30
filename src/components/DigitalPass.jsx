@@ -237,11 +237,21 @@ export default function DigitalPass({ passData, onClose }) {
     // 8. Attendee Name & Details Grid
     ctx.fillStyle = "#94a3b8";
     ctx.font = "12px sans-serif";
-    ctx.fillText("PASS HOLDER NAME", 60, 150);
+    ctx.fillText("PASS HOLDER NAME & AADHAAR", 60, 150);
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 32px Georgia, serif";
-    ctx.fillText(passData.fullName || "Valued Guest", 60, 188);
+    ctx.font = "bold 28px Georgia, serif";
+    ctx.fillText(passData.fullName || "Valued Guest", 60, 182);
+
+    if (Array.isArray(passData.attendees) && passData.attendees.length > 0) {
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "bold 12px monospace";
+      const attSummary = passData.attendees
+        .map((a, i) => `T${i + 1}: ${a.name} (${a.aadhaar})`)
+        .join("  •  ");
+      const displaySummary = attSummary.length > 70 ? attSummary.slice(0, 68) + "..." : attSummary;
+      ctx.fillText(displaySummary, 60, 204);
+    }
 
     ctx.fillStyle = "#94a3b8";
     ctx.font = "12px sans-serif";
@@ -784,11 +794,20 @@ export default function DigitalPass({ passData, onClose }) {
                 <div className="sm:col-span-2 space-y-2.5 sm:space-y-3">
                   <div>
                     <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                      Pass Holder Name
+                      Pass Holder Name & Aadhaar
                     </span>
                     <div className="text-lg sm:text-xl font-black text-white capitalize font-serif-royal leading-tight">
                       {passData.fullName}
                     </div>
+                    {Array.isArray(passData.attendees) && passData.attendees.length > 0 && (
+                      <div className="mt-1 space-y-0.5">
+                        {passData.attendees.map((att, idx) => (
+                          <div key={idx} className="text-[10px] sm:text-[11px] text-amber-300 font-mono">
+                            T{idx + 1}: <strong className="text-white font-sans font-semibold">{att.name}</strong> • Aadhaar: {att.aadhaar ? att.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3") : "N/A"}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-xs">
@@ -809,10 +828,10 @@ export default function DigitalPass({ passData, onClose }) {
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
                       <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400">
-                        Quantity
+                        Quantity & Entry
                       </span>
                       <div className="font-bold text-white text-xs sm:text-sm">
-                        {passData.quantity} {passData.quantity > 1 ? "Persons" : "Person"}
+                        {passData.quantity} {passData.quantity === 1 ? "Couple Pass" : "Couple Passes"} ({passData.quantity * 2} Persons)
                       </div>
                     </div>
                     <div>
