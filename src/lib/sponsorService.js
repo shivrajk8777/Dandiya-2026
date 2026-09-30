@@ -9,8 +9,17 @@ import {
 } from "firebase/firestore";
 import { getFirebaseInstance } from "./firebase";
 
-const LOCAL_SPONSORS_KEY = "dandiya_local_sponsors";
+const LOCAL_SPONSORS_KEY = "dandiya_local_sponsors_v2";
 const COLLECTION_NAME = "dandiya_sponsors";
+
+const OLD_DEFAULT_NAMES = [
+  "GUJARAT TOURISM",
+  "RED BULL",
+  "TAJ HOTELS",
+  "TIMES OF INDIA",
+  "VOGUE INDIA",
+  "FEVER 104 FM"
+];
 
 // Helper to check if a logo URL is valid and browser ready
 export const isValidLogoUrl = (url) => {
@@ -19,6 +28,7 @@ export const isValidLogoUrl = (url) => {
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return true;
   if (trimmed.startsWith("data:image/png") || trimmed.startsWith("data:image/jpeg") || trimmed.startsWith("data:image/webp")) return true;
   if (trimmed.startsWith("data:image/svg+xml;charset=utf-8,")) return true;
+  if (trimmed.startsWith("/")) return true;
   return false;
 };
 
@@ -42,55 +52,47 @@ export const generateDynamicLogoSvg = (name = "PARTNER", tier = "Official Partne
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`;
 };
 
-// Initial seed sponsors
+// Initial seed sponsors with the new 5 official logos
 const DEFAULT_SPONSORS = [
   {
     id: "sp-1",
-    name: "GUJARAT TOURISM",
-    tier: "Title Sponsor",
-    tagline: "Official Cultural & Heritage Partner",
-    website: "https://www.gujarattourism.com",
-    logoUrl: generateDynamicLogoSvg("GUJARAT TOURISM", "Title Sponsor")
+    name: "JKM SOFTWARES",
+    tier: "Technology Partner",
+    tagline: "IT & Software Solutions",
+    website: "",
+    logoUrl: "/sponsors/jkm-softwares.png"
   },
   {
     id: "sp-2",
-    name: "RED BULL",
-    tier: "Energy Partner",
-    tagline: "Official Energy Drink & Beats",
-    website: "https://www.redbull.com",
-    logoUrl: generateDynamicLogoSvg("RED BULL", "Energy Partner")
+    name: "KAKA-KAJOD",
+    tier: "Entertainment Partner",
+    tagline: "Official Comedy & Media",
+    website: "",
+    logoUrl: "/sponsors/kaka-kajod.jpg"
   },
   {
     id: "sp-3",
-    name: "TAJ HOTELS",
-    tier: "Luxury Hospitality",
-    tagline: "VIP Suites & Gourmet Hospitality",
-    website: "https://www.tajhotels.com",
-    logoUrl: generateDynamicLogoSvg("TAJ HOTELS", "Luxury Hospitality")
+    name: "WE MAKE MEMORIES",
+    tier: "Event Partner",
+    tagline: "Creating Unforgettable Moments",
+    website: "",
+    logoUrl: "/sponsors/we-make-memories.png"
   },
   {
     id: "sp-4",
-    name: "TIMES OF INDIA",
-    tier: "Headline Media",
-    tagline: "Official Print & Digital Media",
-    website: "https://timesofindia.indiatimes.com",
-    logoUrl: generateDynamicLogoSvg("TIMES OF INDIA", "Headline Media")
+    name: "MAHAVEER",
+    tier: "Industrial Partner",
+    tagline: "Manufacturer & Exporter",
+    website: "",
+    logoUrl: "/sponsors/mahaveer.png"
   },
   {
     id: "sp-5",
-    name: "VOGUE INDIA",
-    tier: "Fashion & Style",
-    tagline: "Red Carpet & Gala Style Partner",
-    website: "https://www.vogue.in",
-    logoUrl: generateDynamicLogoSvg("VOGUE INDIA", "Fashion & Style")
-  },
-  {
-    id: "sp-6",
-    name: "FEVER 104 FM",
-    tier: "Radio Partner",
-    tagline: "Official Radio Broadcaster",
+    name: "QUEEN PERFORMING ART",
+    tier: "Cultural Partner",
+    tagline: "Dance Company",
     website: "",
-    logoUrl: generateDynamicLogoSvg("FEVER 104 FM", "Radio Partner")
+    logoUrl: "/sponsors/queen-dance-company.jpg"
   }
 ];
 
@@ -107,7 +109,13 @@ export const getLocalSponsors = () => {
       localStorage.setItem(LOCAL_SPONSORS_KEY, JSON.stringify(DEFAULT_SPONSORS));
       return DEFAULT_SPONSORS;
     }
-    const updated = parsed.map((sp) => {
+    // Purge old default sponsors if present in cache
+    const filtered = parsed.filter(sp => !OLD_DEFAULT_NAMES.includes(sp.name));
+    if (filtered.length === 0) {
+      localStorage.setItem(LOCAL_SPONSORS_KEY, JSON.stringify(DEFAULT_SPONSORS));
+      return DEFAULT_SPONSORS;
+    }
+    const updated = filtered.map((sp) => {
       if (!isValidLogoUrl(sp.logoUrl)) {
         const match = DEFAULT_SPONSORS.find(d => d.name === sp.name || d.id === sp.id);
         const logo = (match && isValidLogoUrl(match.logoUrl)) ? match.logoUrl : generateDynamicLogoSvg(sp.name, sp.tier);
@@ -135,6 +143,11 @@ export const saveLocalSponsors = (sponsors) => {
 
 // Real-time listener for sponsors
 export const subscribeToSponsors = (callback) => {
+  // Emit local sponsors immediately so UI is populated with zero flash/delay
+  try {
+    callback(getLocalSponsors(), false);
+  } catch (e) {}
+
   const { db, isConnected } = getFirebaseInstance();
 
   if (isConnected && db) {
@@ -144,7 +157,7 @@ export const subscribeToSponsors = (callback) => {
         q,
         (snapshot) => {
           if (!snapshot.empty) {
-            const list = snapshot.docs.map((d) => {
+            let list = snapshot.docs.map((d) => {
               const data = d.data();
               return {
                 id: d.id,
@@ -152,7 +165,35 @@ export const subscribeToSponsors = (callback) => {
                 logoUrl: isValidLogoUrl(data.logoUrl) ? data.logoUrl : generateDynamicLogoSvg(data.name, data.tier)
               };
             });
-            callback(list, true);
+
+            // Clean up old default sponsors from firestore snapshot if any exist
+            const oldDocs = snapshot.docs.filter(d => OLD_DEFAULT_NAMES.includes(d.data().name));
+            if (oldDocs.length > 0) {
+              oldDocs.forEach(async (d) => {
+                try {
+                  await deleteDoc(doc(db, COLLECTION_NAME, d.id));
+                } catch (e) {}
+              });
+              list = list.filter(item => !OLD_DEFAULT_NAMES.includes(item.name));
+            }
+
+            if (list.length === 0) {
+              DEFAULT_SPONSORS.forEach(async (sp) => {
+                try {
+                  await addDoc(collection(db, COLLECTION_NAME), {
+                    name: sp.name,
+                    tier: sp.tier,
+                    tagline: sp.tagline,
+                    website: sp.website,
+                    logoUrl: sp.logoUrl,
+                    createdAt: new Date().toISOString()
+                  });
+                } catch (e) {}
+              });
+              callback(DEFAULT_SPONSORS, true);
+            } else {
+              callback(list, true);
+            }
           } else {
             // If collection is empty in Firestore, seed with defaults
             DEFAULT_SPONSORS.forEach(async (sp) => {
