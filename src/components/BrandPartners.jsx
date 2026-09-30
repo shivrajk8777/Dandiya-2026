@@ -3,7 +3,7 @@ import React from "react";
 import { Sparkles } from "lucide-react";
 
 // Static official festival partners list
-const STATIC_SPONSORS = [
+export const STATIC_SPONSORS = [
   {
     id: "sp-1",
     name: "MAHAVEER AGRO",

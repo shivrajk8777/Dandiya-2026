@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { Download, Printer, Share2, CheckCircle, Sparkles, MapPin, Calendar, Crown, ShieldCheck, FileText, Info, Layers } from "lucide-react";
 import { subscribeToSponsors, getLocalSponsors, generateDynamicLogoSvg } from "@/lib/sponsorService";
+import { STATIC_SPONSORS } from "@/components/BrandPartners";
+import { jsPDF } from "jspdf";
 
 const DEFAULT_TERMS = [
   {
@@ -46,6 +48,24 @@ const DEFAULT_TERMS = [
     desc: "Pass holder consents to photography, filming, and audio recording by event media team and official festival partners for promotion."
   }
 ];
+
+// Helper to draw canvas images with aspect ratio contain (no stretching or distortion)
+const drawCanvasAspectContain = (ctx, img, boxX, boxY, boxW, boxH, padding = 3) => {
+  if (!img) return;
+  const targetW = boxW - padding * 2;
+  const targetH = boxH - padding * 2;
+  const imgW = img.naturalWidth || img.width || targetW;
+  const imgH = img.naturalHeight || img.height || targetH;
+
+  const ratio = Math.min(targetW / imgW, targetH / imgH);
+  const renderW = imgW * ratio;
+  const renderH = imgH * ratio;
+
+  const renderX = boxX + padding + (targetW - renderW) / 2;
+  const renderY = boxY + padding + (targetH - renderH) / 2;
+
+  ctx.drawImage(img, renderX, renderY, renderW, renderH);
+};
 
 export default function DigitalPass({ passData, onClose }) {
   const [logoDataUrl, setLogoDataUrl] = useState("/logo.png");
@@ -115,38 +135,50 @@ export default function DigitalPass({ passData, onClose }) {
   }, [passData]);
 
   // Native 2D Canvas Pass Generator (Side A Front + Side B Back with Terms & Conditions only)
-  const generateNativeCanvasPass = async () => {
-    const canvasWidth = 1200;
-    const canvasHeight = 1260;
+  const generateNativeCanvasPass = async (scale = 2.0) => {
+    const baseWidth = 1200;
+    const baseHeight = 1260;
     const cvs = document.createElement("canvas");
-    cvs.width = canvasWidth;
-    cvs.height = canvasHeight;
+    cvs.width = baseWidth * scale;
+    cvs.height = baseHeight * scale;
     const ctx = cvs.getContext("2d");
+
+    // Scale canvas context for 300DPI Ultra-HD sharpness
+    ctx.scale(scale, scale);
 
     // ==========================================
     // SIDE A: FRONT PASS (0 to 640 px)
     // ==========================================
 
-    // 1. Background gradient
+    // 1. Background gradient with 28px rounded corners (border radius)
     const bgGrad = ctx.createLinearGradient(0, 0, 1200, 640);
     bgGrad.addColorStop(0, "#1c0836");
     bgGrad.addColorStop(0.5, "#100422");
     bgGrad.addColorStop(1, "#240a44");
     ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, 1200, 640);
+    ctx.beginPath();
+    ctx.roundRect(12, 12, 1176, 616, 28);
+    ctx.fill();
 
-    // 2. Gold Top Bar
+    // 2. Gold Top Bar (Clipped to rounded corners)
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(12, 12, 1176, 616, 28);
+    ctx.clip();
     const goldGrad = ctx.createLinearGradient(0, 0, 1200, 0);
     goldGrad.addColorStop(0, "#fcd34d");
     goldGrad.addColorStop(0.5, "#fb7185");
     goldGrad.addColorStop(1, "#fcd34d");
     ctx.fillStyle = goldGrad;
-    ctx.fillRect(0, 0, 1200, 14);
+    ctx.fillRect(12, 12, 1176, 14);
+    ctx.restore();
 
-    // 3. Outer Border
+    // 3. Outer Border with Rounded Corners
     ctx.strokeStyle = "#e5b869";
-    ctx.lineWidth = 5;
-    ctx.strokeRect(12, 12, 1176, 616);
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.roundRect(12, 12, 1176, 616, 28);
+    ctx.stroke();
 
     // 4. Logo Image
     let textOffsetX = 60;
@@ -158,7 +190,7 @@ export default function DigitalPass({ passData, onClose }) {
         logoImg.onload = resolve;
         setTimeout(resolve, 150);
       });
-      ctx.drawImage(logoImg, 55, 34, 120, 70);
+      drawCanvasAspectContain(ctx, logoImg, 55, 34, 120, 70, 0);
       textOffsetX = 190;
     }
 
@@ -269,7 +301,7 @@ export default function DigitalPass({ passData, onClose }) {
       ctx.roundRect(785, 135, 360, 310, 18);
       ctx.fill();
 
-      ctx.drawImage(qrImg, 825, 150, 280, 245);
+      drawCanvasAspectContain(ctx, qrImg, 825, 150, 280, 245, 5);
 
       ctx.fillStyle = "#0f172a";
       ctx.font = "bold 15px monospace";
@@ -282,7 +314,7 @@ export default function DigitalPass({ passData, onClose }) {
       ctx.textAlign = "left";
     }
 
-    // 11. Front Side Partners Banner Strip with LOGOS
+    // 11. Front Side Partners Banner Strip with LOGOS (Single Horizontal Row)
     ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
     ctx.strokeStyle = "rgba(229, 184, 105, 0.35)";
     ctx.lineWidth = 1;
@@ -291,38 +323,41 @@ export default function DigitalPass({ passData, onClose }) {
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = "#e5b869";
-    ctx.font = "bold 11px sans-serif";
-    ctx.fillText("OFFICIAL FESTIVAL PARTNERS:", 70, 488);
-
-    const activeSps = sponsors && sponsors.length > 0 ? sponsors : getLocalSponsors();
+    const activeSps = STATIC_SPONSORS;
     const loadedLogos = await Promise.all(
-      activeSps.slice(0, 6).map((sp) => {
+      activeSps.map((sp) => {
         return new Promise((resolve) => {
-          if (!sp.logoUrl) return resolve({ name: sp.name, img: null });
+          if (!sp.logoUrl) return resolve({ ...sp, img: null });
           const img = new Image();
-          img.crossOrigin = "anonymous";
+          if (sp.logoUrl.startsWith("http")) {
+            img.crossOrigin = "anonymous";
+          }
           img.src = sp.logoUrl;
-          img.onload = () => resolve({ name: sp.name, img });
-          img.onerror = () => resolve({ name: sp.name, img: null });
-          setTimeout(() => resolve({ name: sp.name, img: null }), 300);
+          img.onload = () => resolve({ ...sp, img });
+          img.onerror = () => resolve({ ...sp, img: null });
+          setTimeout(() => resolve({ ...sp, img: null }), 3000);
         });
       })
     );
 
-    const logoBoxW = 125;
-    const logoBoxH = 34;
-    const logoGap = 12;
-    const startLogoX = 270;
-    const startLogoY = 467;
+    const logoBoxW = 98;
+    const logoBoxH = 38;
+    const logoGap = 9;
+    const startLogoX = 66;
+    const startLogoY = 465;
 
     loadedLogos.forEach((item, idx) => {
       const lx = startLogoX + idx * (logoBoxW + logoGap);
       const ly = startLogoY;
 
-      if (lx + logoBoxW <= 1130) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
-        ctx.strokeStyle = "rgba(229, 184, 105, 0.3)";
+      if (lx + logoBoxW <= 1140) {
+        if (item.bgWhite) {
+          ctx.fillStyle = "#ffffff";
+          ctx.strokeStyle = "#ffffff";
+        } else {
+          ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+          ctx.strokeStyle = "rgba(229, 184, 105, 0.3)";
+        }
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.roundRect(lx, ly, logoBoxW, logoBoxH, 6);
@@ -330,12 +365,12 @@ export default function DigitalPass({ passData, onClose }) {
         ctx.stroke();
 
         if (item.img) {
-          ctx.drawImage(item.img, lx + 4, ly + 3, logoBoxW - 8, logoBoxH - 6);
+          drawCanvasAspectContain(ctx, item.img, lx, ly, logoBoxW, logoBoxH, 4);
         } else {
-          ctx.fillStyle = "#ffffff";
-          ctx.font = "bold 10px sans-serif";
+          ctx.fillStyle = item.bgWhite ? "#000000" : "#ffffff";
+          ctx.font = "bold 8.5px sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText(item.name || "PARTNER", lx + logoBoxW / 2, ly + 21);
+          ctx.fillText(item.name || "PARTNER", lx + logoBoxW / 2, ly + 20);
           ctx.textAlign = "left";
         }
       }
@@ -391,26 +426,35 @@ export default function DigitalPass({ passData, onClose }) {
     // SIDE B: BACK PASS (685 to 1260 px) - TERMS & CONDITIONS ONLY
     // ==========================================
 
-    // 13. Back Pass Background Gradient
+    // 13. Back Pass Background Gradient with 28px rounded corners
     const bgGradBack = ctx.createLinearGradient(0, 685, 1200, 1260);
     bgGradBack.addColorStop(0, "#14052b");
     bgGradBack.addColorStop(0.5, "#0b0318");
     bgGradBack.addColorStop(1, "#1b0838");
     ctx.fillStyle = bgGradBack;
-    ctx.fillRect(0, 685, 1200, 575);
+    ctx.beginPath();
+    ctx.roundRect(12, 695, 1176, 550, 28);
+    ctx.fill();
 
-    // 14. Back Outer Border
-    ctx.strokeStyle = "#e5b869";
-    ctx.lineWidth = 4;
-    ctx.strokeRect(12, 695, 1176, 550);
-
-    // 15. Back Side Header Bar
+    // 14. Back Top Bar (Clipped to rounded corners)
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(12, 695, 1176, 550, 28);
+    ctx.clip();
     const bHeaderGrad = ctx.createLinearGradient(0, 695, 1200, 0);
     bHeaderGrad.addColorStop(0, "#fbbf24");
     bHeaderGrad.addColorStop(0.5, "#f97316");
     bHeaderGrad.addColorStop(1, "#fbbf24");
     ctx.fillStyle = bHeaderGrad;
-    ctx.fillRect(14, 697, 1172, 10);
+    ctx.fillRect(12, 695, 1176, 10);
+    ctx.restore();
+
+    // 15. Back Outer Border with Rounded Corners
+    ctx.strokeStyle = "#e5b869";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.roundRect(12, 695, 1176, 550, 28);
+    ctx.stroke();
 
     // Header Titles
     ctx.fillStyle = "#e5b869";
@@ -506,21 +550,51 @@ export default function DigitalPass({ passData, onClose }) {
     ctx.fillText("AUTHENTICATED BY RANG TARANG GARBA 2026 COMMITTEE", 380, 1210);
     ctx.fillText("RIGHTS OF ADMISSION RESERVED", 870, 1210);
 
-    // 18. Trigger PNG Download
-    const image = cvs.toDataURL("image/png", 1.0);
-    const link = document.createElement("a");
-    link.download = `RangTarangGarba_Pass_${passData?.passId || "2026"}.png`;
-    link.href = image;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    return cvs;
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!passData) return;
+    setDownloading(true);
+    try {
+      const cvs = await generateNativeCanvasPass(2.0);
+      const imgData = cvs.toDataURL("image/jpeg", 0.95);
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+      });
+
+      const pageWidth = 210;
+      const marginX = 10;
+      const pdfWidth = pageWidth - marginX * 2; // 190mm
+      const pdfHeight = (cvs.height / cvs.width) * pdfWidth; // ~199.5mm
+
+      const startY = 12; // Top margin
+
+      pdf.addImage(imgData, "JPEG", marginX, startY, pdfWidth, pdfHeight, undefined, "FAST");
+      pdf.save(`RangTarangGarba_Pass_${passData?.passId || "2026"}.pdf`);
+    } catch (err) {
+      console.error("Pass PDF download error:", err);
+      alert("Could not download PDF automatically. Please try the Print button.");
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const handleDownloadImage = async () => {
     if (!passData) return;
     setDownloading(true);
     try {
-      await generateNativeCanvasPass();
+      const cvs = await generateNativeCanvasPass(2.0);
+      const image = cvs.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.download = `RangTarangGarba_Pass_${passData?.passId || "2026"}.png`;
+      link.href = image;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (err) {
       console.error("Pass download error:", err);
       alert("Could not download pass image automatically. Please take a screenshot.");
@@ -529,315 +603,72 @@ export default function DigitalPass({ passData, onClose }) {
     }
   };
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
+    if (!passData) return;
     try {
-      const printWindow = window.open("", "_blank", "width=900,height=1000");
-      if (printWindow) {
-        const logoSrc = logoDataUrl || "/logo.png";
-        const qrSrc = qrDataUrl || "";
-        const partnersList = sponsors.length > 0 ? sponsors : [
-          { name: "GUJARAT TOURISM" },
-          { name: "RED BULL" },
-          { name: "TAJ HOTELS" },
-          { name: "TIMES OF INDIA" },
-          { name: "VOGUE INDIA" },
-          { name: "FEVER 104 FM" }
-        ];
+      const cvs = await generateNativeCanvasPass(2.0);
+      const imgData = cvs.toDataURL("image/png");
 
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>Print Pass - ${passData.passId || "Rang Tarang Garba"}</title>
-              <style>
-                @page {
-                  size: A4 portrait;
-                  margin: 8mm;
-                }
-                * {
-                  box-sizing: border-box;
-                  margin: 0;
-                  padding: 0;
-                }
-                body {
-                  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-                  background-color: #ffffff;
-                  color: #000000;
-                  padding: 10px;
-                }
-                .ticket-page {
-                  width: 100%;
-                  max-width: 700px;
-                  margin: 0 auto 20px auto;
-                  background: linear-gradient(135deg, #1c0836 0%, #100422 50%, #240a44 100%);
-                  border: 3px solid #e5b869;
-                  border-radius: 20px;
-                  padding: 24px;
-                  color: #ffffff;
-                  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                  position: relative;
-                  page-break-after: always;
-                  -webkit-print-color-adjust: exact;
-                  print-color-adjust: exact;
-                }
-                .ticket-page:last-child {
-                  page-break-after: avoid;
-                }
-                .top-bar {
-                  height: 6px;
-                  background: linear-gradient(to right, #fcd34d, #fb7185, #fcd34d);
-                  margin: -24px -24px 20px -24px;
-                }
-                .header {
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  border-bottom: 1px solid rgba(229, 184, 105, 0.4);
-                  padding-bottom: 14px;
-                  margin-bottom: 20px;
-                }
-                .logo-img {
-                  height: 48px;
-                  width: auto;
-                  object-fit: contain;
-                }
-                .badge {
-                  background: linear-gradient(to right, #fbbf24, #f97316);
-                  color: #000000;
-                  font-weight: 900;
-                  font-size: 11px;
-                  padding: 6px 14px;
-                  border-radius: 20px;
-                  text-transform: uppercase;
-                  letter-spacing: 1px;
-                }
-                .details-grid {
-                  display: grid;
-                  grid-template-columns: 2fr 1fr;
-                  gap: 20px;
-                  align-items: center;
-                }
-                .label {
-                  font-size: 10px;
-                  font-weight: 700;
-                  color: #94a3b8;
-                  text-transform: uppercase;
-                  letter-spacing: 1px;
-                  margin-bottom: 3px;
-                }
-                .val-title {
-                  font-size: 24px;
-                  font-weight: 900;
-                  font-family: Georgia, serif;
-                  color: #ffffff;
-                  margin-bottom: 12px;
-                }
-                .val-meta {
-                  font-size: 14px;
-                  color: #f1f5f9;
-                  font-weight: 600;
-                  margin-bottom: 8px;
-                }
-                .meta-row {
-                  display: flex;
-                  gap: 20px;
-                  margin-bottom: 12px;
-                }
-                .venue-box {
-                  border-top: 1px solid rgba(255,255,255,0.15);
-                  padding-top: 10px;
-                  margin-top: 10px;
-                  font-size: 12px;
-                  color: #fcd34d;
-                  font-weight: 600;
-                }
-                .qr-box {
-                  background: #ffffff;
-                  border-radius: 16px;
-                  padding: 12px;
-                  text-align: center;
-                  color: #0f172a;
-                }
-                .qr-img {
-                  width: 140px;
-                  height: 140px;
-                  object-fit: contain;
-                }
-                .pass-id {
-                  font-family: monospace;
-                  font-weight: 900;
-                  font-size: 12px;
-                  margin-top: 4px;
-                  color: #1e1b4b;
-                }
-                .partners-front-strip {
-                  background: rgba(0,0,0,0.3);
-                  border: 1px solid rgba(229, 184, 105, 0.3);
-                  border-radius: 10px;
-                  padding: 8px 12px;
-                  margin-top: 14px;
-                  font-size: 10px;
-                  color: #f1f5f9;
-                }
-                .terms-grid {
-                  display: grid;
-                  grid-template-columns: 1fr 1fr;
-                  gap: 12px;
-                  margin-top: 16px;
-                }
-                .term-box {
-                  background: rgba(255,255,255,0.04);
-                  border: 1px solid rgba(229, 184, 105, 0.25);
-                  border-radius: 10px;
-                  padding: 10px 12px;
-                  display: flex;
-                  gap: 10px;
-                }
-                .term-num {
-                  background: #fbbf24;
-                  color: #000;
-                  font-weight: 900;
-                  font-size: 10px;
-                  width: 22px;
-                  height: 22px;
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  shrink: 0;
-                }
-                .term-title {
-                  font-size: 11.5px;
-                  font-weight: bold;
-                  color: #fcd34d;
-                  margin-bottom: 3px;
-                }
-                .term-desc {
-                  font-size: 10px;
-                  color: #cbd5e1;
-                  line-height: 1.35;
-                }
-                .footer-strip {
-                  border-top: 1px dashed rgba(229, 184, 105, 0.4);
-                  margin-top: 20px;
-                  padding-top: 10px;
-                  display: flex;
-                  justify-content: space-between;
-                  font-family: monospace;
-                  font-size: 11px;
-                  color: #cbd5e1;
-                }
-              </style>
-            </head>
-            <body>
-              <!-- PAGE 1: FRONT PASS -->
-              <div class="ticket-page">
-                <div class="top-bar"></div>
-                <div class="header">
-                  <div style="display: flex; align-items: center; gap: 12px;">
-                    <img src="${logoSrc}" class="logo-img" />
-                    <div>
-                      <div style="font-size: 10px; color: #fcd34d; font-weight: 800; text-transform: uppercase;">Grand Heritage • Season 6</div>
-                      <div style="font-size: 11px; color: #cbd5e1;">Official Access Badge 2026</div>
-                    </div>
-                  </div>
-                  <div class="badge">${passData.passType || "VIP PASS"}</div>
-                </div>
+      const printIframe = document.createElement("iframe");
+      printIframe.style.position = "fixed";
+      printIframe.style.right = "0";
+      printIframe.style.bottom = "0";
+      printIframe.style.width = "0";
+      printIframe.style.height = "0";
+      printIframe.style.border = "0";
+      document.body.appendChild(printIframe);
 
-                <div class="details-grid">
-                  <div>
-                    <div class="label">Pass Holder Name</div>
-                    <div class="val-title">${passData.fullName || "Valued Guest"}</div>
+      const frameDoc = printIframe.contentWindow.document;
+      frameDoc.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Print Pass - ${passData.passId || "Rang Tarang Garba 2026"}</title>
+            <style>
+              @page {
+                size: A4 portrait;
+                margin: 5mm;
+              }
+              body {
+                margin: 0;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #ffffff;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+              img {
+                width: 100%;
+                max-width: 195mm;
+                height: auto;
+                display: block;
+                margin: 0 auto;
+              }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" />
+            <script>
+              window.onload = function() {
+                setTimeout(function() {
+                  window.print();
+                }, 300);
+              };
+            </script>
+          </body>
+        </html>
+      `);
+      frameDoc.close();
 
-                    <div class="meta-row">
-                      <div>
-                        <div class="label">Phone / WhatsApp</div>
-                        <div class="val-meta">${passData.phone || "-"}</div>
-                      </div>
-                      <div>
-                        <div class="label">Total Paid</div>
-                        <div class="val-meta" style="color: #4ade80;">₹${passData.totalAmount || passData.unitPrice || 0}</div>
-                      </div>
-                      <div>
-                        <div class="label">Quantity</div>
-                        <div class="val-meta">${passData.quantity || 1} Persons</div>
-                      </div>
-                    </div>
-
-                    <div class="venue-box">
-                      <div>📅 Oct 17 - 19, 2026 (07:00 PM Onwards)</div>
-                      <div>📍 Raj Vilas Garden, Chomu, Rajasthan</div>
-                    </div>
-                  </div>
-
-                  <div class="qr-box">
-                    <img src="${qrSrc}" class="qr-img" />
-                    <div class="pass-id">${passData.passId || "DND-2026"}</div>
-                    <div style="font-size: 9px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-top: 2px;">Scan At Gate</div>
-                  </div>
-                </div>
-
-                <div class="partners-front-strip">
-                  <div style="font-weight: 800; color: #e5b869; text-transform: uppercase; font-size: 10px; margin-bottom: 6px;">OFFICIAL FESTIVAL PARTNERS 2026:</div>
-                  <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                    ${partnersList.slice(0, 6).map(p => p.logoUrl
-                      ? `<img src="${p.logoUrl}" class="partner-logo-item" alt="${p.name}" />`
-                      : `<span style="font-weight: bold; color: #fff; font-size: 11px; padding: 3px 8px; background: rgba(255,255,255,0.08); border-radius: 6px;">${p.name}</span>`
-                    ).join("")}
-                  </div>
-                </div>
-
-                <div class="footer-strip">
-                  <div>ID: <strong style="color: #fcd34d;">${passData.passId || "-"}</strong></div>
-                  <div>STATUS: ${passData.status || "CONFIRMED"}</div>
-                  <div>NON-TRANSFERABLE</div>
-                </div>
-              </div>
-
-              <!-- PAGE 2: BACK PASS (TERMS & CONDITIONS ONLY) -->
-              <div class="ticket-page">
-                <div class="top-bar"></div>
-                <div style="border-bottom: 1px solid rgba(229,184,105,0.4); padding-bottom: 10px; margin-bottom: 16px;">
-                  <div style="font-size: 10px; color: #e5b869; font-weight: 800; text-transform: uppercase;">RANG TARANG GARBA 2026 • TICKET BACK SIDE</div>
-                  <div style="font-size: 20px; font-weight: 900; font-family: Georgia, serif; color: #fff;">TERMS & CONDITIONS OF ENTRY</div>
-                </div>
-
-                <div class="terms-grid">
-                  ${DEFAULT_TERMS.map(t => `
-                    <div class="term-box">
-                      <div class="term-num">${t.num}</div>
-                      <div>
-                        <div class="term-title">${t.title}</div>
-                        <div class="term-desc">${t.desc}</div>
-                      </div>
-                    </div>
-                  `).join("")}
-                </div>
-
-                <div class="footer-strip" style="margin-top: 30px;">
-                  <div>SECURITY ID: ${passData.passId || "-"}</div>
-                  <div>AUTHENTICATED TICKET</div>
-                  <div>RIGHTS OF ADMISSION RESERVED</div>
-                </div>
-              </div>
-
-              <script>
-                window.onload = function() {
-                  setTimeout(function() {
-                    window.print();
-                    window.close();
-                  }, 300);
-                };
-              </script>
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
-      } else {
-        window.print();
-      }
+      setTimeout(() => {
+        try {
+          document.body.removeChild(printIframe);
+        } catch (e) {}
+      }, 60000);
     } catch (e) {
-      console.warn("Popup window blocked, fallback to window.print()", e);
+      console.error("Print error:", e);
       window.print();
     }
   };
@@ -1027,34 +858,23 @@ export default function DigitalPass({ passData, onClose }) {
                 </div>
               </div>
 
-              {/* Official Festival Partners Front Strip WITH LOGO IMAGES */}
-              <div className="mt-3 p-2.5 rounded-2xl bg-black/50 border border-amber-500/35 space-y-1.5">
-                <div className="flex items-center justify-between px-1">
-                  <div className="font-bold text-amber-400 flex items-center gap-1.5 text-[10px] uppercase tracking-wider">
-                    <Sparkles className="w-3 h-3 text-amber-400" /> Official Festival Partners
-                  </div>
-                  <span className="text-[9px] text-slate-400 font-medium uppercase tracking-widest">Season 2026</span>
-                </div>
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-0.5">
-                  {(sponsors && sponsors.length > 0 ? sponsors : getLocalSponsors()).slice(0, 6).map((sp, idx) => {
-                    const logoSrc = sp.logoUrl || generateDynamicLogoSvg(sp.name, sp.tier);
-                    return (
-                      <div
-                        key={sp.id || idx}
-                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 border border-amber-500/25 hover:border-amber-400/50 transition-colors shadow-sm"
-                      >
-                        <img
-                          src={logoSrc}
-                          alt={sp.name}
-                          onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = generateDynamicLogoSvg(sp.name, sp.tier);
-                          }}
-                          className="h-6 w-auto max-w-[85px] object-contain drop-shadow"
-                        />
-                      </div>
-                    );
-                  })}
+              {/* Official Festival Partners Front Strip WITH LOGO IMAGES (Single Horizontal Line) */}
+              <div className="mt-3 p-2 rounded-2xl bg-black/50 border border-amber-500/35">
+                <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar w-full">
+                  {STATIC_SPONSORS.map((sp, idx) => (
+                    <div
+                      key={sp.id || idx}
+                      className={`flex items-center justify-center shrink-0 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-lg border transition-colors shadow-sm ${
+                        sp.bgWhite ? "bg-white border-white" : "bg-white/5 border-amber-500/25 hover:border-amber-400/50"
+                      }`}
+                    >
+                      <img
+                        src={sp.logoUrl}
+                        alt={sp.name}
+                        className="h-5 sm:h-6 w-auto max-w-[55px] sm:max-w-[70px] object-contain drop-shadow"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -1137,14 +957,23 @@ export default function DigitalPass({ passData, onClose }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-4 sm:mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-3 mt-4 sm:mt-6">
           <button
-            onClick={handleDownloadImage}
+            onClick={handleDownloadPdf}
             disabled={downloading}
             className="py-3 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 hover:opacity-95 active:scale-95 transition-all"
           >
+            <FileText className="w-4 h-4 text-black" />
+            {downloading ? "Generating HD PDF..." : "Download HD Ticket (PDF)"}
+          </button>
+
+          <button
+            onClick={handleDownloadImage}
+            disabled={downloading}
+            className="py-3 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
+          >
             <Download className="w-4 h-4" />
-            {downloading ? "Generating HD Ticket..." : "Download Ticket (PNG)"}
+            Download PNG
           </button>
 
           <button
@@ -1152,7 +981,7 @@ export default function DigitalPass({ passData, onClose }) {
             className="py-3 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
           >
             <Printer className="w-4 h-4" />
-            Print Full Ticket
+            Print Ticket
           </button>
 
           <button
