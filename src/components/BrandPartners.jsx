@@ -44,10 +44,11 @@ export const STATIC_SPONSORS = [
     name: "JKM SOFTWARES",
     tier: "Technology Partner",
     tagline: "IT & Software Solutions",
-    website: "",
+    website: "https://www.jkmsoftwares.com",
     logoUrl: "/sponsors/JKM-Softwares.png",
     bgWhite: true
   },
+
 
   {
     id: "sp-6",

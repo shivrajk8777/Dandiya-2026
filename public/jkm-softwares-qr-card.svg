@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="660" viewBox="0 0 500 660">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1b0833"/>
+      <stop offset="50%" stop-color="#100322"/>
+      <stop offset="100%" stop-color="#07010f"/>
+    </linearGradient>
+    <linearGradient id="goldText" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e5b869"/>
+      <stop offset="50%" stop-color="#fef08a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer Card Background -->
+  <rect width="500" height="660" rx="28" fill="url(#cardBg)" stroke="#e5b869" stroke-width="2.5"/>
+  <rect x="12" y="12" width="476" height="636" rx="20" fill="none" stroke="rgba(229,184,105,0.25)" stroke-width="1" stroke-dasharray="6,6"/>
+  
+  <!-- Header Branding -->
+  <text x="250" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="bold" fill="#e5b869" letter-spacing="3" text-anchor="middle">OFFICIAL IT &amp; TECH PARTNER</text>
+  <text x="250" y="92" font-family="'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="900" fill="url(#goldText)" text-anchor="middle">JKM SOFTWARES</text>
+  <text x="250" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#cbd5e1" text-anchor="middle">Software • Web • Mobile • Cloud Solutions</text>
+  
+  <!-- White QR Box Frame -->
+  <g transform="translate(80, 145)">
+    <rect width="340" height="340" rx="22" fill="#ffffff" stroke="#e5b869" stroke-width="3.5"/>
+    <g transform="translate(15, 15) scale(8.37)">
+      <path fill="#ffffff" d="M0 0h35v35H0z"/><path stroke="#0e031a" d="M1 1.5h7m1 0h2m2 0h1m1 0h5m1 0h5m1 0h7M1 2.5h1m5 0h1m3 0h1m2 0h3m1 0h2m2 0h3m2 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m2 0h3m4 0h1m1 0h1m4 0h2m1 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h2m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m2 0h2m2 0h1m1 0h1m2 0h3m3 0h1m1 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m3 0h1m2 0h2m2 0h1m1 0h2m2 0h2m1 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 8.5h1m1 0h2m1 0h1m1 0h2m1 0h1m1 0h3M3 9.5h1m1 0h3m1 0h5m1 0h3m3 0h3m2 0h1m3 0h1m2 0h1M1 10.5h3m4 0h1m1 0h2m1 0h2m2 0h3m1 0h1m3 0h1m1 0h1m5 0h1M3 11.5h7m3 0h4m2 0h4m3 0h1m2 0h1m2 0h2M5 12.5h2m4 0h3m1 0h1m1 0h1m1 0h1m4 0h4m5 0h1M1 13.5h1m1 0h1m3 0h1m1 0h2m3 0h2m2 0h1m6 0h3m1 0h2m1 0h2M2 14.5h1m2 0h1m2 0h1m2 0h3m3 0h2m1 0h1m4 0h3m1 0h1m1 0h3M2 15.5h3m2 0h2m3 0h1m2 0h2m3 0h1m1 0h1m4 0h1m2 0h1m1 0h2M3 16.5h1m1 0h2m2 0h1m1 0h4m1 0h1m1 0h2m2 0h2m5 0h1m2 0h1M1 17.5h1m2 0h1m2 0h1m1 0h1m1 0h1m5 0h2m1 0h5m1 0h2m4 0h1M6 18.5h1m3 0h1m7 0h2m1 0h2m4 0h1m2 0h4M2 19.5h1m1 0h1m2 0h2m2 0h1m2 0h1m1 0h3m1 0h1m1 0h2m3 0h2m2 0h3M1 20.5h1m1 0h1m1 0h1m2 0h2m1 0h1m7 0h2m1 0h2m9 0h1M1 21.5h1m2 0h2m1 0h1m2 0h3m3 0h1m2 0h2m1 0h1m2 0h1m1 0h1m2 0h1m2 0h1M2 22.5h2m1 0h1m3 0h2m4 0h1m3 0h1m1 0h1m2 0h2m2 0h1m3 0h2M1 23.5h1m3 0h1m1 0h1m3 0h5m1 0h2m2 0h2m1 0h2m1 0h2m1 0h1m1 0h2M2 24.5h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h1m1 0h1m3 0h3m2 0h2m6 0h1M1 25.5h1m1 0h1m1 0h1m1 0h3m1 0h2m3 0h3m1 0h1m1 0h1m1 0h7m1 0h1M9 26.5h4m3 0h1m1 0h5m1 0h2m3 0h1m3 0h1M1 27.5h7m4 0h2m1 0h1m1 0h1m3 0h1m1 0h3m1 0h1m1 0h1m1 0h3M1 28.5h1m5 0h1m1 0h4m2 0h1m6 0h2m1 0h1m3 0h1m3 0h1M1 29.5h1m1 0h3m1 0h1m1 0h1m1 0h2m2 0h1m4 0h1m2 0h1m1 0h6m1 0h1M1 30.5h1m1 0h3m1 0h1m2 0h1m1 0h1m2 0h5m3 0h3m3 0h1m1 0h1M1 31.5h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h3m4 0h2m1 0h2m1 0h4m1 0h1M1 32.5h1m5 0h1m3 0h1m1 0h1m1 0h2m1 0h1m1 0h1m1 0h7m1 0h1m1 0h1M1 33.5h7m5 0h2m2 0h1m1 0h4m1 0h2m2 0h2m1 0h3"/>
+
+    </g>
+  </g>
+  
+  <!-- Footer Call to Action -->
+  <text x="250" y="525" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">Scan QR Code to Visit Website</text>
+  <text x="250" y="552" font-family="'Courier New', Courier, monospace" font-size="15" font-weight="bold" fill="#e5b869" text-anchor="middle">https://www.jkmsoftwares.com</text>
+  <text x="250" y="605" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">Rang Tarang Garba Mahotsav 2026 • Jaipur, Rajasthan</text>
+</svg>

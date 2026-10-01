@@ -27,7 +27,7 @@ export default function Footer({ onOpenAdmin, onOpenRegister, onOpenLookup }) {
                   RANG TARANG <span className="gold-foil-text font-sans-modern font-black">GARBA</span>
                 </span>
                 <p className="text-[10px] text-amber-300/80 font-bold uppercase tracking-widest">
-                  Season 6 • Navratri 2026
+                  Season 1 • Navratri 2026
                 </p>
               </div>
             </div>

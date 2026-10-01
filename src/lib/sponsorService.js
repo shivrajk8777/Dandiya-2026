@@ -55,9 +55,10 @@ const DEFAULT_SPONSORS = [
     name: "JKM SOFTWARES",
     tier: "Technology Partner",
     tagline: "IT & Software Solutions",
-    website: "",
+    website: "https://www.jkmsoftwares.com",
     logoUrl: "/sponsors/jkm-softwares.png"
   },
+
   {
     id: "sp-2",
     name: "KAKA-KAJOD",
