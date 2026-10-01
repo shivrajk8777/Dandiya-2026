@@ -433,286 +433,286 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         <div className="flex-1 overflow-y-auto pr-1 no-scrollbar space-y-3.5">
           {/* Attendee Info & Pass selection */}
           <form onSubmit={handleFormSubmit} className="space-y-3 sm:space-y-4">
-              {/* Pass Category Display */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 uppercase tracking-wider">
-                    Event Ticket Pass (Couple Entry Only)
-                  </label>
-                  <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border ${
-                    isSoldOut 
-                      ? "bg-rose-500/20 text-rose-300 border-rose-500/40" 
-                      : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+            {/* Pass Category Display */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+                  Event Ticket Pass (Couple Entry Only)
+                </label>
+                <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border ${isSoldOut
+                  ? "bg-rose-500/20 text-rose-300 border-rose-500/40"
+                  : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
                   }`}>
-                    {isSoldOut ? "SOLD OUT" : `⚡ ${remainingTickets} Available (${soldPasses}/${maxTickets} Sold)`}
-                  </span>
-                </div>
-                <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-[#2a0e4a] via-[#1c0830] to-[#120522] border-2 border-amber-400 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-lg shadow-amber-500/10">
+                  {isSoldOut ? "SOLD OUT" : `⚡ ${remainingTickets} Available (${soldPasses}/${maxTickets} Sold)`}
+                </span>
+              </div>
+              <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-[#2a0e4a] via-[#1c0830] to-[#120522] border-2 border-amber-400 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-lg shadow-amber-500/10">
 
-                  <div className="flex items-center gap-2.5 sm:gap-3">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0">
-                      <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </div>
-                    <div>
-                      <div className="text-xs sm:text-sm font-extrabold text-white font-serif-royal flex flex-wrap items-center gap-1.5 sm:gap-2">
-                        <span>{selectedPass.name}</span>
-                        {pricing.isDiscounted && pricing.discountBadge && (
-                          <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded-full">
-                            {pricing.discountBadge}
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[10px] text-amber-300/90 font-medium">
-                        {selectedPass.tier || "Couple Exclusive Entry (2 Persons)"}
-                      </div>
-                    </div>
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0">
+                    <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <div className="text-left sm:text-right border-t sm:border-t-0 border-white/10 pt-2 sm:pt-0 flex sm:block items-baseline justify-between">
-                    <div className="text-base sm:text-lg font-black text-amber-400 font-sans flex items-baseline gap-1.5">
-                      <span>₹{unitPrice}</span>
-                      {pricing.isDiscounted && (
-                        <span className="text-xs text-slate-400 line-through">₹{pricing.basePrice}</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-extrabold text-white font-serif-royal flex flex-wrap items-center gap-1.5 sm:gap-2">
+                      <span>{selectedPass.name}</span>
+                      {pricing.isDiscounted && pricing.discountBadge && (
+                        <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded-full">
+                          {pricing.discountBadge}
+                        </span>
                       )}
                     </div>
-                    <div className="text-[9px] text-slate-400">All taxes incl.</div>
+                    <div className="text-[10px] text-amber-300/90 font-medium">
+                      {selectedPass.tier || "Couple Exclusive Entry (2 Persons)"}
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Pass Quantity & Price Row */}
-              <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                <div>
-                  <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                    Quantity (Couple Passes)
-                  </label>
-                  <select
-                    name="quantity"
-                    value={formData.quantity}
-                    onChange={handleInputChange}
-                    className="w-full bg-[#1b0a38] border border-white/15 rounded-xl px-2.5 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-amber-400"
-                  >
-                    {[1, 2, 3, 4, 5, 8, 10].map((num) => (
-                      <option key={num} value={num}>
-                        {num} {num === 1 ? "Couple Pass (2 Pax)" : `Couple Passes (${num * 2} Pax)`}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                    Total Payable
-                  </label>
-                  <div className="w-full bg-[#1b0a38] border border-amber-500/40 rounded-xl px-2.5 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-black text-amber-400 flex items-center justify-between">
-                    <span>₹{totalAmount}</span>
-                    {totalSavings > 0 && (
-                      <span className="text-[9px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
-                        Save ₹{totalSavings}
-                      </span>
+                <div className="text-left sm:text-right border-t sm:border-t-0 border-white/10 pt-2 sm:pt-0 flex sm:block items-baseline justify-between">
+                  <div className="text-base sm:text-lg font-black text-amber-400 font-sans flex items-baseline gap-1.5">
+                    <span>₹{unitPrice}</span>
+                    {pricing.isDiscounted && (
+                      <span className="text-xs text-slate-400 line-through">₹{pricing.basePrice}</span>
                     )}
                   </div>
+                  <div className="text-[9px] text-slate-400">All taxes incl.</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Pass Quantity & Price Row - Strictly 1 Pass per Booking */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div>
+                <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider flex items-center justify-between">
+                  <span>Ticket Quantity</span>
+                  <span className="text-[9px] text-amber-300 font-bold bg-amber-500/15 px-1.5 py-0.5 rounded-full border border-amber-500/30">
+                    1 Pass / Booking
+                  </span>
+                </label>
+                <div className="w-full bg-[#1b0a38] border border-amber-500/30 rounded-xl px-2.5 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm text-white flex items-center justify-between shadow-inner">
+                  <span className="font-bold text-slate-200 flex items-center gap-1.5">
+                    <Ticket className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span>1 Couple Pass</span>
+                  </span>
+                  <span className="text-[9px] text-amber-300 font-bold bg-amber-500/20 px-1.5 py-0.5 rounded-md border border-amber-500/30">
+                    2 Persons Entry
+                  </span>
                 </div>
               </div>
 
-              {/* Price Savings Badge if Discounted */}
-              {totalSavings > 0 && (
-                <div className="p-2 sm:p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[10px] sm:text-[11px] text-emerald-300 font-semibold flex flex-wrap items-center justify-between gap-1">
-                  <span>Original: <line className="line-through text-slate-400">₹{originalTotal}</line></span>
-                  <span className="font-bold">Discount: -₹{totalSavings}</span>
-                  <span className="text-amber-400 font-extrabold">Final: ₹{totalAmount}</span>
-                </div>
-              )}
-
-              {/* Primary Contact Full Name */}
               <div>
                 <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                  Primary Contact Full Name *
+                  Total Payable
+                </label>
+                <div className="w-full bg-[#1b0a38] border border-amber-500/40 rounded-xl px-2.5 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-black text-amber-400 flex items-center justify-between">
+                  <span>₹{totalAmount}</span>
+                  {totalSavings > 0 && (
+                    <span className="text-[9px] text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
+                      Save ₹{totalSavings}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+
+
+            {/* Price Savings Badge if Discounted */}
+            {totalSavings > 0 && (
+              <div className="p-2 sm:p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[10px] sm:text-[11px] text-emerald-300 font-semibold flex flex-wrap items-center justify-between gap-1">
+                <span>Original: <span className="line-through text-slate-400">₹{originalTotal}</span></span>
+                <span className="font-bold">Discount: -₹{totalSavings}</span>
+                <span className="text-amber-400 font-extrabold">Final: ₹{totalAmount}</span>
+              </div>
+            )}
+
+
+            {/* Primary Contact Full Name */}
+            <div>
+              <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
+                Primary Contact Full Name *
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 sm:top-3" />
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="e.g. Aarav Sharma"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full bg-[#1b0a38] border border-white/15 rounded-xl pl-9 sm:pl-10 pr-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+            </div>
+
+            {/* WhatsApp Number */}
+            <div>
+              <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
+                WhatsApp / Mobile Number *
+              </label>
+              <div className="relative">
+                <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 sm:top-3" />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="10-digit mobile number"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  maxLength={12}
+                  required
+                  className="w-full bg-[#1b0a38] border border-white/15 rounded-xl pl-9 sm:pl-10 pr-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Email & City */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+              <div>
+                <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
+                  Email Address
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 sm:top-3" />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 sm:top-3" />
                   <input
-                    type="text"
-                    name="fullName"
-                    placeholder="e.g. Aarav Sharma"
-                    value={formData.fullName}
+                    type="email"
+                    name="email"
+                    placeholder="name@gmail.com"
+                    value={formData.email}
                     onChange={handleInputChange}
-                    required
                     className="w-full bg-[#1b0a38] border border-white/15 rounded-xl pl-9 sm:pl-10 pr-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
                   />
                 </div>
               </div>
 
-              {/* WhatsApp Number */}
               <div>
                 <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                  WhatsApp / Mobile Number *
+                  City
                 </label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 sm:top-3" />
+                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 sm:top-3" />
                   <input
-                    type="tel"
-                    name="phone"
-                    placeholder="10-digit mobile number"
-                    value={formData.phone}
+                    type="text"
+                    name="city"
+                    placeholder="e.g. Chomu / Jaipur"
+                    value={formData.city}
                     onChange={handleInputChange}
-                    maxLength={12}
-                    required
-                    className="w-full bg-[#1b0a38] border border-white/15 rounded-xl pl-9 sm:pl-10 pr-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono"
+                    className="w-full bg-[#1b0a38] border border-white/15 rounded-xl pl-9 sm:pl-10 pr-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
                   />
                 </div>
               </div>
+            </div>
 
-              {/* Email & City */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                <div>
-                  <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 sm:top-3" />
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="name@gmail.com"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full bg-[#1b0a38] border border-white/15 rounded-xl pl-9 sm:pl-10 pr-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                    City
-                  </label>
-                  <div className="relative">
-                    <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 sm:top-3" />
-                    <input
-                      type="text"
-                      name="city"
-                      placeholder="e.g. Chomu / Jaipur"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      className="w-full bg-[#1b0a38] border border-white/15 rounded-xl pl-9 sm:pl-10 pr-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
-                </div>
+            {/* Mandatory Attendees & Aadhaar Card Numbers Section */}
+            <div className="space-y-2.5 pt-2 border-t border-white/10">
+              <div className="flex flex-wrap items-center justify-between gap-1">
+                <label className="text-[10px] sm:text-[11px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5 font-serif-royal">
+                  <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Pass Holder Info ({attendees.length} Persons Entry)</span>
+                </label>
+                <span className="text-[9px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full border border-rose-500/30 font-bold uppercase tracking-wider">
+                  * Mandatory for Entry
+                </span>
               </div>
 
-              {/* Mandatory Attendees & Aadhaar Card Numbers Section */}
-              <div className="space-y-2.5 pt-2 border-t border-white/10">
-                <div className="flex flex-wrap items-center justify-between gap-1">
-                  <label className="text-[10px] sm:text-[11px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5 font-serif-royal">
-                    <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>Pass Holder Info ({attendees.length} Persons Entry)</span>
-                  </label>
-                  <span className="text-[9px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full border border-rose-500/30 font-bold uppercase tracking-wider">
-                    * Mandatory for Entry
-                  </span>
-                </div>
+              <div className="space-y-2.5">
+                {attendees.map((att, idx) => {
+                  const personLabel = idx === 0 ? "Person 1 (Primary Pass Holder)" : "Person 2 (Accompanying Partner)";
+                  return (
+                    <div
+                      key={idx}
+                      className="p-3 sm:p-3.5 rounded-2xl bg-[#180733] border border-amber-500/30 space-y-2 relative shadow-md"
+                    >
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-200">
+                        <span className="flex items-center gap-1.5 text-amber-300 font-serif-royal">
+                          <Ticket className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          {personLabel}
+                        </span>
+                        <span className={`text-[10px] font-mono ${att.aadhaar.length === 12 ? "text-emerald-400 font-bold" : "text-amber-400"}`}>
+                          {att.aadhaar.length === 12 ? "✓ Aadhaar Verified" : "12 Digits Req."}
+                        </span>
+                      </div>
 
-                <div className="space-y-2.5">
-                  {attendees.map((att, idx) => {
-                    const passNum = Math.floor(idx / 2) + 1;
-                    const personLabel = idx % 2 === 0 ? "Person 1" : "Person 2";
-                    return (
-                      <div
-                        key={idx}
-                        className="p-3 sm:p-3.5 rounded-2xl bg-[#180733] border border-amber-500/30 space-y-2 relative shadow-md"
-                      >
-                        <div className="flex items-center justify-between text-xs font-bold text-slate-200">
-                          <span className="flex items-center gap-1.5 text-amber-300 font-serif-royal">
-                            <Ticket className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                            Person #{idx + 1} (Pass #{passNum} • {personLabel})
-                          </span>
-                          <span className={`text-[10px] font-mono ${att.aadhaar.length === 12 ? "text-emerald-400 font-bold" : "text-amber-400"}`}>
-                            {att.aadhaar.length === 12 ? "✓ Aadhaar Verified" : "12 Digits Req."}
-                          </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {/* Attendee Name */}
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
+                            Full Name ({idx === 0 ? "Person 1" : "Person 2"}) *
+                          </label>
+
+                          <div className="relative">
+                            <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                            <input
+                              type="text"
+                              placeholder="e.g. Aarav Sharma"
+                              value={att.name}
+                              onChange={(e) => handleAttendeeChange(idx, "name", e.target.value)}
+                              required
+                              className="w-full bg-[#0e0320] border border-white/15 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                            />
+                          </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {/* Attendee Name */}
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
-                              Full Name (Person #{idx + 1}) *
-                            </label>
-                            <div className="relative">
-                              <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
-                              <input
-                                type="text"
-                                placeholder="e.g. Aarav Sharma"
-                                value={att.name}
-                                onChange={(e) => handleAttendeeChange(idx, "name", e.target.value)}
-                                required
-                                className="w-full bg-[#0e0320] border border-white/15 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Attendee Aadhaar */}
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider flex items-center justify-between">
-                              <span>Aadhaar Number *</span>
-                              <span className={`font-mono text-[9px] ${att.aadhaar.length === 12 ? "text-emerald-400 font-bold" : "text-slate-400"}`}>
-                                {att.aadhaar.length}/12
-                              </span>
-                            </label>
-                            <div className="relative">
-                              <ShieldCheck className={`w-3.5 h-3.5 absolute left-3 top-2.5 ${att.aadhaar.length === 12 ? "text-emerald-400" : "text-slate-400"}`} />
-                              <input
-                                type="text"
-                                placeholder="12-digit Aadhaar No."
-                                value={att.aadhaar}
-                                onChange={(e) => handleAttendeeChange(idx, "aadhaar", e.target.value)}
-                                maxLength={12}
-                                required
-                                className={`w-full bg-[#0e0320] border rounded-xl pl-8 pr-3 py-2 text-xs font-mono tracking-wider text-white placeholder-slate-500 focus:outline-none ${
-                                  att.aadhaar.length === 12 ? "border-emerald-500/60 text-emerald-300" : "border-white/15 focus:border-amber-400"
+                        {/* Attendee Aadhaar */}
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider flex items-center justify-between">
+                            <span>Aadhaar Number *</span>
+                            <span className={`font-mono text-[9px] ${att.aadhaar.length === 12 ? "text-emerald-400 font-bold" : "text-slate-400"}`}>
+                              {att.aadhaar.length}/12
+                            </span>
+                          </label>
+                          <div className="relative">
+                            <ShieldCheck className={`w-3.5 h-3.5 absolute left-3 top-2.5 ${att.aadhaar.length === 12 ? "text-emerald-400" : "text-slate-400"}`} />
+                            <input
+                              type="text"
+                              placeholder="12-digit Aadhaar No."
+                              value={att.aadhaar}
+                              onChange={(e) => handleAttendeeChange(idx, "aadhaar", e.target.value)}
+                              maxLength={12}
+                              required
+                              className={`w-full bg-[#0e0320] border rounded-xl pl-8 pr-3 py-2 text-xs font-mono tracking-wider text-white placeholder-slate-500 focus:outline-none ${att.aadhaar.length === 12 ? "border-emerald-500/60 text-emerald-300" : "border-white/15 focus:border-amber-400"
                                 }`}
-                              />
-                            </div>
+                            />
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })}
               </div>
+            </div>
 
-              {/* Direct Proceed to Pay Submit Button */}
-              <div className="pt-2 sticky bottom-0 bg-[#110524]/95 backdrop-blur-md pb-1 z-10 space-y-1.5">
-                {isSoldOut && (
-                  <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center">
-                    🚫 OUT OF STOCK: All {maxTickets} VIP Passes for Rang Tarang Garba 2026 have been booked!
-                  </div>
-                )}
-                <button
-                  type="submit"
-                  disabled={loading || isSoldOut}
-                  className={`w-full py-4 rounded-xl font-black text-sm sm:text-base uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 ${
-                    isSoldOut
-                      ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
-                      : "text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-xl shadow-amber-500/25 active:scale-95"
+            {/* Direct Proceed to Pay Submit Button */}
+            <div className="pt-2 sticky bottom-0 bg-[#110524]/95 backdrop-blur-md pb-1 z-10 space-y-1.5">
+              {isSoldOut && (
+                <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center">
+                  🚫 OUT OF STOCK: All {maxTickets} VIP Passes for Rang Tarang Garba 2026 have been booked!
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={loading || isSoldOut}
+                className={`w-full py-4 rounded-xl font-black text-sm sm:text-base uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 ${isSoldOut
+                  ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
+                  : "text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-xl shadow-amber-500/25 active:scale-95"
                   }`}
-                >
-                  <CreditCard className="w-5 h-5 shrink-0" />
-                  {isSoldOut
-                    ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)`
-                    : loading
+              >
+                <CreditCard className="w-5 h-5 shrink-0" />
+                {isSoldOut
+                  ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)`
+                  : loading
                     ? "Launching Razorpay Gateway..."
                     : `PROCEED TO PAY (₹${totalAmount})`}
-                </button>
-                {!isSoldOut && (
-                  <div className="text-center mt-1.5 text-[10px] text-slate-400 flex items-center justify-center gap-1">
-                    <Lock className="w-3 h-3 text-emerald-400" />
-                    Secured by Razorpay • Instant Verification & Pass Generation
-                  </div>
-                )}
-              </div>
-            </form>
-          </div>
+              </button>
+              {!isSoldOut && (
+                <div className="text-center mt-1.5 text-[10px] text-slate-400 flex items-center justify-center gap-1">
+                  <Lock className="w-3 h-3 text-emerald-400" />
+                  Secured by Razorpay • Instant Verification & Pass Generation
+                </div>
+              )}
+            </div>
+          </form>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 

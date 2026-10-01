@@ -213,23 +213,29 @@ export default function PassTiers({ onSelectPass }) {
                   </ul>
                 </div>
 
-                {/* CTA Button */}
-                <div className="mt-8 pt-4">
-                  <button
-                    onClick={() => !isSoldOut && onSelectPass({ ...tier, price: currentPrice })}
-                    disabled={isSoldOut}
-                    className={`w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 ${
-                      isSoldOut
-                        ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
-                        : "text-black shadow-xl shadow-[#e5b869]/20 bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] hover:opacity-95 active:scale-95"
-                    }`}
-                  >
-                    <span>
-                      {isSoldOut ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)` : `Book VIP Couple Pass (₹${currentPrice})`}
-                    </span>
-                    {!isSoldOut && <ArrowRight className="w-4 h-4 text-black" />}
-                  </button>
-                </div>
+                  {/* CTA Button */}
+                  <div className="mt-8 pt-4 space-y-2">
+                    <button
+                      onClick={() => !isSoldOut && onSelectPass({ ...tier, price: currentPrice })}
+                      disabled={isSoldOut}
+                      className={`w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 ${
+                        isSoldOut
+                          ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
+                          : "text-black shadow-xl shadow-[#e5b869]/20 bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] hover:opacity-95 active:scale-95"
+                      }`}
+                    >
+                      <span>
+                        {isSoldOut ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)` : `Book VIP Couple Pass (₹${currentPrice})`}
+                      </span>
+                      {!isSoldOut && <ArrowRight className="w-4 h-4 text-black" />}
+                    </button>
+                    {!isSoldOut && (
+                      <p className="text-[10px] text-center text-slate-400 font-medium">
+                        🔒 Ek baar me ek hi couple pass (2 Persons Entry) book hoga
+                      </p>
+                    )}
+                  </div>
+
               </div>
             );
           })}

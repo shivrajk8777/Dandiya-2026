@@ -37,7 +37,7 @@ export const STATIC_SPONSORS = [
     tier: "Entertainment Partner",
     tagline: "Official Comedy & Media",
     website: "",
-    logoUrl: "/sponsors/Kaka-Kajod01.png",
+    logoUrl: "/sponsors/Kaka-Kajod02.png",
   },
   {
     id: "sp-5",
@@ -55,7 +55,7 @@ export const STATIC_SPONSORS = [
     tier: "Digital Partner",
     tagline: "Official Digital Partner",
     website: "",
-    logoUrl: "/sponsors/Raj-Rox-Creative-Studio.png"
+    logoUrl: "/sponsors/Raj-Rox-Creative-Studio001.png"
   },
   {
     id: "sp-7",

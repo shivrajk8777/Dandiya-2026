@@ -64,7 +64,7 @@ const DEFAULT_SPONSORS = [
     tier: "Entertainment Partner",
     tagline: "Official Comedy & Media",
     website: "",
-    logoUrl: "/sponsors/Kaka-Kajod01.png"
+    logoUrl: "/sponsors/Kaka-Kajod02.png"
   },
   {
     id: "sp-3",
