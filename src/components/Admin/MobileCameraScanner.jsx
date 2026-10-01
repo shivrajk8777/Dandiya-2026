@@ -13,16 +13,40 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
   const scannerRef = useRef(null);
   const directCamInputRef = useRef(null);
   const isProcessingRef = useRef(false);
+  const isMountedRef = useRef(true);
   const elementId = "html5-mobile-qr-reader";
 
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (scannerRef.current) {
+        try {
+          if (scannerRef.current.isScanning) {
+            scannerRef.current.stop().catch(() => {});
+          }
+          scannerRef.current.clear().catch(() => {});
+        } catch (e) {}
+        scannerRef.current = null;
+      }
+    };
+  }, []);
+
   const startCameraStream = async () => {
+    if (!isMountedRef.current) return;
     setCameraError("");
     setScanningStatus("Requesting camera permission...");
     isProcessingRef.current = false;
 
+    // Small delay to ensure DOM element is rendered and visible
+    await new Promise((r) => setTimeout(r, 60));
+    if (!isMountedRef.current) return;
+
     const targetElement = document.getElementById(elementId);
     if (!targetElement) {
-      setTimeout(startCameraStream, 100);
+      if (isMountedRef.current) {
+        setTimeout(startCameraStream, 120);
+      }
       return;
     }
 
@@ -32,7 +56,9 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
           if (scannerRef.current.isScanning) {
             await scannerRef.current.stop();
           }
+          await scannerRef.current.clear();
         } catch (e) {}
+        scannerRef.current = null;
       }
 
       const html5Qrcode = new Html5Qrcode(elementId, {
@@ -45,7 +71,7 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
       const qrConfig = {
         fps: 25,
         qrbox: (w, h) => {
-          const min = Math.min(w, h);
+          const min = Math.min(w || 250, h || 250);
           const size = Math.max(180, Math.floor(min * 0.75));
           return { width: size, height: size };
         },
@@ -53,17 +79,21 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
       };
 
       const handleSuccess = (decodedText) => {
-        if (isProcessingRef.current) return;
+        if (isProcessingRef.current || !isMountedRef.current) return;
         isProcessingRef.current = true;
 
         setScanFlash(true);
-        setTimeout(() => setScanFlash(false), 800);
+        setTimeout(() => {
+          if (isMountedRef.current) setScanFlash(false);
+        }, 800);
 
-        onScanResult(decodedText);
+        if (typeof onScanResult === "function") {
+          onScanResult(decodedText);
+        }
 
         if (autoKeepAlive) {
           setTimeout(() => {
-            isProcessingRef.current = false;
+            if (isMountedRef.current) isProcessingRef.current = false;
           }, 1200);
         } else {
           setCameraActive(false);
@@ -77,24 +107,38 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
 
       try {
         await html5Qrcode.start({ facingMode: "environment" }, qrConfig, handleSuccess, () => {});
-        setScanningStatus("⚡ Camera Active! Point camera at ticket QR code");
+        if (isMountedRef.current) {
+          setScanningStatus("⚡ Camera Active! Point camera at ticket QR code");
+        }
         return;
       } catch (err1) {
-        console.warn("FacingMode environment failed, checking camera list:", err1);
+        console.warn("FacingMode environment fallback:", err1);
       }
+
+      if (!isMountedRef.current) return;
 
       const cameras = await Html5Qrcode.getCameras();
       if (cameras && cameras.length > 0) {
-        const rearCam = cameras.find((c) => c.label.toLowerCase().includes("back") || c.label.toLowerCase().includes("rear")) || cameras[0];
+        const rearCam =
+          cameras.find(
+            (c) =>
+              c.label &&
+              (c.label.toLowerCase().includes("back") ||
+                c.label.toLowerCase().includes("rear") ||
+                c.label.toLowerCase().includes("environment"))
+          ) || cameras[0];
         await html5Qrcode.start(rearCam.id, qrConfig, handleSuccess, () => {});
-        setScanningStatus("⚡ Camera Active! Point camera at ticket QR code");
+        if (isMountedRef.current) {
+          setScanningStatus("⚡ Camera Active! Point camera at ticket QR code");
+        }
       } else {
         throw new Error("No camera devices detected on this phone.");
       }
     } catch (err) {
       console.error("Camera start exception:", err);
+      if (!isMountedRef.current) return;
       let msg = "Could not access mobile camera. ";
-      if (location.protocol !== "https:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+      if (typeof window !== "undefined" && window.location.protocol !== "https:" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
         msg += "Mobile browsers block camera on unsecure HTTP links. Please use HTTPS or type Pass ID / Phone below!";
       } else {
         msg += "Please allow camera permission in your browser or type Pass ID / Phone below!";
@@ -113,22 +157,14 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
           if (scannerRef.current.isScanning) {
             scannerRef.current.stop().catch(() => {});
           }
+          scannerRef.current.clear().catch(() => {});
         } catch (e) {}
+        scannerRef.current = null;
       }
     }
-
-    return () => {
-      if (scannerRef.current) {
-        try {
-          if (scannerRef.current.isScanning) {
-            scannerRef.current.stop().catch(() => {});
-          }
-        } catch (e) {}
-      }
-    };
   }, [cameraActive]);
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -137,33 +173,44 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
 
     try {
       const html5Qrcode = new Html5Qrcode("html5-file-qr-temp");
-      html5Qrcode
-        .scanFile(file, true)
-        .then((decodedText) => {
+      try {
+        const decodedText = await html5Qrcode.scanFile(file, true);
+        if (typeof onScanResult === "function") {
           onScanResult(decodedText);
-        })
-        .catch((err) => {
-          console.warn("File scan error", err);
-          setCameraError("No QR Code detected in this photo. Please take a clearer photo or enter Pass ID manually.");
-        });
+        }
+        html5Qrcode.clear().catch(() => {});
+      } catch (err) {
+        console.warn("File scan error", err);
+        setCameraError("No QR Code detected in this photo. Please take a clearer photo or enter Pass ID manually.");
+        html5Qrcode.clear().catch(() => {});
+      }
     } catch (err) {
       console.error("File scanner error", err);
       setCameraError("Error reading image file: " + err.message);
+    } finally {
+      if (e.target) e.target.value = "";
     }
   };
 
   const handleManualSubmit = (e) => {
     if (e) e.preventDefault();
     if (!manualCodeInput.trim()) return;
-    onScanResult(manualCodeInput.trim());
+    if (typeof onScanResult === "function") {
+      onScanResult(manualCodeInput.trim());
+    }
     setManualCodeInput("");
   };
 
   const stopCamera = () => {
     if (scannerRef.current && scannerRef.current.isScanning) {
-      scannerRef.current.stop().then(() => {
-        setCameraActive(false);
-      }).catch(() => setCameraActive(false));
+      scannerRef.current
+        .stop()
+        .then(() => {
+          if (isMountedRef.current) setCameraActive(false);
+        })
+        .catch(() => {
+          if (isMountedRef.current) setCameraActive(false);
+        });
     } else {
       setCameraActive(false);
     }
@@ -297,7 +344,7 @@ export default function MobileCameraScanner({ onScanResult, onCloseScanner }) {
           <span>Quick Demo Test Pass:</span>
           <button
             type="button"
-            onClick={() => onScanResult("DND-RAAS-8942")}
+            onClick={() => onScanResult && onScanResult("DND-RAAS-8942")}
             className="px-2 py-0.5 rounded bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/30 text-amber-300 font-mono font-bold"
           >
             DND-RAAS-8942 (Click to Test)

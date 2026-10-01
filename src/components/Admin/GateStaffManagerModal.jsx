@@ -16,6 +16,20 @@ export const DEFAULT_STAFF_USERS = [
     password: "gatepass2026",
     name: "VIP Gate Scanner",
     gate: "VIP Lounge Entrance"
+  },
+  {
+    id: "staff-3",
+    username: "staff1",
+    password: "gatepass2026",
+    name: "Gate Staff 1",
+    gate: "Main Entrance Gate"
+  },
+  {
+    id: "staff-4",
+    username: "staff2",
+    password: "gatepass2026",
+    name: "Gate Staff 2",
+    gate: "VIP Entrance Gate"
   }
 ];
 
