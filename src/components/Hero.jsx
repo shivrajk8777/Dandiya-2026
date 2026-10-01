@@ -12,7 +12,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
 
   useEffect(() => {
     const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 18);
+    targetDate.setDate(targetDate.getDate() + 17);
     targetDate.setHours(19, 0, 0, 0);
 
     const timer = setInterval(() => {
@@ -66,11 +66,11 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#160829] border border-[#e5b869]/30 mb-6 shadow-lg">
           <span className="w-2 h-2 rounded-full bg-[#e5b869]" />
           <span className="text-[11px] sm:text-xs font-semibold tracking-widest uppercase text-[#e5b869] font-sans">
-            6th Annual Grand Garba Mahotsav
+            1th Annual Grand Garba Mahotsav
           </span>
           <span className="text-slate-600">|</span>
           <span className="text-[11px] sm:text-xs text-slate-300 font-medium">
-            October 17 – 19, 2026
+            October 17-10-2026
           </span>
         </div>
 
@@ -80,7 +80,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
         </div>
 
         {/* Main Headline */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.08] mb-6 font-serif-royal">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[1.08] mb-6 font-serif-royal break-words">
           <span className="text-white">RANG TARANG </span>
           <br />
           <span className="text-gold-gradient font-sans-modern font-black">
@@ -89,23 +89,23 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
         </h1>
 
         {/* Subtitle */}
-        <p className="max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-slate-300 font-light mb-8 leading-relaxed">
+        <p className="max-w-2xl mx-auto text-xs sm:text-base md:text-lg text-slate-300 font-light mb-8 leading-relaxed px-2">
           Experience Rajasthan’s most prestigious and electric Rang Tarang Garba festival at Raj Vilas Garden, Chomu. 3 grand evenings with 100-piece live Dhol symphony, celebrity headliners, 40,000 sq.ft wooden arena, and royal dining.
         </p>
 
         {/* Event Meta Badges */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 mb-10 text-xs sm:text-sm text-slate-300">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl editorial-card">
-            <Calendar className="w-4 h-4 text-[#e5b869]" />
-            <span className="font-medium">Oct 17 - 19, 2026</span>
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-10 text-xs sm:text-sm text-slate-300">
+          <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl editorial-card text-[11px] sm:text-xs">
+            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#e5b869] shrink-0" />
+            <span className="font-medium whitespace-nowrap">17 Oct 2026</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl editorial-card">
-            <Clock className="w-4 h-4 text-[#fb7185]" />
-            <span className="font-medium">07:00 PM to 01:00 AM</span>
+          <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl editorial-card text-[11px] sm:text-xs">
+            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#fb7185] shrink-0" />
+            <span className="font-medium whitespace-nowrap">07:00 PM to 01:00 AM</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl editorial-card">
-            <MapPin className="w-4 h-4 text-purple-400" />
-            <span className="font-medium">Raj Vilas Garden, Chomu, Rajasthan</span>
+          <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl editorial-card text-[11px] sm:text-xs">
+            <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400 shrink-0" />
+            <span className="font-medium text-left">Raj Vilas Garden, Chomu, Rajasthan</span>
           </div>
         </div>
 
@@ -113,99 +113,99 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12">
           <button
             onClick={() => onOpenRegister()}
-            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#e5b869] via-[#d4a359] to-[#c9933b] hover:from-[#fef08a] hover:to-[#e5b869] text-black font-extrabold text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-[#e5b869]/15 flex items-center justify-center gap-2.5 group hover:scale-[1.01] active:scale-95 transition-all"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-[#e5b869] via-[#d4a359] to-[#c9933b] hover:from-[#fef08a] hover:to-[#e5b869] text-black font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-[#e5b869]/15 flex items-center justify-center gap-2 sm:gap-2.5 group hover:scale-[1.01] active:scale-95 transition-all"
           >
-            <Ticket className="w-4 h-4 text-black" />
+            <Ticket className="w-4 h-4 text-black shrink-0" />
             <span>Book Official Passes</span>
-            <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform shrink-0" />
           </button>
 
           <button
             onClick={onOpenLookup}
-            className="w-full sm:w-auto px-6 py-4 bg-[#140826] hover:bg-[#1a0b33] border border-[#e5b869]/30 hover:border-[#e5b869] text-slate-200 hover:text-white font-medium text-sm rounded-2xl transition-all flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 bg-[#140826] hover:bg-[#1a0b33] border border-[#e5b869]/30 hover:border-[#e5b869] text-slate-200 hover:text-white font-medium text-xs sm:text-sm rounded-2xl transition-all flex items-center justify-center gap-2"
           >
-            <Search className="w-4 h-4 text-[#e5b869]" />
+            <Search className="w-4 h-4 text-[#e5b869] shrink-0" />
             <span>Retrieve Existing Pass</span>
           </button>
         </div>
 
         {/* Live Glass Countdown Timer */}
-        <div className="max-w-xl mx-auto p-5 sm:p-6 rounded-3xl editorial-card relative overflow-hidden">
-          <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-white/10">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#e5b869] uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-[#e5b869]" />
-              Event Gates Open In
+        <div className="max-w-xl mx-auto p-4 sm:p-6 rounded-3xl editorial-card relative overflow-hidden">
+          <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4 pb-2.5 sm:pb-3 border-b border-white/10">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold text-[#e5b869] uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-[#e5b869] shrink-0" />
+              Gates Open In
             </div>
-            <div className="text-[11px] text-emerald-400 font-medium">
-              Early-Bird Tiers Available
+            <div className="text-[10px] sm:text-[11px] text-emerald-400 font-medium">
+              Early-Bird Available
             </div>
           </div>
 
-          <div className="grid grid-cols-4 gap-2 sm:gap-3.5 text-center">
-            <div className="bg-[#0b0314] p-3 sm:p-4 rounded-2xl border border-white/5">
-              <div className="text-2xl sm:text-4xl font-black text-white font-sans">
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-3.5 text-center">
+            <div className="bg-[#0b0314] p-2 sm:p-4 rounded-xl sm:rounded-2xl border border-white/5">
+              <div className="text-xl sm:text-4xl font-black text-white font-sans">
                 {String(timeLeft.days).padStart(2, "0")}
               </div>
-              <div className="text-[10px] sm:text-xs uppercase text-slate-400 font-medium tracking-wider mt-1">
+              <div className="text-[9px] sm:text-xs uppercase text-slate-400 font-medium tracking-wider mt-0.5 sm:mt-1">
                 Days
               </div>
             </div>
-            <div className="bg-[#0b0314] p-3 sm:p-4 rounded-2xl border border-white/5">
-              <div className="text-2xl sm:text-4xl font-black text-white font-sans">
+            <div className="bg-[#0b0314] p-2 sm:p-4 rounded-xl sm:rounded-2xl border border-white/5">
+              <div className="text-xl sm:text-4xl font-black text-white font-sans">
                 {String(timeLeft.hours).padStart(2, "0")}
               </div>
-              <div className="text-[10px] sm:text-xs uppercase text-slate-400 font-medium tracking-wider mt-1">
+              <div className="text-[9px] sm:text-xs uppercase text-slate-400 font-medium tracking-wider mt-0.5 sm:mt-1">
                 Hours
               </div>
             </div>
-            <div className="bg-[#0b0314] p-3 sm:p-4 rounded-2xl border border-white/5">
-              <div className="text-2xl sm:text-4xl font-black text-white font-sans">
+            <div className="bg-[#0b0314] p-2 sm:p-4 rounded-xl sm:rounded-2xl border border-white/5">
+              <div className="text-xl sm:text-4xl font-black text-white font-sans">
                 {String(timeLeft.minutes).padStart(2, "0")}
               </div>
-              <div className="text-[10px] sm:text-xs uppercase text-slate-400 font-medium tracking-wider mt-1">
-                Minutes
+              <div className="text-[9px] sm:text-xs uppercase text-slate-400 font-medium tracking-wider mt-0.5 sm:mt-1">
+                Mins
               </div>
             </div>
-            <div className="bg-[#0b0314] p-3 sm:p-4 rounded-2xl border border-white/5">
-              <div className="text-2xl sm:text-4xl font-black text-[#e5b869] font-sans">
+            <div className="bg-[#0b0314] p-2 sm:p-4 rounded-xl sm:rounded-2xl border border-white/5">
+              <div className="text-xl sm:text-4xl font-black text-[#e5b869] font-sans">
                 {String(timeLeft.seconds).padStart(2, "0")}
               </div>
-              <div className="text-[10px] sm:text-xs uppercase text-slate-400 font-medium tracking-wider mt-1">
-                Seconds
+              <div className="text-[9px] sm:text-xs uppercase text-slate-400 font-medium tracking-wider mt-0.5 sm:mt-1">
+                Secs
               </div>
             </div>
           </div>
         </div>
 
         {/* Live Festival Key Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-10 max-w-4xl mx-auto text-left">
-          <div className="p-3.5 sm:p-4 rounded-2xl editorial-card flex items-center gap-3">
-            <div className="text-lg text-[#e5b869] font-black">10K+</div>
-            <div className="text-xs text-slate-300">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 mt-8 sm:mt-10 max-w-4xl mx-auto text-left">
+          <div className="p-3 sm:p-4 rounded-2xl editorial-card flex items-center gap-2.5 sm:gap-3">
+            <div className="text-base sm:text-lg text-[#e5b869] font-black shrink-0">10K+</div>
+            <div className="text-[11px] sm:text-xs text-slate-300">
               <strong className="block text-white font-semibold">Attendees</strong>
               Open Arena
             </div>
           </div>
 
-          <div className="p-3.5 sm:p-4 rounded-2xl editorial-card flex items-center gap-3">
-            <div className="text-lg text-[#fb7185] font-black">100</div>
-            <div className="text-xs text-slate-300">
+          <div className="p-3 sm:p-4 rounded-2xl editorial-card flex items-center gap-2.5 sm:gap-3">
+            <div className="text-base sm:text-lg text-[#fb7185] font-black shrink-0">100</div>
+            <div className="text-[11px] sm:text-xs text-slate-300">
               <strong className="block text-white font-semibold">Dhol Symphony</strong>
               Live Percussion
             </div>
           </div>
 
-          <div className="p-3.5 sm:p-4 rounded-2xl editorial-card flex items-center gap-3">
-            <div className="text-lg text-purple-400 font-black">40K</div>
-            <div className="text-xs text-slate-300">
+          <div className="p-3 sm:p-4 rounded-2xl editorial-card flex items-center gap-2.5 sm:gap-3">
+            <div className="text-base sm:text-lg text-purple-400 font-black shrink-0">40K</div>
+            <div className="text-[11px] sm:text-xs text-slate-300">
               <strong className="block text-white font-semibold">Sq.Ft Hardwood</strong>
               Cushioned Floor
             </div>
           </div>
 
-          <div className="p-3.5 sm:p-4 rounded-2xl editorial-card flex items-center gap-3">
-            <div className="text-lg text-emerald-400 font-black">₹5L</div>
-            <div className="text-xs text-slate-300">
+          <div className="p-3 sm:p-4 rounded-2xl editorial-card flex items-center gap-2.5 sm:gap-3">
+            <div className="text-base sm:text-lg text-emerald-400 font-black shrink-0">₹5L</div>
+            <div className="text-[11px] sm:text-xs text-slate-300">
               <strong className="block text-white font-semibold">Prize Pool</strong>
               Gold & Trophies
             </div>

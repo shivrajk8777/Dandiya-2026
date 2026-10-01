@@ -693,59 +693,60 @@ export default function DigitalPass({ passData, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-xl overflow-y-auto">
-      <div className="relative max-w-2xl w-full my-4 sm:my-8 bg-[#0e041c] border border-amber-500/40 rounded-3xl p-4 sm:p-7 shadow-2xl max-h-[95vh] overflow-y-auto">
+      <div className="relative max-w-2xl w-full my-2 sm:my-6 bg-[#0e041c] border border-amber-500/40 rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-2xl max-h-[94vh] flex flex-col overflow-hidden">
         {/* Success Header */}
-        <div className="text-center mb-3 sm:mb-5">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-2">
-            <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7" />
+        <div className="text-center mb-2.5 sm:mb-4 shrink-0">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-1.5">
+            <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-white font-serif-royal">Pass Issued Successfully!</h2>
-          <p className="text-[11px] sm:text-xs text-amber-300 font-medium mt-0.5">
+          <h2 className="text-lg sm:text-2xl font-black text-white font-serif-royal leading-tight">Pass Issued Successfully!</h2>
+          <p className="text-[10px] sm:text-xs text-amber-300 font-medium mt-0.5">
             Your Official RANG TARANG GARBA 2026 E-Pass is ready
           </p>
         </div>
 
         {/* Side View Switcher Tabs */}
-        <div className="flex items-center justify-center gap-1.5 p-1 mb-4 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold">
+        <div className="grid grid-cols-3 gap-1 p-1 mb-3 rounded-xl bg-white/5 border border-white/10 text-[10px] sm:text-xs font-semibold shrink-0">
           <button
             onClick={() => setActiveTab("front")}
-            className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+            className={`py-1.5 px-1 sm:px-3 rounded-lg flex items-center justify-center gap-1 transition-all ${
               activeTab === "front"
                 ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md"
                 : "text-slate-300 hover:text-white hover:bg-white/5"
             }`}
           >
-            🎟️ Front Side (Pass)
+            <span className="truncate">🎟️ Front</span>
           </button>
           <button
             onClick={() => setActiveTab("back")}
-            className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+            className={`py-1.5 px-1 sm:px-3 rounded-lg flex items-center justify-center gap-1 transition-all ${
               activeTab === "back"
                 ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md"
                 : "text-slate-300 hover:text-white hover:bg-white/5"
             }`}
           >
-            📜 Back Side (Terms & Conditions)
+            <span className="truncate">📜 Back (Rules)</span>
           </button>
           <button
             onClick={() => setActiveTab("both")}
-            className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+            className={`py-1.5 px-1 sm:px-3 rounded-lg flex items-center justify-center gap-1 transition-all ${
               activeTab === "both"
                 ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md"
                 : "text-slate-300 hover:text-white hover:bg-white/5"
             }`}
           >
-            <Layers className="w-3.5 h-3.5" /> Both Sides
+            <Layers className="w-3 h-3 shrink-0" />
+            <span className="truncate">Both</span>
           </button>
         </div>
 
-        {/* Ticket Container */}
-        <div id="printable-ticket" ref={ticketRef} className="space-y-4">
+        {/* Ticket Container Scrollable Body */}
+        <div id="printable-ticket" ref={ticketRef} className="flex-1 overflow-y-auto pr-1 no-scrollbar space-y-3.5">
           {/* ========================================= */}
           {/* SIDE A: FRONT PASS */}
           {/* ========================================= */}
           {(activeTab === "front" || activeTab === "both") && (
-            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-br from-[#1c0836] via-[#100422] to-[#240a44] border-2 border-amber-400/60 shadow-2xl p-4 sm:p-6 text-white">
+            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-br from-[#1c0836] via-[#100422] to-[#240a44] border-2 border-amber-400/60 shadow-2xl p-3.5 sm:p-6 text-white">
               {/* Top Gold Foil Bar */}
               <div className="absolute top-0 left-0 right-0 h-2 sm:h-2.5 bg-gradient-to-r from-amber-300 via-rose-400 to-amber-300" />
 
@@ -755,48 +756,45 @@ export default function DigitalPass({ passData, onClose }) {
               </div>
 
               {/* Header */}
-              <div className="flex items-start justify-between border-b border-amber-500/30 pb-3 mb-4">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-amber-500/30 pb-2.5 mb-3 gap-2">
+                <div className="flex items-center gap-2.5">
                   <img
                     src={logoDataUrl}
                     alt="Rang Tarang Garba"
                     crossOrigin="anonymous"
-                    className="h-10 sm:h-12 w-auto object-contain drop-shadow-md shrink-0"
+                    className="h-9 sm:h-12 w-auto object-contain drop-shadow-md shrink-0"
                   />
                   <div>
-                    <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold text-amber-400 uppercase tracking-widest font-serif-royal">
-                      <Crown className="w-3 h-3 text-amber-400" />
-                      Grand Heritage • Season 6
+                    <div className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold text-amber-400 uppercase tracking-widest font-serif-royal">
+                      <Crown className="w-3 h-3 text-amber-400 shrink-0" />
+                      Season 6 • Garba Mahotsav
                     </div>
-                    <h3 className="text-lg sm:text-xl font-black tracking-wider text-white font-serif-royal leading-tight">
+                    <h3 className="text-base sm:text-xl font-black tracking-wider text-white font-serif-royal leading-tight">
                       RANG TARANG <span className="gold-foil-text font-sans-modern font-black">GARBA</span>
                     </h3>
-                    <p className="text-[9px] sm:text-[10px] text-slate-400 tracking-wider uppercase">
-                      Official Access Badge 2026
-                    </p>
                   </div>
                 </div>
 
-                <div className="text-right shrink-0">
-                  <span className="inline-block px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-md">
+                <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto shrink-0 border-t sm:border-t-0 border-white/10 pt-1.5 sm:pt-0">
+                  <span className="inline-block px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[9px] sm:text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-md">
                     {passData.passType}
                   </span>
-                  <div className="text-[9px] sm:text-[10px] text-emerald-400 font-bold mt-1 flex items-center justify-end gap-1">
-                    <ShieldCheck className="w-3 h-3" />
+                  <div className="text-[9px] sm:text-[10px] text-emerald-400 font-bold mt-0.5 flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 shrink-0" />
                     AUTHENTICATED
                   </div>
                 </div>
               </div>
 
               {/* Pass Body */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-6 items-center">
                 {/* Attendee Details */}
-                <div className="sm:col-span-2 space-y-2.5 sm:space-y-3">
+                <div className="sm:col-span-2 space-y-2 sm:space-y-3">
                   <div>
                     <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider">
                       Pass Holder Name & Aadhaar
                     </span>
-                    <div className="text-lg sm:text-xl font-black text-white capitalize font-serif-royal leading-tight">
+                    <div className="text-base sm:text-xl font-black text-white capitalize font-serif-royal leading-tight">
                       {passData.fullName}
                     </div>
                     {Array.isArray(passData.attendees) && passData.attendees.length > 0 && (
@@ -815,7 +813,7 @@ export default function DigitalPass({ passData, onClose }) {
                       <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400">
                         Phone / WhatsApp
                       </span>
-                      <div className="font-semibold text-slate-200 text-xs sm:text-sm">{passData.phone}</div>
+                      <div className="font-semibold text-slate-200 text-xs sm:text-sm font-mono">{passData.phone}</div>
                     </div>
                     <div>
                       <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400">
@@ -831,7 +829,7 @@ export default function DigitalPass({ passData, onClose }) {
                         Quantity & Entry
                       </span>
                       <div className="font-bold text-white text-xs sm:text-sm">
-                        {passData.quantity} {passData.quantity === 1 ? "Couple Pass" : "Couple Passes"} ({passData.quantity * 2} Persons)
+                        {passData.quantity} {passData.quantity === 1 ? "Couple Pass" : "Couple Passes"} ({passData.quantity * 2} Pax)
                       </div>
                     </div>
                     <div>
@@ -858,17 +856,17 @@ export default function DigitalPass({ passData, onClose }) {
                 </div>
 
                 {/* QR Code Container */}
-                <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white text-black shadow-xl mx-auto sm:mx-0 w-full max-w-[150px]">
+                <div className="flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-2xl bg-white text-black shadow-xl mx-auto sm:mx-0 w-full max-w-[140px] sm:max-w-[150px]">
                   {qrDataUrl ? (
                     <img
                       src={qrDataUrl}
                       alt="Pass QR Code"
-                      className="w-28 h-28 sm:w-32 sm:h-32 object-contain"
+                      className="w-24 h-24 sm:w-32 sm:h-32 object-contain"
                     />
                   ) : (
-                    <div className="w-28 h-28 flex items-center justify-center text-xs">Generating QR...</div>
+                    <div className="w-24 h-24 flex items-center justify-center text-xs">Generating QR...</div>
                   )}
-                  <div className="font-mono text-[10px] font-black tracking-widest text-purple-950 mt-1 uppercase text-center">
+                  <div className="font-mono text-[9px] sm:text-[10px] font-black tracking-widest text-purple-950 mt-1 uppercase text-center">
                     {passData.passId}
                   </div>
                   <div className="text-[8px] text-slate-600 uppercase font-extrabold tracking-wider">
@@ -878,7 +876,7 @@ export default function DigitalPass({ passData, onClose }) {
               </div>
 
               {/* Official Festival Partners Front Strip WITH LOGO IMAGES (Single Horizontal Line) */}
-              <div className="mt-3 p-2 rounded-2xl bg-black/50 border border-amber-500/35">
+              <div className="mt-3 p-1.5 sm:p-2 rounded-2xl bg-black/50 border border-amber-500/35">
                 <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar w-full">
                   {STATIC_SPONSORS.map((sp, idx) => (
                     <div
@@ -890,7 +888,7 @@ export default function DigitalPass({ passData, onClose }) {
                       <img
                         src={sp.logoUrl}
                         alt={sp.name}
-                        className="h-5 sm:h-6 w-auto max-w-[55px] sm:max-w-[70px] object-contain drop-shadow"
+                        className="h-4 sm:h-6 w-auto max-w-[45px] sm:max-w-[70px] object-contain drop-shadow"
                       />
                     </div>
                   ))}
@@ -898,12 +896,12 @@ export default function DigitalPass({ passData, onClose }) {
               </div>
 
               {/* Bottom security strip */}
-              <div className="mt-3 pt-2 border-t border-dashed border-amber-500/40 flex items-center justify-between text-[9px] sm:text-[10px] text-slate-400 font-mono">
+              <div className="mt-2.5 pt-1.5 border-t border-dashed border-amber-500/40 flex items-center justify-between text-[9px] sm:text-[10px] text-slate-400 font-mono">
                 <div>
                   ID: <span className="text-amber-300 font-bold">{passData.passId}</span>
                 </div>
                 <div>STATUS: {passData.status || "CONFIRMED"}</div>
-                <div>NON-TRANSFERABLE</div>
+                <div className="hidden sm:block">NON-TRANSFERABLE</div>
               </div>
             </div>
           )}
@@ -922,34 +920,34 @@ export default function DigitalPass({ passData, onClose }) {
           {/* SIDE B: BACK PASS (TERMS & CONDITIONS ONLY) */}
           {/* ========================================= */}
           {(activeTab === "back" || activeTab === "both") && (
-            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-br from-[#14052b] via-[#0b0318] to-[#1b0838] border-2 border-amber-400/60 shadow-2xl p-4 sm:p-6 text-white space-y-4">
+            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-br from-[#14052b] via-[#0b0318] to-[#1b0838] border-2 border-amber-400/60 shadow-2xl p-3.5 sm:p-6 text-white space-y-3 sm:space-y-4">
               {/* Top Gold Foil Bar */}
               <div className="absolute top-0 left-0 right-0 h-2 sm:h-2.5 bg-gradient-to-r from-amber-300 via-orange-400 to-amber-300" />
 
               {/* Back Side Header */}
               <div className="border-b border-amber-500/30 pb-2">
                 <div className="text-[9px] sm:text-[10px] font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5 font-serif-royal">
-                  <FileText className="w-3.5 h-3.5" />
+                  <FileText className="w-3.5 h-3.5 shrink-0" />
                   Official Ticket Back Side • Rang Tarang Garba 2026
                 </div>
-                <h3 className="text-base sm:text-lg font-black text-white font-serif-royal mt-0.5">
+                <h3 className="text-sm sm:text-lg font-black text-white font-serif-royal mt-0.5">
                   TERMS & CONDITIONS OF ENTRY
                 </h3>
               </div>
 
               {/* TERMS AND CONDITIONS */}
               <div>
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 uppercase tracking-wider mb-3">
-                  <Info className="w-3.5 h-3.5 text-amber-400" />
+                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 uppercase tracking-wider mb-2 sm:mb-3">
+                  <Info className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   Rules & Event Guidelines
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[10px] sm:text-[11px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 text-[10px] sm:text-[11px]">
                   {DEFAULT_TERMS.map((term) => (
                     <div
                       key={term.num}
-                      className="p-2.5 sm:p-3 rounded-xl bg-white/[0.04] border border-amber-500/25 flex items-start gap-2.5"
+                      className="p-2 sm:p-3 rounded-xl bg-white/[0.04] border border-amber-500/25 flex items-start gap-2"
                     >
-                      <span className="w-5 h-5 rounded-full bg-amber-400 text-black font-black text-[9px] flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                      <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-amber-400 text-black font-black text-[8px] sm:text-[9px] flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
                         {term.num}
                       </span>
                       <div>
@@ -967,59 +965,62 @@ export default function DigitalPass({ passData, onClose }) {
 
               {/* Security Footer (Back) */}
               <div className="pt-2 border-t border-dashed border-amber-500/40 flex items-center justify-between text-[9px] sm:text-[10px] text-slate-400 font-mono">
-                <div>PASS SECURITY ID: <span className="text-amber-300 font-bold">{passData.passId}</span></div>
-                <div>AUTHENTICATED TICKET</div>
-                <div>RIGHTS OF ADMISSION RESERVED</div>
+                <div>SECURITY ID: <span className="text-amber-300 font-bold">{passData.passId}</span></div>
+                <div>AUTHENTICATED</div>
+                <div className="hidden sm:block">RIGHTS RESERVED</div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-3 mt-4 sm:mt-6">
-          <button
-            onClick={handleDownloadPdf}
-            disabled={downloading}
-            className="py-3 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 hover:opacity-95 active:scale-95 transition-all"
-          >
-            <FileText className="w-4 h-4 text-black" />
-            {downloading ? "Generating HD PDF..." : "Download HD Ticket (PDF)"}
-          </button>
+        {/* Action Buttons (2x2 Grid on Mobile for height efficiency) */}
+        <div className="shrink-0 pt-2 border-t border-white/10 space-y-2 mt-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-3">
+            <button
+              onClick={handleDownloadPdf}
+              disabled={downloading}
+              className="py-2.5 px-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow-lg shadow-amber-500/20 hover:opacity-95 active:scale-95 transition-all"
+            >
+              <FileText className="w-3.5 h-3.5 text-black shrink-0" />
+              <span className="truncate">{downloading ? "Generating..." : "Download PDF"}</span>
+            </button>
 
-          <button
-            onClick={handleDownloadImage}
-            disabled={downloading}
-            className="py-3 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
-          >
-            <Download className="w-4 h-4" />
-            Download PNG
-          </button>
+            <button
+              onClick={handleDownloadImage}
+              disabled={downloading}
+              className="py-2.5 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-[11px] sm:text-xs flex items-center justify-center gap-1 transition-all"
+            >
+              <Download className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Download PNG</span>
+            </button>
 
-          <button
-            onClick={handlePrint}
-            className="py-3 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
-          >
-            <Printer className="w-4 h-4" />
-            Print Ticket
-          </button>
+            <button
+              onClick={handlePrint}
+              className="py-2.5 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-[11px] sm:text-xs flex items-center justify-center gap-1 transition-all"
+            >
+              <Printer className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Print Ticket</span>
+            </button>
 
+            <button
+              onClick={handleShare}
+              className="py-2.5 px-2.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/40 border border-emerald-500/40 text-emerald-300 font-semibold text-[11px] sm:text-xs flex items-center justify-center gap-1 transition-all"
+            >
+              <Share2 className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Share Pass</span>
+            </button>
+          </div>
+
+          {/* Close Button */}
           <button
-            onClick={handleShare}
-            className="py-3 px-3 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/40 border border-emerald-500/40 text-emerald-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
+            onClick={onClose}
+            className="w-full py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
           >
-            <Share2 className="w-4 h-4" />
-            Share Pass
+            Close & Back to Festival Site
           </button>
         </div>
-
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="w-full mt-3 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
-        >
-          Close & Back to Festival Site
-        </button>
       </div>
     </div>
   );
+
 }

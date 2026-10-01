@@ -58,13 +58,13 @@ export default function EventSchedule() {
         </div>
 
         {/* Timeline */}
-        <div className="relative border-l-2 border-amber-500/30 ml-4 sm:ml-32 space-y-8">
+        <div className="relative border-l-2 border-amber-500/30 ml-4 sm:ml-32 space-y-6 sm:space-y-8">
           {scheduleItems.map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div key={idx} className="relative pl-6 sm:pl-10 group">
+              <div key={idx} className="relative pl-5 sm:pl-10 group">
                 {/* Node icon */}
-                <div className="absolute -left-[17px] top-1.5 w-8 h-8 rounded-full bg-[#0e031c] border-2 border-amber-400 flex items-center justify-center text-amber-400 group-hover:scale-110 group-hover:bg-amber-400 group-hover:text-black transition-all shadow-lg shadow-amber-500/20">
+                <div className="absolute -left-[17px] top-1.5 w-8 h-8 rounded-full bg-[#0e031c] border-2 border-amber-400 flex items-center justify-center text-amber-400 group-hover:scale-110 group-hover:bg-amber-400 group-hover:text-black transition-all shadow-lg shadow-amber-500/20 shrink-0">
                   <Icon className="w-4 h-4" />
                 </div>
 
@@ -74,7 +74,7 @@ export default function EventSchedule() {
                 </div>
 
                 {/* Content Card */}
-                <div className="luxury-glass rounded-2xl p-6 transition-all group-hover:border-amber-400/50">
+                <div className="luxury-glass rounded-2xl p-4 sm:p-6 transition-all group-hover:border-amber-400/50">
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                     <span className="sm:hidden text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20 font-sans-modern">
                       {item.time}
@@ -84,7 +84,7 @@ export default function EventSchedule() {
                     </span>
                   </div>
 
-                  <h3 className="text-lg sm:text-xl font-bold text-white mb-2 font-serif-royal">
+                  <h3 className="text-base sm:text-xl font-bold text-white mb-2 font-serif-royal leading-snug">
                     {item.title}
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-light">

@@ -44,7 +44,7 @@ export default function RoyalExperience() {
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 pt-6 border-t border-white/10 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-6 border-t border-white/10 text-xs">
               <div>
                 <span className="block text-slate-400 text-[10px] uppercase">Capacity</span>
                 <strong className="text-white font-semibold">10,000 Dancers</strong>

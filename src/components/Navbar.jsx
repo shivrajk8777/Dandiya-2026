@@ -17,8 +17,8 @@ export default function Navbar({ onOpenRegister, onOpenLookup, onOpenAdmin }) {
   return (
     <header
       className={`sticky top-0 left-0 right-0 z-40 transition-all duration-300 w-full ${scrolled
-          ? "bg-[#07030e]/95 backdrop-blur-xl border-b border-[#e5b869]/20 py-3 shadow-2xl"
-          : "bg-[#07030e]/80 backdrop-blur-md border-b border-white/5 py-4"
+        ? "bg-[#07030e]/95 backdrop-blur-xl border-b border-[#e5b869]/20 py-3 shadow-2xl"
+        : "bg-[#07030e]/80 backdrop-blur-md border-b border-white/5 py-4"
         }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -27,7 +27,7 @@ export default function Navbar({ onOpenRegister, onOpenLookup, onOpenAdmin }) {
           <img
             src="/logo.png"
             alt="Rang Tarang Garba"
-            className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-[0_2px_12px_rgba(249,115,22,0.5)] group-hover:scale-105 transition-all duration-300"
+            className="h-10 sm:h-12 md:h-16 w-auto object-contain drop-shadow-[0_2px_12px_rgba(249,115,22,0.5)] group-hover:scale-105 transition-all duration-300"
           />
         </a>
 
@@ -65,23 +65,13 @@ export default function Navbar({ onOpenRegister, onOpenLookup, onOpenAdmin }) {
             Find Pass
           </button>
 
-          {/* Admin Portal */}
-          <button
-            onClick={onOpenAdmin}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all"
-            title="Admin Login & Gate Scanner"
-          >
-            <Shield className="w-3.5 h-3.5 text-purple-400" />
-            Admin
-          </button>
-
           {/* Book Passes CTA */}
           <button
             onClick={() => onOpenRegister()}
-            className="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#e5b869] via-[#d4a359] to-[#c9933b] hover:from-[#fef08a] hover:to-[#e5b869] text-black font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#e5b869]/15 active:scale-95 transition-all flex items-center gap-2 shrink-0"
+            className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#e5b869] via-[#d4a359] to-[#c9933b] hover:from-[#fef08a] hover:to-[#e5b869] text-black font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#e5b869]/15 active:scale-95 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0"
           >
-            <Ticket className="w-4 h-4 text-black" />
-            Book Passes
+            <Ticket className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black shrink-0" />
+            <span className="whitespace-nowrap">Book Passes</span>
           </button>
 
           {/* Mobile menu trigger */}
@@ -97,7 +87,7 @@ export default function Navbar({ onOpenRegister, onOpenLookup, onOpenAdmin }) {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#0a0414]/98 backdrop-blur-2xl border-b border-[#e5b869]/20 px-5 py-6 space-y-4">
+        <div className="lg:hidden bg-[#0a0414]/98 backdrop-blur-2xl border-b border-[#e5b869]/20 px-5 py-6 space-y-4 max-h-[85vh] overflow-y-auto">
           <nav className="flex flex-col space-y-3.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
             <a
               href="#experience"

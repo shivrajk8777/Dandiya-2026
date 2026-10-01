@@ -129,7 +129,7 @@ export default function Footer({ onOpenAdmin, onOpenRegister, onOpenLookup }) {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-purple-400 shrink-0" />
-                <a href="mailto:rangtaranggarbaofficial@gmail.com" className="hover:text-amber-400 transition-colors">rangtaranggarbaofficial@gmail.com</a>
+                <a href="mailto:rangtaranggarbaofficial@gmail.com" className="hover:text-amber-400 transition-colors break-all sm:break-normal">rangtaranggarbaofficial@gmail.com</a>
               </div>
             </div>
           </div>

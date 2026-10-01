@@ -261,10 +261,10 @@ export default function BackgroundMusicPlayer() {
       )}
 
       {/* Floating Bottom-Left Garba Sound Player & Playlist Container */}
-      <div className="fixed bottom-5 left-5 z-40 flex flex-col items-start gap-2">
+      <div className="fixed bottom-3 sm:bottom-5 left-3 sm:left-5 z-40 flex flex-col items-start gap-2 max-w-[calc(100vw-24px)]">
         {/* Playlist Selection Popup Menu */}
         {showPlaylistMenu && (
-          <div className="w-80 p-3 rounded-2xl bg-[#13072b]/95 border border-amber-500/40 text-white backdrop-blur-2xl shadow-2xl mb-1 animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <div className="w-[calc(100vw-32px)] sm:w-80 p-3 rounded-2xl bg-[#13072b]/95 border border-amber-500/40 text-white backdrop-blur-2xl shadow-2xl mb-1 animate-in fade-in slide-in-from-bottom-3 duration-200">
             <div className="flex items-center justify-between pb-2 border-b border-amber-500/20 mb-2">
               <div className="flex items-center gap-2 text-amber-300 font-bold text-xs">
                 <ListMusic className="w-4 h-4 text-amber-400" />
