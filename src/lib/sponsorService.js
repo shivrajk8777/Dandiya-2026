@@ -14,12 +14,7 @@ const LOCAL_SPONSORS_KEY = "dandiya_local_sponsors_v2";
 const COLLECTION_NAME = "dandiya_sponsors";
 
 const OLD_DEFAULT_NAMES = [
-  "GUJARAT TOURISM",
-  "RED BULL",
-  "TAJ HOTELS",
-  "TIMES OF INDIA",
-  "VOGUE INDIA",
-  "FEVER 104 FM"
+  ""
 ];
 
 // Helper to check if a logo URL is valid and browser ready
@@ -37,17 +32,17 @@ export const isValidLogoUrl = (url) => {
 export const generateDynamicLogoSvg = (name = "PARTNER", tier = "Official Partner") => {
   const cleanName = (name || "PARTNER").trim().toUpperCase();
   const cleanTier = (tier || "OFFICIAL PARTNER").trim().toUpperCase();
-  
+
   let hash = 0;
   for (let i = 0; i < cleanName.length; i++) {
     hash = cleanName.charCodeAt(i) + ((hash << 5) - hash);
   }
-  
+
   const hues = [285, 210, 345, 42, 165, 25]; // Luxury purple, royal blue, crimson, gold, emerald, bronze
   const selectedHue = hues[Math.abs(hash) % hues.length];
   const initial = cleanName.charAt(0) || "P";
   const gradId = `bgGrad_${Math.abs(hash)}`;
-  
+
   const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 70"><defs><linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="hsl(${selectedHue}, 75%, 16%)"/><stop offset="100%" stop-color="hsl(${selectedHue}, 85%, 8%)"/></linearGradient></defs><rect width="220" height="70" rx="10" fill="url(#${gradId})" stroke="#e5b869" stroke-width="2"/><circle cx="35" cy="35" r="19" fill="#e5b869"/><text x="35" y="42" fill="#000000" font-family="Georgia, serif" font-weight="900" font-size="20" text-anchor="middle">${initial}</text><text x="66" y="34" fill="#ffffff" font-family="Georgia, serif" font-weight="900" font-size="14" letter-spacing="1">${cleanName.length > 14 ? cleanName.substring(0, 14) : cleanName}</text><text x="66" y="50" fill="#fcd34d" font-family="sans-serif" font-weight="bold" font-size="9" letter-spacing="1">${cleanTier.length > 20 ? cleanTier.substring(0, 18) + '...' : cleanTier}</text></svg>`;
 
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`;
@@ -69,7 +64,7 @@ const DEFAULT_SPONSORS = [
     tier: "Entertainment Partner",
     tagline: "Official Comedy & Media",
     website: "",
-    logoUrl: "/sponsors/kaka-kajod.jpg"
+    logoUrl: "/sponsors/Kaka-Kajod01.png"
   },
   {
     id: "sp-3",
@@ -147,7 +142,7 @@ export const subscribeToSponsors = (callback) => {
   // Emit local sponsors immediately so UI is populated with zero flash/delay
   try {
     callback(getLocalSponsors(), false);
-  } catch (e) {}
+  } catch (e) { }
 
   const { db, isConnected } = getFirebaseInstance();
 
@@ -173,7 +168,7 @@ export const subscribeToSponsors = (callback) => {
               oldDocs.forEach(async (d) => {
                 try {
                   await deleteDoc(doc(db, COLLECTION_NAME, d.id));
-                } catch (e) {}
+                } catch (e) { }
               });
               list = list.filter(item => !OLD_DEFAULT_NAMES.includes(item.name));
             }
@@ -189,7 +184,7 @@ export const subscribeToSponsors = (callback) => {
                     logoUrl: sp.logoUrl,
                     createdAt: new Date().toISOString()
                   });
-                } catch (e) {}
+                } catch (e) { }
               });
               callback(DEFAULT_SPONSORS, true);
             } else {
@@ -207,7 +202,7 @@ export const subscribeToSponsors = (callback) => {
                   logoUrl: sp.logoUrl,
                   createdAt: new Date().toISOString()
                 });
-              } catch (e) {}
+              } catch (e) { }
             });
             callback(DEFAULT_SPONSORS, true);
           }
@@ -235,7 +230,7 @@ export const subscribeToSponsors = (callback) => {
       window.removeEventListener("dandiya_sponsors_update", sendLocal);
     };
   }
-  return () => {};
+  return () => { };
 };
 
 // Add Sponsor

@@ -37,7 +37,7 @@ export const STATIC_SPONSORS = [
     tier: "Entertainment Partner",
     tagline: "Official Comedy & Media",
     website: "",
-    logoUrl: "/sponsors/Kaka-Kajod.png",
+    logoUrl: "/sponsors/Kaka-Kajod01.png",
   },
   {
     id: "sp-5",
