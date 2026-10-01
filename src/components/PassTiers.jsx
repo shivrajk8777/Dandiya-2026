@@ -112,40 +112,40 @@ export default function PassTiers({ onSelectPass }) {
           </div>
         </div>
 
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-lg mx-auto px-2 sm:px-0">
           {PASS_OPTIONS.map((tier) => {
             const Icon = tier.icon;
             const currentPrice = pricing.finalPrice;
             const isDiscounted = pricing.isDiscounted;
 
-
             return (
               <div
                 key={tier.id}
-                className={`relative rounded-3xl p-6 sm:p-8 pt-9 sm:pt-10 flex flex-col justify-between transition-all duration-300 bg-gradient-to-b from-[#250d3e] via-[#140626] to-[#1c0830] border-2 shadow-2xl ${
+                className={`relative rounded-2xl sm:rounded-3xl p-4 sm:p-8 pt-8 sm:pt-10 flex flex-col justify-between transition-all duration-300 bg-gradient-to-b from-[#250d3e] via-[#140626] to-[#1c0830] border-2 shadow-2xl ${
                   isSoldOut
                     ? "border-slate-700 opacity-90 shadow-none"
                     : "border-[#e5b869] shadow-[#e5b869]/25 hover:scale-[1.01]"
                 }`}
               >
                 {/* Floating Top Ribbon */}
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap z-10">
+                <div className="absolute -top-3.5 sm:-top-4 left-1/2 -translate-x-1/2 whitespace-nowrap z-10">
                   {isSoldOut ? (
-                    <span className="px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-white shadow-xl bg-gradient-to-r from-rose-600 to-red-700 border border-rose-400/40 flex items-center gap-1.5">
+                    <span className="px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider text-white shadow-xl bg-gradient-to-r from-rose-600 to-red-700 border border-rose-400/40 flex items-center gap-1.5">
                       <AlertCircle className="w-3.5 h-3.5 text-white" />
                       OUT OF STOCK
                     </span>
                   ) : isDiscounted && pricing.discountBadge ? (
-                    <span className="px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-slate-950 shadow-xl bg-gradient-to-r from-amber-300 via-emerald-400 to-teal-300 border border-emerald-300/50 flex items-center gap-1.5">
+                    <span className="px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-950 shadow-xl bg-gradient-to-r from-amber-300 via-emerald-400 to-teal-300 border border-emerald-300/50 flex items-center gap-1.5">
                       <Tag className="w-3.5 h-3.5 text-slate-950" />
                       {pricing.discountBadge}
                     </span>
                   ) : (
-                    <span className="px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-black shadow-xl bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#f97316]">
+                    <span className="px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider text-black shadow-xl bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#f97316]">
                       {tier.tag}
                     </span>
                   )}
                 </div>
+
 
                 <div>
                   {/* Top Icon & Badge Row */}
