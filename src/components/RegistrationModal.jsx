@@ -535,7 +535,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                 <input
                   type="text"
                   name="fullName"
-                  placeholder="e.g. Aarav Sharma"
+                  placeholder="e.g. Enter Your Full Name"
                   value={formData.fullName}
                   onChange={handleInputChange}
                   required
@@ -575,7 +575,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                   <input
                     type="email"
                     name="email"
-                    placeholder="name@gmail.com"
+                    placeholder="Enter Your Email Id"
                     value={formData.email}
                     onChange={handleInputChange}
                     className="w-full bg-[#1b0a38] border border-white/15 rounded-xl pl-9 sm:pl-10 pr-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
@@ -642,7 +642,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                             <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                             <input
                               type="text"
-                              placeholder="e.g. Aarav Sharma"
+                              placeholder="Enter Your Name"
                               value={att.name}
                               onChange={(e) => handleAttendeeChange(idx, "name", e.target.value)}
                               required

@@ -22,9 +22,9 @@ const SEED_DATA = [
   {
     id: "dnd-demo-1",
     passId: "DND-RAAS-8942",
-    fullName: "Aarav Sharma",
+    fullName: "",
     phone: "9876543210",
-    email: "aarav.sharma@example.com",
+    email: "",
     city: "Chomu",
     passType: "Royal VIP Couple Pass",
     quantity: 1,
@@ -225,7 +225,7 @@ export const subscribeToRegistrations = (callback) => {
       window.removeEventListener("dandiya_local_update", sendLocal);
     };
   }
-  return () => {};
+  return () => { };
 };
 
 // Update existing registration details (e.g. from Pending to Approved with Payment Ref)
@@ -278,7 +278,7 @@ export const checkInAttendee = async (identifier, staffInfo = null) => {
     try {
       const parsed = JSON.parse(cleanId);
       if (parsed.id) cleanId = parsed.id;
-    } catch (e) {}
+    } catch (e) { }
   }
   cleanId = cleanId.toUpperCase();
 
