@@ -6,9 +6,9 @@ export default function GalleryShowcase() {
   const highlights = [
     {
       title: "The Maha Raas Concentric Circles",
-      caption: "5,000 dancers moving in rhythmic synchrony under 3D laser arches.",
+      caption: "1,000 dancers moving in rhythmic synchrony under 3D laser arches.",
       tag: "Main Arena",
-      stat: "5,000+ Dancers"
+      stat: "1,000+ Dancers"
     },
     {
       title: "Royal Chaniya Choli Couture",

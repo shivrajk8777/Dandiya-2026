@@ -25,7 +25,7 @@ export default function RoyalExperience() {
           {/* Card 1: Large Span (40,000 sq.ft arena) */}
           <div className="md:col-span-2 lg:col-span-2 editorial-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#e5b869]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-            
+
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div className="w-12 h-12 rounded-2xl bg-[#e5b869]/10 border border-[#e5b869]/30 flex items-center justify-center text-[#e5b869]">
@@ -149,7 +149,7 @@ export default function RoyalExperience() {
               </div>
 
               <h3 className="text-xl font-bold text-white mb-2 font-serif-royal">
-                500-Drone Aerial Symphony & 3D Lasers
+                50-Drone Aerial Symphony & 3D Lasers
               </h3>
               <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-light mb-4">
                 Witness a breathtaking sky choreography of 500 synchronized illuminated drones forming sacred Navratri motifs above the open night sky, accompanied by synchronized 3D laser mapping.

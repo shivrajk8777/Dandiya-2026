@@ -14,7 +14,7 @@ export default function BrandAnnouncementBar({ onOpenRegister }) {
           </span>
           <span className="text-slate-600 hidden md:inline">|</span>
           <span className="hidden md:inline text-slate-400 font-light truncate">
-            India’s Premier Grand Heritage Rang Tarang Garba Mahotsav • Oct 17–19 • Raj Vilas Garden, Chomu
+            India’s Premier Grand Heritage Rang Tarang Garba Mahotsav • Oct 17 • Raj Vilas Garden, Chomu
           </span>
         </div>
 

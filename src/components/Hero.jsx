@@ -55,7 +55,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
                   RANG TARANG <span className="text-gold-gradient font-sans-modern font-black">GARBA</span>
                 </span>
                 <span className="text-[10px] text-slate-300 font-medium tracking-wider">
-                  Season 6 • Chomu, Rajasthan
+                  Season 1 • Chomu, Rajasthan
                 </span>
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
         {/* Live Festival Key Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 mt-8 sm:mt-10 max-w-4xl mx-auto text-left">
           <div className="p-3 sm:p-4 rounded-2xl editorial-card flex items-center gap-2.5 sm:gap-3">
-            <div className="text-base sm:text-lg text-[#e5b869] font-black shrink-0">10K+</div>
+            <div className="text-base sm:text-lg text-[#e5b869] font-black shrink-0">2K+</div>
             <div className="text-[11px] sm:text-xs text-slate-300">
               <strong className="block text-white font-semibold">Attendees</strong>
               Open Arena
@@ -204,7 +204,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
           </div>
 
           <div className="p-3 sm:p-4 rounded-2xl editorial-card flex items-center gap-2.5 sm:gap-3">
-            <div className="text-base sm:text-lg text-emerald-400 font-black shrink-0">₹5L</div>
+            <div className="text-base sm:text-lg text-emerald-400 font-black shrink-0">₹10k</div>
             <div className="text-[11px] sm:text-xs text-slate-300">
               <strong className="block text-white font-semibold">Prize Pool</strong>
               Gold & Trophies
