@@ -2,16 +2,19 @@ import React, { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
 import QRCode from "qrcode";
 import { X, Sparkles, User, Phone, Mail, MapPin, CreditCard, CheckCircle2, ArrowRight, ShieldCheck, Ticket, Users, Tag, Clock, QrCode, Lock } from "lucide-react";
-import { registerAttendee } from "@/lib/registrationService";
+import { registerAttendee, updateRegistrationData, subscribeToRegistrations } from "@/lib/registrationService";
 import { PASS_OPTIONS } from "./PassTiers";
 import { subscribeToDiscountConfig, calculateTicketPrice } from "@/lib/discountService";
 import { initiateRazorpayCheckout } from "@/lib/razorpayService";
+import { subscribeToInventoryConfig } from "@/lib/ticketInventoryService";
 
 export default function RegistrationModal({ initialPass, isOpen, onClose, onSuccess }) {
   const [selectedPass, setSelectedPass] = useState(
     initialPass || PASS_OPTIONS[0]
   );
   const [discountConfig, setDiscountConfig] = useState(null);
+  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300 });
+  const [registrations, setRegistrations] = useState([]);
   const [step, setStep] = useState(1); // 1: Attendee details, 2: Payment
   const [paymentMethodTab, setPaymentMethodTab] = useState("razorpay"); // "razorpay" or "upi_qr"
   const [formData, setFormData] = useState({
@@ -34,13 +37,22 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    const unsubscribe = subscribeToDiscountConfig((cfg) => {
-      setDiscountConfig(cfg);
-    });
+    const unsubDisc = subscribeToDiscountConfig((cfg) => setDiscountConfig(cfg));
+    const unsubInv = subscribeToInventoryConfig((inv) => setInventoryConfig(inv));
+    const unsubReg = subscribeToRegistrations((list) => setRegistrations(list));
+
     return () => {
-      if (typeof unsubscribe === "function") unsubscribe();
+      if (typeof unsubDisc === "function") unsubDisc();
+      if (typeof unsubInv === "function") unsubInv();
+      if (typeof unsubReg === "function") unsubReg();
     };
   }, []);
+
+  const maxTickets = Number(inventoryConfig?.maxTickets) || 300;
+  const soldPasses = registrations
+    .filter((r) => r.status === "Approved")
+    .reduce((sum, r) => sum + (Number(r.quantity) || 1), 0);
+  const isSoldOut = soldPasses >= maxTickets;
 
   useEffect(() => {
     if (isOpen) {
@@ -221,10 +233,35 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     }
   };
 
-  // Razorpay Automated Payment Handler
+  // Razorpay Automated Payment Handler with Instant Pending Lead Recording
   const handleRazorpayPayment = async () => {
     setErrorMsg("");
     setLoading(true);
+
+    // 1. Immediately record an "Incomplete / Pending Payment" registration lead in database
+    let pendingRecord = null;
+    try {
+      const initialPayload = {
+        fullName: formData.fullName.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        city: formData.city.trim(),
+        passType: selectedPass.name,
+        quantity: Number(formData.quantity),
+        unitPrice: unitPrice,
+        totalAmount: totalAmount,
+        paymentMethod: "Razorpay (Initiated)",
+        transactionRef: "PENDING_PAYMENT",
+        paymentStatus: "Pending", // Saved as Pending Lead
+        attendees: attendees.map((a) => ({
+          name: a.name.trim(),
+          aadhaar: a.aadhaar.trim()
+        }))
+      };
+      pendingRecord = await registerAttendee(initialPayload);
+    } catch (e) {
+      console.warn("Could not save initial pending booking:", e);
+    }
 
     try {
       await initiateRazorpayCheckout({
@@ -237,35 +274,50 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         onSuccess: async (razorpayData) => {
           setLoading(true);
           try {
-            const payload = {
-              fullName: formData.fullName.trim(),
-              phone: formData.phone.trim(),
-              email: formData.email.trim(),
-              city: formData.city.trim(),
-              passType: selectedPass.name,
-              quantity: Number(formData.quantity),
-              unitPrice: unitPrice,
-              totalAmount: totalAmount,
+            const updates = {
               paymentMethod: razorpayData.paymentMethod || "Razorpay Automated (UPI / Card / Netbanking)",
               transactionRef: razorpayData.paymentId,
-              paymentStatus: "Approved",
-              attendees: attendees.map((a) => ({
-                name: a.name.trim(),
-                aadhaar: a.aadhaar.trim()
-              }))
+              status: "Approved"
             };
 
-            const result = await registerAttendee(payload);
-            if (result.success) {
+            if (pendingRecord && pendingRecord.id) {
+              await updateRegistrationData(pendingRecord.id, updates);
+              const updatedItem = { ...pendingRecord, ...updates };
               confetti({
                 particleCount: 120,
                 spread: 80,
                 origin: { y: 0.6 },
                 colors: ["#fbbf24", "#f43f5e", "#a855f7", "#34d399"]
               });
-              onSuccess(result);
+              onSuccess(updatedItem);
             } else {
-              setErrorMsg("Payment completed (" + razorpayData.paymentId + "), but pass registration failed.");
+              const fullPayload = {
+                fullName: formData.fullName.trim(),
+                phone: formData.phone.trim(),
+                email: formData.email.trim(),
+                city: formData.city.trim(),
+                passType: selectedPass.name,
+                quantity: Number(formData.quantity),
+                unitPrice: unitPrice,
+                totalAmount: totalAmount,
+                paymentMethod: razorpayData.paymentMethod || "Razorpay Automated (UPI / Card / Netbanking)",
+                transactionRef: razorpayData.paymentId,
+                paymentStatus: "Approved",
+                attendees: attendees.map((a) => ({
+                  name: a.name.trim(),
+                  aadhaar: a.aadhaar.trim()
+                }))
+              };
+              const result = await registerAttendee(fullPayload);
+              if (result.success) {
+                confetti({
+                  particleCount: 120,
+                  spread: 80,
+                  origin: { y: 0.6 },
+                  colors: ["#fbbf24", "#f43f5e", "#a855f7", "#34d399"]
+                });
+                onSuccess(result);
+              }
             }
           } catch (e) {
             setErrorMsg("Error completing registration: " + e.message);
@@ -617,19 +669,34 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               </div>
 
               {/* Direct Proceed to Pay Submit Button */}
-              <div className="pt-2 sticky bottom-0 bg-[#110524]/95 backdrop-blur-md pb-1 z-10">
+              <div className="pt-2 sticky bottom-0 bg-[#110524]/95 backdrop-blur-md pb-1 z-10 space-y-1.5">
+                {isSoldOut && (
+                  <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center">
+                    🚫 OUT OF STOCK: All {maxTickets} VIP Passes for Rang Tarang Garba 2026 have been booked!
+                  </div>
+                )}
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="w-full py-4 rounded-xl font-black text-sm sm:text-base uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2.5 active:scale-95 transition-all"
+                  disabled={loading || isSoldOut}
+                  className={`w-full py-4 rounded-xl font-black text-sm sm:text-base uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 ${
+                    isSoldOut
+                      ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
+                      : "text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-xl shadow-amber-500/25 active:scale-95"
+                  }`}
                 >
-                  <CreditCard className="w-5 h-5 text-black shrink-0" />
-                  {loading ? "Launching Razorpay Gateway..." : `PROCEED TO PAY (₹${totalAmount})`}
+                  <CreditCard className="w-5 h-5 shrink-0" />
+                  {isSoldOut
+                    ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)`
+                    : loading
+                    ? "Launching Razorpay Gateway..."
+                    : `PROCEED TO PAY (₹${totalAmount})`}
                 </button>
-                <div className="text-center mt-1.5 text-[10px] text-slate-400 flex items-center justify-center gap-1">
-                  <Lock className="w-3 h-3 text-emerald-400" />
-                  Secured by Razorpay • Instant Verification & Pass Generation
-                </div>
+                {!isSoldOut && (
+                  <div className="text-center mt-1.5 text-[10px] text-slate-400 flex items-center justify-center gap-1">
+                    <Lock className="w-3 h-3 text-emerald-400" />
+                    Secured by Razorpay • Instant Verification & Pass Generation
+                  </div>
+                )}
               </div>
             </form>
           </div>

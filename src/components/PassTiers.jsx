@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Check, Sparkles, User, Users, Crown, Flame, ShieldCheck, ArrowRight, Tag, Clock } from "lucide-react";
+import { Check, Sparkles, User, Users, Crown, Flame, ShieldCheck, ArrowRight, Tag, Clock, AlertCircle } from "lucide-react";
 import { subscribeToDiscountConfig, calculateTicketPrice } from "@/lib/discountService";
+import { subscribeToInventoryConfig } from "@/lib/ticketInventoryService";
+import { subscribeToRegistrations } from "@/lib/registrationService";
 
 export const PASS_OPTIONS = [
   {
@@ -25,17 +27,28 @@ export const PASS_OPTIONS = [
 
 export default function PassTiers({ onSelectPass }) {
   const [discountConfig, setDiscountConfig] = useState(null);
+  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300 });
+  const [registrations, setRegistrations] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = subscribeToDiscountConfig((cfg) => {
-      setDiscountConfig(cfg);
-    });
+    const unsubDisc = subscribeToDiscountConfig((cfg) => setDiscountConfig(cfg));
+    const unsubInv = subscribeToInventoryConfig((inv) => setInventoryConfig(inv));
+    const unsubReg = subscribeToRegistrations((list) => setRegistrations(list));
+
     return () => {
-      if (typeof unsubscribe === "function") unsubscribe();
+      if (typeof unsubDisc === "function") unsubDisc();
+      if (typeof unsubInv === "function") unsubInv();
+      if (typeof unsubReg === "function") unsubReg();
     };
   }, []);
 
   const pricing = calculateTicketPrice(discountConfig);
+  const maxTickets = Number(inventoryConfig?.maxTickets) || 300;
+  const soldPasses = registrations
+    .filter((r) => r.status === "Approved")
+    .reduce((sum, r) => sum + (Number(r.quantity) || 1), 0);
+  const remainingTickets = Math.max(0, maxTickets - soldPasses);
+  const isSoldOut = soldPasses >= maxTickets;
 
   return (
     <section id="passes" className="py-24 relative bg-[#07030e]">
@@ -51,6 +64,21 @@ export default function PassTiers({ onSelectPass }) {
           <p className="mt-4 text-slate-300 text-base font-light">
             All-inclusive access to Rajasthan's most grand Dandiya Mahotsav 2026 including Dandiya sticks, VIP arena, and instant digital QR e-ticket.
           </p>
+
+          {/* Live Inventory Stock Badge */}
+          <div className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-[#170529] border border-amber-500/40">
+            {isSoldOut ? (
+              <span className="text-rose-400 font-extrabold flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 text-rose-400 animate-pulse" />
+                OUT OF STOCK — All {maxTickets} VIP Passes Booked!
+              </span>
+            ) : (
+              <span className="text-amber-300 flex items-center gap-1.5">
+                <Flame className="w-4 h-4 text-amber-400 animate-bounce" />
+                Limited Stock: <strong className="text-white font-mono text-sm">{remainingTickets}</strong> of {maxTickets} Couple Passes Remaining!
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="max-w-lg mx-auto">
@@ -62,11 +90,20 @@ export default function PassTiers({ onSelectPass }) {
             return (
               <div
                 key={tier.id}
-                className="relative rounded-3xl p-6 sm:p-8 pt-9 sm:pt-10 flex flex-col justify-between transition-all duration-300 bg-gradient-to-b from-[#250d3e] via-[#140626] to-[#1c0830] border-2 border-[#e5b869] shadow-2xl shadow-[#e5b869]/25 hover:scale-[1.01]"
+                className={`relative rounded-3xl p-6 sm:p-8 pt-9 sm:pt-10 flex flex-col justify-between transition-all duration-300 bg-gradient-to-b from-[#250d3e] via-[#140626] to-[#1c0830] border-2 shadow-2xl ${
+                  isSoldOut
+                    ? "border-slate-700 opacity-90 shadow-none"
+                    : "border-[#e5b869] shadow-[#e5b869]/25 hover:scale-[1.01]"
+                }`}
               >
                 {/* Floating Top Ribbon */}
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap z-10">
-                  {isDiscounted && pricing.discountBadge ? (
+                  {isSoldOut ? (
+                    <span className="px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-white shadow-xl bg-gradient-to-r from-rose-600 to-red-700 border border-rose-400/40 flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5 text-white" />
+                      OUT OF STOCK
+                    </span>
+                  ) : isDiscounted && pricing.discountBadge ? (
                     <span className="px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-slate-950 shadow-xl bg-gradient-to-r from-amber-300 via-emerald-400 to-teal-300 border border-emerald-300/50 flex items-center gap-1.5">
                       <Tag className="w-3.5 h-3.5 text-slate-950" />
                       {pricing.discountBadge}
@@ -135,11 +172,18 @@ export default function PassTiers({ onSelectPass }) {
                 {/* CTA Button */}
                 <div className="mt-8 pt-4">
                   <button
-                    onClick={() => onSelectPass({ ...tier, price: currentPrice })}
-                    className="w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider text-black shadow-xl shadow-[#e5b869]/20 transition-all flex items-center justify-center gap-2.5 bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] hover:opacity-95 active:scale-95"
+                    onClick={() => !isSoldOut && onSelectPass({ ...tier, price: currentPrice })}
+                    disabled={isSoldOut}
+                    className={`w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 ${
+                      isSoldOut
+                        ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
+                        : "text-black shadow-xl shadow-[#e5b869]/20 bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] hover:opacity-95 active:scale-95"
+                    }`}
                   >
-                    <span>Book VIP Couple Pass (₹{currentPrice})</span>
-                    <ArrowRight className="w-4 h-4 text-black" />
+                    <span>
+                      {isSoldOut ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)` : `Book VIP Couple Pass (₹${currentPrice})`}
+                    </span>
+                    {!isSoldOut && <ArrowRight className="w-4 h-4 text-black" />}
                   </button>
                 </div>
               </div>

@@ -40,9 +40,10 @@ import FirebaseConfigModal from "./FirebaseConfigModal";
 import GateScannerModal from "./GateScannerModal";
 import SponsorManagerModal from "./SponsorManagerModal";
 import GateStaffManagerModal, { getGateStaffUsers } from "./GateStaffManagerModal";
-import MobileCameraScanner from "./MobileCameraScanner";
 import DiscountManagerModal from "./DiscountManagerModal";
 import RazorpayConfigModal from "./RazorpayConfigModal";
+import TicketInventoryModal from "./TicketInventoryModal";
+import { subscribeToInventoryConfig } from "@/lib/ticketInventoryService";
 
 // Audio sound feedback helper using Web Audio API
 const playTone = (type) => {
@@ -104,6 +105,8 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
   const [showGateStaffModal, setShowGateStaffModal] = useState(false);
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [showRazorpayModal, setShowRazorpayModal] = useState(false);
+  const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300 });
   const [actionLoading, setActionLoading] = useState(false);
 
   // Gate staff scanner state
@@ -124,7 +127,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
         if (role === "GATE_STAFF" && staffRaw) {
           try {
             setActiveStaffUser(JSON.parse(staffRaw));
-          } catch (e) {}
+          } catch (e) { }
         }
       }
     }
@@ -133,13 +136,18 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
   useEffect(() => {
     if (!isAuthenticated || !isOpen) return;
 
-    const unsubscribe = subscribeToRegistrations((data, isFb) => {
+    const unsubReg = subscribeToRegistrations((data, isFb) => {
       setRegistrations(data);
       setIsFirebaseLive(isFb);
     });
 
+    const unsubInv = subscribeToInventoryConfig((inv) => {
+      setInventoryConfig(inv);
+    });
+
     return () => {
-      if (typeof unsubscribe === "function") unsubscribe();
+      if (typeof unsubReg === "function") unsubReg();
+      if (typeof unsubInv === "function") unsubInv();
     };
   }, [isAuthenticated, isOpen]);
 
@@ -206,12 +214,13 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
   // Metrics calculation
   const totalRegistrations = registrations.length;
   const totalPasses = registrations.reduce((acc, r) => acc + (Number(r.quantity) || 1), 0);
-  const totalRevenue = registrations.reduce(
+  const totalRevenue = registrations.filter((r) => r.status !== "Pending").reduce(
     (acc, r) => acc + (Number(r.totalAmount) || Number(r.unitPrice) || 0),
     0
   );
   const checkedInCount = registrations.filter((r) => r.checkedIn).length;
   const checkInPercent = totalRegistrations > 0 ? Math.round((checkedInCount / totalRegistrations) * 100) : 0;
+  const pendingLeadsCount = registrations.filter((r) => r.status === "Pending" || r.status === "Pending Payment").length;
 
   // Filtered registrations for Super Admin
   const filteredList = registrations.filter((item) => {
@@ -269,7 +278,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
       try {
         const parsed = JSON.parse(clean);
         if (parsed.id) passId = parsed.id;
-      } catch {}
+      } catch { }
     }
 
     setGateScanLoading(true);
@@ -452,7 +461,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                   try {
                     const parsed = JSON.parse(scannedCode);
                     if (parsed.id) passId = parsed.id;
-                  } catch {}
+                  } catch { }
                 }
                 setGateScanLoading(true);
                 setGateScanResult(null);
@@ -506,13 +515,12 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
             {gateScanResult && (
               <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
                 <div
-                  className={`max-w-md w-full p-6 sm:p-8 rounded-3xl border-4 shadow-2xl space-y-5 text-center ${
-                    gateScanResult.type === "success"
+                  className={`max-w-md w-full p-6 sm:p-8 rounded-3xl border-4 shadow-2xl space-y-5 text-center ${gateScanResult.type === "success"
                       ? "bg-[#0b1d12] border-emerald-500 text-emerald-100 shadow-emerald-500/30"
                       : gateScanResult.type === "warning"
-                      ? "bg-[#231704] border-amber-500 text-amber-100 shadow-amber-500/30"
-                      : "bg-[#24080e] border-rose-500 text-rose-100 shadow-rose-500/30"
-                  }`}
+                        ? "bg-[#231704] border-amber-500 text-amber-100 shadow-amber-500/30"
+                        : "bg-[#24080e] border-rose-500 text-rose-100 shadow-rose-500/30"
+                    }`}
                 >
                   {/* Status Header Badge */}
                   <div className="flex flex-col items-center justify-center gap-2">
@@ -671,12 +679,20 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                 </button>
 
                 <button
+                  onClick={() => setShowInventoryModal(true)}
+                  className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 flex items-center gap-1.5 shadow-sm"
+                >
+                  <Ticket className="w-3.5 h-3.5 text-amber-400" />
+                  Stock Capacity ({inventoryConfig?.maxTickets || 300})
+                </button>
+
+                {/* <button
                   onClick={() => setShowRazorpayModal(true)}
                   className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 flex items-center gap-1.5"
                 >
                   <CreditCard className="w-3.5 h-3.5" />
                   Razorpay Keys
-                </button>
+                </button> */}
 
                 <button
                   onClick={() => setShowSponsorModal(true)}
@@ -713,7 +729,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
             </div>
 
             {/* Metrics Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3.5 mb-3">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 mb-3">
               <div className="p-3 sm:p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center gap-2.5 sm:gap-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
                   <Users className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -750,6 +766,27 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                   </div>
                   <div className="text-base sm:text-xl font-black text-emerald-400">
                     ₹{totalRevenue.toLocaleString("en-IN")}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                onClick={() => setStatusFilter(statusFilter === "Pending" ? "ALL" : "Pending")}
+                className={`p-3 sm:p-3.5 rounded-2xl border flex items-center gap-2.5 sm:gap-3 cursor-pointer transition-all ${
+                  statusFilter === "Pending"
+                    ? "bg-amber-500/20 border-amber-400 text-amber-200"
+                    : "bg-white/[0.03] border-white/10 hover:border-amber-500/30"
+                }`}
+              >
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+                </div>
+                <div>
+                  <div className="text-[10px] text-amber-300 font-bold uppercase tracking-wider">
+                    Incomplete Leads
+                  </div>
+                  <div className="text-base sm:text-xl font-black text-amber-400">
+                    {pendingLeadsCount}
                   </div>
                 </div>
               </div>
@@ -852,7 +889,22 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
 
                         {/* Contact */}
                         <td className="p-3">
-                          <div className="font-medium text-white">{item.phone}</div>
+                          <div className="font-medium text-white flex items-center gap-1.5">
+                            <span>{item.phone}</span>
+                            {item.phone && (
+                              <a
+                                href={`https://wa.me/91${item.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                                  `Hello ${item.fullName}, we noticed your Rang Tarang Garba VIP Pass booking (₹${item.totalAmount || item.unitPrice}) was incomplete. Do you need any assistance to issue your official E-Pass?`
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 text-[10px] font-bold inline-flex items-center gap-0.5 border border-emerald-500/30"
+                                title="Send WhatsApp Lead Follow-up"
+                              >
+                                💬 WhatsApp
+                              </a>
+                            )}
+                          </div>
                           <div className="text-[10px] text-slate-400 truncate max-w-[130px]">
                             {item.email || "—"}
                           </div>
@@ -888,12 +940,12 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                             className={`rounded-lg px-2 py-1 text-[11px] font-bold border focus:outline-none ${item.status === "Approved"
                               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
                               : item.status === "Pending"
-                                ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                                ? "bg-amber-500/20 border-amber-400 text-amber-300 font-extrabold"
                                 : "bg-rose-500/10 border-rose-500/30 text-rose-300"
                               }`}
                           >
                             <option value="Approved">Approved</option>
-                            <option value="Pending">Pending</option>
+                            <option value="Pending">⚠️ Pending / Incomplete</option>
                             <option value="Cancelled">Cancelled</option>
                           </select>
                         </td>
@@ -996,6 +1048,12 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
       <RazorpayConfigModal
         isOpen={showRazorpayModal}
         onClose={() => setShowRazorpayModal(false)}
+      />
+
+      <TicketInventoryModal
+        isOpen={showInventoryModal}
+        onClose={() => setShowInventoryModal(false)}
+        totalSoldPasses={totalPasses}
       />
     </div>
   );

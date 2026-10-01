@@ -228,6 +228,25 @@ export const subscribeToRegistrations = (callback) => {
   return () => {};
 };
 
+// Update existing registration details (e.g. from Pending to Approved with Payment Ref)
+export const updateRegistrationData = async (id, updates) => {
+  const { db, isConnected } = getFirebaseInstance();
+
+  if (isConnected && db && !id.startsWith("local-") && !id.startsWith("dnd-demo-")) {
+    try {
+      const ref = doc(db, COLLECTION_NAME, id);
+      await updateDoc(ref, updates);
+    } catch (e) {
+      console.warn("Firebase updateRegistrationData failed, trying local:", e);
+    }
+  }
+
+  const list = getLocalRegistrations();
+  const updated = list.map((item) => (item.id === id ? { ...item, ...updates } : item));
+  saveLocalRegistrations(updated);
+  return { success: true };
+};
+
 // Update Registration Status (Approve, Pending, Cancelled)
 export const updateStatus = async (id, newStatus) => {
   const { db, isConnected } = getFirebaseInstance();
