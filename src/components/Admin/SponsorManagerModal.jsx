@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { X, Plus, Trash2, Globe, Building2, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
-import { subscribeToSponsors, addSponsor, deleteSponsor } from "@/lib/sponsorService";
+import { X, Plus, Trash2, Globe, Building2, Sparkles, CheckCircle2, AlertCircle, Edit2, RotateCcw } from "lucide-react";
+import { subscribeToSponsors, addSponsor, updateSponsor, deleteSponsor } from "@/lib/sponsorService";
 
 const SPONSOR_TIERS = [
   "Title Sponsor",
@@ -20,6 +20,7 @@ const SPONSOR_TIERS = [
 export default function SponsorManagerModal({ isOpen, onClose }) {
   const [sponsors, setSponsors] = useState([]);
   const [isFirebaseLive, setIsFirebaseLive] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     tier: "Associate Partner",
@@ -48,7 +49,31 @@ export default function SponsorManagerModal({ isOpen, onClose }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddSponsor = async (e) => {
+  const handleEditClick = (sp) => {
+    setEditingId(sp.id);
+    setFormData({
+      name: sp.name || "",
+      tier: sp.tier || "Associate Partner",
+      tagline: sp.tagline || "",
+      website: sp.website || "",
+      logoUrl: sp.logoUrl || ""
+    });
+    setStatusMsg({ type: "success", text: `Editing sponsor "${sp.name}". Make changes below and click Save.` });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setFormData({
+      name: "",
+      tier: "Associate Partner",
+      tagline: "",
+      website: "",
+      logoUrl: ""
+    });
+    setStatusMsg(null);
+  };
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) {
       setStatusMsg({ type: "error", text: "Please enter sponsor / company name" });
@@ -59,19 +84,36 @@ export default function SponsorManagerModal({ isOpen, onClose }) {
     setStatusMsg(null);
 
     try {
-      const res = await addSponsor(formData);
-      if (res.success) {
-        setStatusMsg({ type: "success", text: `Sponsor "${formData.name.toUpperCase()}" added successfully!` });
-        setFormData({
-          name: "",
-          tier: "Associate Partner",
-          tagline: "",
-          website: "",
-          logoUrl: ""
-        });
+      if (editingId) {
+        // Edit mode
+        const res = await updateSponsor(editingId, formData);
+        if (res.success) {
+          setStatusMsg({ type: "success", text: `Sponsor "${formData.name.toUpperCase()}" updated successfully!` });
+          setEditingId(null);
+          setFormData({
+            name: "",
+            tier: "Associate Partner",
+            tagline: "",
+            website: "",
+            logoUrl: ""
+          });
+        }
+      } else {
+        // Add mode
+        const res = await addSponsor(formData);
+        if (res.success) {
+          setStatusMsg({ type: "success", text: `Sponsor "${formData.name.toUpperCase()}" added successfully!` });
+          setFormData({
+            name: "",
+            tier: "Associate Partner",
+            tagline: "",
+            website: "",
+            logoUrl: ""
+          });
+        }
       }
     } catch (err) {
-      setStatusMsg({ type: "error", text: "Failed to add sponsor: " + err.message });
+      setStatusMsg({ type: "error", text: `Failed to ${editingId ? "update" : "add"} sponsor: ` + err.message });
     } finally {
       setLoading(false);
     }
@@ -80,6 +122,9 @@ export default function SponsorManagerModal({ isOpen, onClose }) {
   const handleDelete = async (id, name) => {
     if (confirm(`Remove sponsor "${name}" from website?`)) {
       await deleteSponsor(id);
+      if (editingId === id) {
+        handleCancelEdit();
+      }
       setStatusMsg({ type: "success", text: `Sponsor "${name}" removed.` });
     }
   };
@@ -127,12 +172,24 @@ export default function SponsorManagerModal({ isOpen, onClose }) {
           </div>
         )}
 
-        {/* Add Sponsor Form */}
-        <form onSubmit={handleAddSponsor} className="bg-[#180836] p-4 sm:p-5 rounded-2xl border border-white/10 mb-6 space-y-3.5">
-          <h3 className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-            <Plus className="w-3.5 h-3.5" />
-            Add New Sponsor / Partner
-          </h3>
+        {/* Add/Edit Sponsor Form */}
+        <form onSubmit={handleFormSubmit} className={`p-4 sm:p-5 rounded-2xl border mb-6 space-y-3.5 transition-all ${editingId ? "bg-[#230f4a] border-amber-400 shadow-lg shadow-amber-500/10" : "bg-[#180836] border-white/10"}`}>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+              {editingId ? <Edit2 className="w-3.5 h-3.5 text-amber-400" /> : <Plus className="w-3.5 h-3.5" />}
+              {editingId ? `Edit Sponsor Details (${formData.name})` : "Add New Sponsor / Partner"}
+            </h3>
+            {editingId && (
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="text-[10px] font-bold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-lg border border-rose-500/30 flex items-center gap-1"
+              >
+                <RotateCcw className="w-3 h-3" />
+                Cancel Edit
+              </button>
+            )}
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -239,14 +296,25 @@ export default function SponsorManagerModal({ isOpen, onClose }) {
             )}
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:opacity-95 flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
-          >
-            <Plus className="w-4 h-4 text-black" />
-            {loading ? "Adding..." : "Add Sponsor to Website"}
-          </button>
+          <div className="flex gap-2 pt-1">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:opacity-95 flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
+            >
+              {editingId ? <Edit2 className="w-4 h-4 text-black" /> : <Plus className="w-4 h-4 text-black" />}
+              {loading ? (editingId ? "Updating..." : "Adding...") : editingId ? "Save Changes & Update Sponsor" : "Add Sponsor to Website"}
+            </button>
+            {editingId && (
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="px-4 py-2.5 rounded-xl font-bold text-xs text-slate-300 bg-white/10 hover:bg-white/20 border border-white/10"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
 
         {/* Existing Sponsors List */}
@@ -269,7 +337,9 @@ export default function SponsorManagerModal({ isOpen, onClose }) {
               sponsors.map((sp) => (
                 <div
                   key={sp.id}
-                  className="p-3 rounded-2xl bg-[#0e031c] border border-white/10 flex items-center justify-between gap-3"
+                  className={`p-3 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
+                    editingId === sp.id ? "bg-amber-500/15 border-amber-400" : "bg-[#0e031c] border-white/10"
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     {sp.logoUrl && (
@@ -306,6 +376,13 @@ export default function SponsorManagerModal({ isOpen, onClose }) {
                         <Globe className="w-3.5 h-3.5" />
                       </a>
                     )}
+                    <button
+                      onClick={() => handleEditClick(sp)}
+                      className="p-1.5 text-amber-300 hover:text-amber-200 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg border border-amber-500/30 transition-all"
+                      title="Edit Sponsor Details"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
                     <button
                       onClick={() => handleDelete(sp.id, sp.name)}
                       className="p-1.5 text-slate-400 hover:text-rose-400 bg-white/5 rounded-lg border border-white/10"

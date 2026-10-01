@@ -4,6 +4,7 @@ import {
   getDocs,
   onSnapshot,
   deleteDoc,
+  updateDoc,
   doc,
   serverTimestamp
 } from "firebase/firestore";
@@ -286,5 +287,37 @@ export const deleteSponsor = async (id) => {
 
   const list = getLocalSponsors().filter((sp) => sp.id !== id);
   saveLocalSponsors(list);
+  return { success: true };
+};
+
+// Update Sponsor
+export const updateSponsor = async (id, sponsorData) => {
+  const { db, isConnected } = getFirebaseInstance();
+  const brandName = sponsorData.name.trim().toUpperCase();
+  const brandTier = sponsorData.tier || "Associate Partner";
+  const userProvidedLogo = sponsorData.logoUrl?.trim();
+
+  const updatedFields = {
+    name: brandName,
+    tier: brandTier,
+    tagline: sponsorData.tagline?.trim() || "Official Festival Partner",
+    website: sponsorData.website?.trim() || "",
+    logoUrl: isValidLogoUrl(userProvidedLogo) ? userProvidedLogo : generateDynamicLogoSvg(brandName, brandTier),
+    updatedAt: new Date().toISOString()
+  };
+
+  if (isConnected && db && !id.startsWith("sp-")) {
+    try {
+      const ref = doc(db, COLLECTION_NAME, id);
+      await updateDoc(ref, updatedFields);
+      return { success: true };
+    } catch (e) {
+      console.warn("Firestore update sponsor failed, falling back to local:", e);
+    }
+  }
+
+  const list = getLocalSponsors();
+  const updatedList = list.map((sp) => (sp.id === id ? { ...sp, ...updatedFields } : sp));
+  saveLocalSponsors(updatedList);
   return { success: true };
 };
