@@ -516,10 +516,10 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
               <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
                 <div
                   className={`max-w-md w-full p-6 sm:p-8 rounded-3xl border-4 shadow-2xl space-y-5 text-center ${gateScanResult.type === "success"
-                      ? "bg-[#0b1d12] border-emerald-500 text-emerald-100 shadow-emerald-500/30"
-                      : gateScanResult.type === "warning"
-                        ? "bg-[#231704] border-amber-500 text-amber-100 shadow-amber-500/30"
-                        : "bg-[#24080e] border-rose-500 text-rose-100 shadow-rose-500/30"
+                    ? "bg-[#0b1d12] border-emerald-500 text-emerald-100 shadow-emerald-500/30"
+                    : gateScanResult.type === "warning"
+                      ? "bg-[#231704] border-amber-500 text-amber-100 shadow-amber-500/30"
+                      : "bg-[#24080e] border-rose-500 text-rose-100 shadow-rose-500/30"
                     }`}
                 >
                   {/* Status Header Badge */}
@@ -772,11 +772,10 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
 
               <div
                 onClick={() => setStatusFilter(statusFilter === "Pending" ? "ALL" : "Pending")}
-                className={`p-3 sm:p-3.5 rounded-2xl border flex items-center gap-2.5 sm:gap-3 cursor-pointer transition-all ${
-                  statusFilter === "Pending"
-                    ? "bg-amber-500/20 border-amber-400 text-amber-200"
-                    : "bg-white/[0.03] border-white/10 hover:border-amber-500/30"
-                }`}
+                className={`p-3 sm:p-3.5 rounded-2xl border flex items-center gap-2.5 sm:gap-3 cursor-pointer transition-all ${statusFilter === "Pending"
+                  ? "bg-amber-500/20 border-amber-400 text-amber-200"
+                  : "bg-white/[0.03] border-white/10 hover:border-amber-500/30"
+                  }`}
               >
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
                   <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
@@ -988,14 +987,14 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                             <Eye className="w-3.5 h-3.5" />
                           </button>
 
-                          <button
+                          {/* <button
                             onClick={() => handleDelete(item.id)}
                             disabled={actionLoading}
                             className="p-1.5 text-slate-400 hover:text-rose-400 bg-white/5 rounded-lg border border-white/10"
                             title="Delete"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          </button> */}
                         </td>
                       </tr>
                     ))
