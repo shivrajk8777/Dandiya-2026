@@ -29,6 +29,11 @@ export const metadata = {
     "Celebrity Garba Night"
   ],
   authors: [{ name: "Rang Tarang Cultural Foundation" }],
+  icons: {
+    icon: "/rang-tarang-logo.png",
+    shortcut: "/rang-tarang-logo.png",
+    apple: "/rang-tarang-logo.png",
+  },
   openGraph: {
     title: "RANG TARANG GARBA 2026 | Grand Heritage Dandiya & Garba Mahotsav",
     description: "Book exclusive passes for India's biggest Rang Tarang Garba celebration. Instant QR digital passes!",
@@ -40,6 +45,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`scroll-smooth dark ${playfair.variable} ${jakarta.variable}`}>
       <head>
+        <link rel="icon" href="/rang-tarang-logo.png" type="image/png" />
+        <link rel="shortcut icon" href="/rang-tarang-logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/rang-tarang-logo.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
