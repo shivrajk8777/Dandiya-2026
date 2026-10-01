@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
 import QRCode from "qrcode";
-import { X, Sparkles, User, Phone, Mail, MapPin, CreditCard, CheckCircle2, ArrowRight, ShieldCheck, Ticket, Users, Tag, Clock } from "lucide-react";
+import { X, Sparkles, User, Phone, Mail, MapPin, CreditCard, CheckCircle2, ArrowRight, ShieldCheck, Ticket, Users, Tag, Clock, QrCode, Lock } from "lucide-react";
 import { registerAttendee } from "@/lib/registrationService";
 import { PASS_OPTIONS } from "./PassTiers";
 import { subscribeToDiscountConfig, calculateTicketPrice } from "@/lib/discountService";
+import { initiateRazorpayCheckout } from "@/lib/razorpayService";
 
 export default function RegistrationModal({ initialPass, isOpen, onClose, onSuccess }) {
   const [selectedPass, setSelectedPass] = useState(
@@ -12,6 +13,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   );
   const [discountConfig, setDiscountConfig] = useState(null);
   const [step, setStep] = useState(1); // 1: Attendee details, 2: Payment
+  const [paymentMethodTab, setPaymentMethodTab] = useState("razorpay"); // "razorpay" or "upi_qr"
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -20,7 +22,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     quantity: 1,
     childrenCount: 0,
     transactionRef: "",
-    paymentMethod: "UPI (Google Pay / PhonePe / Paytm)"
+    paymentMethod: "Razorpay Automated (UPI / Card / Netbanking)"
   });
   const [attendees, setAttendees] = useState([
     { name: "", aadhaar: "" },
@@ -43,6 +45,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   useEffect(() => {
     if (isOpen) {
       setStep(1);
+      setPaymentMethodTab("razorpay");
       setErrorMsg("");
       setLoading(false);
       setFormData({
@@ -53,7 +56,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         quantity: 1,
         childrenCount: 0,
         transactionRef: "",
-        paymentMethod: "UPI (Google Pay / PhonePe / Paytm)"
+        paymentMethod: "Razorpay Automated (UPI / Card / Netbanking)"
       });
       setAttendees([
         { name: "", aadhaar: "" },
@@ -86,31 +89,15 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     });
   }, [formData.quantity, formData.fullName]);
 
-  // Keep children list in sync with childrenCount
-  useEffect(() => {
-    const count = Number(formData.childrenCount) || 0;
-    setChildrenList((prev) => {
-      const next = [...prev];
-      if (next.length < count) {
-        while (next.length < count) {
-          next.push({ name: "", age: "6", aadhaar: "" });
-        }
-      } else if (next.length > count) {
-        next.splice(count);
-      }
-      return next;
-    });
-  }, [formData.childrenCount]);
-
   const pricing = calculateTicketPrice(discountConfig);
   const unitPrice = pricing.finalPrice;
   const totalAmount = unitPrice * formData.quantity;
   const originalTotal = pricing.basePrice * formData.quantity;
   const totalSavings = originalTotal - totalAmount;
 
-  // Generate real UPI payment string and QR Code
+  // Generate real UPI payment string and QR Code for fallback QR tab
   useEffect(() => {
-    if (step === 2) {
+    if (step === 2 && paymentMethodTab === "upi_qr") {
       const upiString = `upi://pay?pa=rangtaranggarba2026@okhdfcbank&pn=RangTarangGarbaMahotsav&am=${totalAmount}&cu=INR&tn=RangTarangPass_${formData.phone}`;
       QRCode.toDataURL(upiString, {
         width: 280,
@@ -123,7 +110,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         .then((url) => setUpiQrUrl(url))
         .catch((e) => console.error(e));
     }
-  }, [step, totalAmount, formData.phone]);
+  }, [step, paymentMethodTab, totalAmount, formData.phone]);
 
   if (!isOpen) return null;
 
@@ -182,7 +169,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     }
 
     if (cleanEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-      setErrorMsg("Please enter Email id");
+      setErrorMsg("Please enter valid Email ID");
       return false;
     }
 
@@ -196,7 +183,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
       return false;
     }
 
-    // MANDATORY NAME & 12-DIGIT AADHAAR FOR ALL ATTENDEES (2 Persons per Couple Pass)
+    // MANDATORY NAME & 12-DIGIT AADHAAR FOR ALL ATTENDEES
     for (let i = 0; i < attendees.length; i++) {
       const att = attendees[i] || {};
       const pNum = i + 1;
@@ -227,13 +214,80 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     return true;
   };
 
-  const handleNextStep = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (validateStep1()) {
-      setStep(2);
+      handleRazorpayPayment();
     }
   };
 
+  // Razorpay Automated Payment Handler
+  const handleRazorpayPayment = async () => {
+    setErrorMsg("");
+    setLoading(true);
+
+    try {
+      await initiateRazorpayCheckout({
+        amount: totalAmount,
+        fullName: formData.fullName.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        passName: selectedPass.name,
+        quantity: Number(formData.quantity),
+        onSuccess: async (razorpayData) => {
+          setLoading(true);
+          try {
+            const payload = {
+              fullName: formData.fullName.trim(),
+              phone: formData.phone.trim(),
+              email: formData.email.trim(),
+              city: formData.city.trim(),
+              passType: selectedPass.name,
+              quantity: Number(formData.quantity),
+              unitPrice: unitPrice,
+              totalAmount: totalAmount,
+              paymentMethod: razorpayData.paymentMethod || "Razorpay Automated (UPI / Card / Netbanking)",
+              transactionRef: razorpayData.paymentId,
+              paymentStatus: "Approved",
+              attendees: attendees.map((a) => ({
+                name: a.name.trim(),
+                aadhaar: a.aadhaar.trim()
+              }))
+            };
+
+            const result = await registerAttendee(payload);
+            if (result.success) {
+              confetti({
+                particleCount: 120,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ["#fbbf24", "#f43f5e", "#a855f7", "#34d399"]
+              });
+              onSuccess(result);
+            } else {
+              setErrorMsg("Payment completed (" + razorpayData.paymentId + "), but pass registration failed.");
+            }
+          } catch (e) {
+            setErrorMsg("Error completing registration: " + e.message);
+          } finally {
+            setLoading(false);
+          }
+        },
+        onError: (errText) => {
+          setLoading(false);
+          setErrorMsg(errText || "Razorpay payment declined or cancelled.");
+        },
+        onModalDismiss: () => {
+          setLoading(false);
+        }
+      });
+    } catch (err) {
+      setLoading(false);
+      setErrorMsg("Razorpay gateway error: " + err.message);
+    }
+  };
+
+  // Manual UPI Submission Handler
   const handleSubmitRegistration = async () => {
     setErrorMsg("");
 
@@ -259,7 +313,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         quantity: Number(formData.quantity),
         unitPrice: unitPrice,
         totalAmount: totalAmount,
-        paymentMethod: formData.paymentMethod,
+        paymentMethod: "Manual UPI Scan & UTR",
         transactionRef: cleanRef,
         paymentStatus: "Approved",
         attendees: attendees.map((a) => ({
@@ -306,15 +360,13 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         <div className="text-left mb-3 sm:mb-5 pr-8 shrink-0">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 font-serif-royal">
             <Sparkles className="w-3 h-3 shrink-0" />
-            Step {step} of 2: {step === 1 ? "Attendee Info" : "UPI Payment Verification"}
+            VIP Ticket Booking & Instant E-Pass
           </div>
           <h2 className="text-lg sm:text-2xl font-black text-white font-serif-royal leading-snug">
-            {step === 1 ? "Book Your VIP Pass" : "Complete UPI Payment"}
+            Book Your VIP Pass
           </h2>
           <p className="text-[10px] sm:text-xs text-slate-400">
-            {step === 1
-              ? "Select pass quantity & enter attendee info for instant E-Ticket"
-              : "Scan UPI QR code & enter UTR number to generate official E-Ticket"}
+            Fill attendee info & click Proceed to Pay to open Razorpay Payment Gateway directly
           </p>
         </div>
 
@@ -326,9 +378,8 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
 
         {/* Scrollable Form Body */}
         <div className="flex-1 overflow-y-auto pr-1 no-scrollbar space-y-3.5">
-          {/* STEP 1: Attendee Info & Pass selection */}
-          {step === 1 && (
-            <form onSubmit={handleNextStep} className="space-y-3 sm:space-y-4">
+          {/* Attendee Info & Pass selection */}
+          <form onSubmit={handleFormSubmit} className="space-y-3 sm:space-y-4">
               {/* Pass Category Display */}
               <div>
                 <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
@@ -565,102 +616,25 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                 </div>
               </div>
 
-              {/* Step 1 Submit Button */}
+              {/* Direct Proceed to Pay Submit Button */}
               <div className="pt-2 sticky bottom-0 bg-[#110524]/95 backdrop-blur-md pb-1 z-10">
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 hover:opacity-95 shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 active:scale-95 transition-all"
+                  disabled={loading}
+                  className="w-full py-4 rounded-xl font-black text-sm sm:text-base uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2.5 active:scale-95 transition-all"
                 >
-                  Proceed to Payment (₹{totalAmount})
-                  <ArrowRight className="w-4 h-4 text-black shrink-0" />
+                  <CreditCard className="w-5 h-5 text-black shrink-0" />
+                  {loading ? "Launching Razorpay Gateway..." : `PROCEED TO PAY (₹${totalAmount})`}
                 </button>
+                <div className="text-center mt-1.5 text-[10px] text-slate-400 flex items-center justify-center gap-1">
+                  <Lock className="w-3 h-3 text-emerald-400" />
+                  Secured by Razorpay • Instant Verification & Pass Generation
+                </div>
               </div>
             </form>
-          )}
-
-          {/* STEP 2: UPI Payment & Verification */}
-          {step === 2 && (
-            <div className="space-y-3.5">
-              {/* Booking Summary */}
-              <div className="p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs sm:text-sm">
-                <div>
-                  <div className="text-white font-bold">{formData.fullName}</div>
-                  <div className="text-slate-400 text-[11px]">
-                    {selectedPass.name} × {formData.quantity}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-base sm:text-lg font-black text-amber-400">₹{totalAmount}</div>
-                  <span className="text-[9px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                    Pay via UPI
-                  </span>
-                </div>
-              </div>
-
-              {/* UPI QR Display */}
-              <div className="flex flex-col sm:flex-row items-center gap-3.5 sm:gap-4 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-[#1d0938] to-[#100320] border border-amber-500/30">
-                <div className="p-2 rounded-xl bg-white text-black shrink-0 shadow-lg mx-auto sm:mx-0">
-                  {upiQrUrl ? (
-                    <img src={upiQrUrl} alt="UPI QR Code" className="w-28 h-28 sm:w-36 sm:h-36 object-contain" />
-                  ) : (
-                    <div className="w-28 h-28 flex items-center justify-center text-xs">Loading QR...</div>
-                  )}
-                </div>
-
-                <div className="space-y-1 text-center sm:text-left text-xs">
-                  <div className="font-bold text-white text-sm">Scan with Any UPI App</div>
-                  <div className="text-slate-300 text-[11px]">
-                    Google Pay • PhonePe • Paytm • BHIM • CRED
-                  </div>
-                  <div className="p-2 rounded-lg bg-black/50 border border-white/10 font-mono text-[10px] text-amber-300 select-all break-all">
-                    UPI ID: rangtaranggarba2026@okhdfcbank
-                  </div>
-                  <div className="text-[10px] text-slate-400">
-                    Recipient: <strong className="text-white">Rang Tarang Garba Mahotsav</strong>
-                  </div>
-                </div>
-              </div>
-
-              {/* Reference Number Input */}
-              <div>
-                <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                  UPI Reference / UTR Number *
-                </label>
-                <input
-                  type="text"
-                  name="transactionRef"
-                  placeholder="e.g. 329182049182"
-                  value={formData.transactionRef}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full bg-[#1b0a38] border border-white/15 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-2 pt-1 sticky bottom-0 bg-[#110524]/95 backdrop-blur-md pb-1 z-10">
-                <button
-                  type="button"
-                  onClick={handleSubmitRegistration}
-                  disabled={loading}
-                  className="w-full py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider text-black bg-gradient-to-r from-emerald-400 to-teal-400 hover:opacity-95 shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 active:scale-95 transition-all"
-                >
-                  <CheckCircle2 className="w-4 h-4 text-black shrink-0" />
-                  {loading ? "Confirming Pass..." : "I Have Paid & Generate E-Pass"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="w-full py-1 text-xs font-semibold text-slate-400 hover:text-slate-200"
-                >
-                  ← Back to Edit Details
-                </button>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
+
