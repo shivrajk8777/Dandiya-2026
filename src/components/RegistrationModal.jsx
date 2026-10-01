@@ -6,7 +6,7 @@ import { registerAttendee, updateRegistrationData, subscribeToRegistrations } fr
 import { PASS_OPTIONS } from "./PassTiers";
 import { subscribeToDiscountConfig, calculateTicketPrice } from "@/lib/discountService";
 import { initiateRazorpayCheckout } from "@/lib/razorpayService";
-import { subscribeToInventoryConfig } from "@/lib/ticketInventoryService";
+import { subscribeToInventoryConfig, computeTicketStats } from "@/lib/ticketInventoryService";
 
 export default function RegistrationModal({ initialPass, isOpen, onClose, onSuccess }) {
   const [selectedPass, setSelectedPass] = useState(
@@ -48,11 +48,12 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     };
   }, []);
 
-  const maxTickets = Number(inventoryConfig?.maxTickets) || 300;
-  const soldPasses = registrations
-    .filter((r) => r.status === "Approved")
-    .reduce((sum, r) => sum + (Number(r.quantity) || 1), 0);
-  const isSoldOut = soldPasses >= maxTickets;
+  const stats = computeTicketStats(inventoryConfig, registrations);
+  const maxTickets = stats.maxTickets;
+  const soldPasses = stats.soldPasses;
+  const remainingTickets = stats.remainingTickets;
+  const isSoldOut = stats.isSoldOut;
+
 
   useEffect(() => {
     if (isOpen) {
@@ -434,10 +435,20 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
           <form onSubmit={handleFormSubmit} className="space-y-3 sm:space-y-4">
               {/* Pass Category Display */}
               <div>
-                <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                  Event Ticket Pass (Couple Entry Only)
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-[10px] sm:text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+                    Event Ticket Pass (Couple Entry Only)
+                  </label>
+                  <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border ${
+                    isSoldOut 
+                      ? "bg-rose-500/20 text-rose-300 border-rose-500/40" 
+                      : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+                  }`}>
+                    {isSoldOut ? "SOLD OUT" : `⚡ ${remainingTickets} Available (${soldPasses}/${maxTickets} Sold)`}
+                  </span>
+                </div>
                 <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-[#2a0e4a] via-[#1c0830] to-[#120522] border-2 border-amber-400 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-lg shadow-amber-500/10">
+
                   <div className="flex items-center gap-2.5 sm:gap-3">
                     <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0">
                       <Users className="w-4 h-4 sm:w-5 sm:h-5" />

@@ -105,3 +105,22 @@ export const addMoreTickets = async (countToAdd) => {
   const newMax = currentMax + (Number(countToAdd) || 0);
   return await updateInventoryLimit(newMax);
 };
+
+export const computeTicketStats = (inventoryConfig, registrations = []) => {
+  const maxTickets = Number(inventoryConfig?.maxTickets) || 300;
+  const soldPasses = (registrations || [])
+    .filter((r) => r.status === "Approved")
+    .reduce((sum, r) => sum + (Number(r.quantity) || 1), 0);
+  const remainingTickets = Math.max(0, maxTickets - soldPasses);
+  const isSoldOut = soldPasses >= maxTickets;
+  const soldPercentage = maxTickets > 0 ? Math.min(100, Math.round((soldPasses / maxTickets) * 100)) : 0;
+
+  return {
+    maxTickets,
+    soldPasses,
+    remainingTickets,
+    isSoldOut,
+    soldPercentage
+  };
+};
+

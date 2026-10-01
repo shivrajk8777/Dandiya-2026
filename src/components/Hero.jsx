@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Sparkles, Calendar, MapPin, Clock, Ticket, Search, ShieldCheck, ArrowRight, Star } from "lucide-react";
+import { Sparkles, Calendar, MapPin, Clock, Ticket, Search, ShieldCheck, ArrowRight, Star, Flame, TrendingUp } from "lucide-react";
+import { subscribeToInventoryConfig, computeTicketStats } from "@/lib/ticketInventoryService";
+import { subscribeToRegistrations } from "@/lib/registrationService";
 
 export default function Hero({ onOpenRegister, onOpenLookup }) {
   const [timeLeft, setTimeLeft] = useState({
@@ -9,6 +11,20 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
     minutes: 42,
     seconds: 19
   });
+  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300 });
+  const [registrations, setRegistrations] = useState([]);
+
+  useEffect(() => {
+    const unsubInv = subscribeToInventoryConfig((inv) => setInventoryConfig(inv));
+    const unsubReg = subscribeToRegistrations((list) => setRegistrations(list));
+
+    return () => {
+      if (typeof unsubInv === "function") unsubInv();
+      if (typeof unsubReg === "function") unsubReg();
+    };
+  }, []);
+
+  const stats = computeTicketStats(inventoryConfig, registrations);
 
   useEffect(() => {
     const targetDate = new Date();
@@ -30,6 +46,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
 
     return () => clearInterval(timer);
   }, []);
+
 
   return (
     <section className="relative min-h-[85vh] pt-12 sm:pt-20 pb-16 sm:pb-24 flex items-center justify-center overflow-hidden bg-grid-subtle">
@@ -110,7 +127,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
         </div>
 
         {/* CTA Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8">
           <button
             onClick={() => onOpenRegister()}
             className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-[#e5b869] via-[#d4a359] to-[#c9933b] hover:from-[#fef08a] hover:to-[#e5b869] text-black font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-[#e5b869]/15 flex items-center justify-center gap-2 sm:gap-2.5 group hover:scale-[1.01] active:scale-95 transition-all"
@@ -127,6 +144,87 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
             <Search className="w-4 h-4 text-[#e5b869] shrink-0" />
             <span>Retrieve Existing Pass</span>
           </button>
+        </div>
+
+        {/* Live Real-Time Ticket Inventory & Sales Progress Card */}
+        <div className="max-w-xl mx-auto mb-8 p-4 sm:p-5 rounded-3xl bg-gradient-to-b from-[#1c0830]/90 via-[#130524]/95 to-[#0b0314]/95 border border-amber-500/30 backdrop-blur-md shadow-2xl relative overflow-hidden">
+          {/* Subtle glowing radial background */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          
+          {/* Header Row */}
+          <div className="flex items-center justify-between gap-2 mb-3.5 pb-2.5 border-b border-white/10 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <span className="font-extrabold uppercase tracking-wider text-amber-300 text-[11px] sm:text-xs font-serif-royal">
+                ⚡ Live Ticket Booking & Stock Status
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
+                stats.isSoldOut 
+                  ? "bg-rose-500/20 border-rose-500/40 text-rose-300"
+                  : "bg-amber-500/15 border-amber-500/30 text-amber-300"
+              }`}>
+                {stats.isSoldOut ? "Sold Out" : `${stats.soldPercentage}% Passes Booked`}
+              </span>
+            </div>
+          </div>
+
+          {/* 3 Metric Stats Grid */}
+          <div className="grid grid-cols-3 gap-2 text-center mb-3.5">
+            <div className="p-2 sm:p-3 rounded-2xl bg-white/[0.04] border border-white/10">
+              <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold block mb-0.5">
+                Total Capacity
+              </span>
+              <span className="text-base sm:text-2xl font-black text-white font-sans">
+                {stats.maxTickets}
+              </span>
+            </div>
+            <div className="p-2 sm:p-3 rounded-2xl bg-white/[0.04] border border-white/10">
+              <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold block mb-0.5">
+                Passes Sold
+              </span>
+              <span className="text-base sm:text-2xl font-black text-amber-400 font-sans">
+                {stats.soldPasses}
+              </span>
+            </div>
+            <div className={`p-2 sm:p-3 rounded-2xl border ${
+              stats.isSoldOut 
+                ? "bg-rose-500/15 border-rose-500/30 text-rose-300" 
+                : "bg-emerald-500/15 border-emerald-500/30 text-emerald-300"
+            }`}>
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold block mb-0.5">
+                Available Left
+              </span>
+              <span className={`text-base sm:text-2xl font-black font-sans ${stats.isSoldOut ? "text-rose-400" : "text-emerald-400"}`}>
+                {stats.remainingTickets}
+              </span>
+            </div>
+          </div>
+
+          {/* Animated Progress Bar */}
+          <div className="space-y-1.5">
+            <div className="w-full bg-black/60 rounded-full h-3 p-0.5 border border-white/10 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 h-full rounded-full transition-all duration-700 relative"
+                style={{ width: `${Math.max(4, Math.min(100, stats.soldPercentage))}%` }}
+              >
+                <div className="absolute inset-0 bg-white/20 animate-pulse rounded-full" />
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-medium pt-0.5">
+              <span className="flex items-center gap-1 text-emerald-400">
+                <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <strong className="text-white font-mono">{stats.remainingTickets}</strong> Couple Passes Available
+              </span>
+              <span className="text-slate-300">
+                <strong className="text-amber-300 font-mono">{stats.soldPasses}</strong> Sold ({stats.soldPercentage}%)
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Live Glass Countdown Timer */}
@@ -196,15 +294,17 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
           </div>
 
           <div className="p-3 sm:p-4 rounded-2xl editorial-card flex items-center gap-2.5 sm:gap-3">
-            <div className="text-base sm:text-lg text-purple-400 font-black shrink-0">40K</div>
+            <div className="text-base sm:text-lg text-emerald-400 font-black shrink-0">
+              {stats.remainingTickets}
+            </div>
             <div className="text-[11px] sm:text-xs text-slate-300">
-              <strong className="block text-white font-semibold">Sq.Ft Hardwood</strong>
-              Cushioned Floor
+              <strong className="block text-white font-semibold">Passes Available</strong>
+              {stats.soldPasses} Sold of {stats.maxTickets}
             </div>
           </div>
 
           <div className="p-3 sm:p-4 rounded-2xl editorial-card flex items-center gap-2.5 sm:gap-3">
-            <div className="text-base sm:text-lg text-emerald-400 font-black shrink-0">₹10k</div>
+            <div className="text-base sm:text-lg text-amber-400 font-black shrink-0">₹10k</div>
             <div className="text-[11px] sm:text-xs text-slate-300">
               <strong className="block text-white font-semibold">Prize Pool</strong>
               Gold & Trophies
