@@ -157,6 +157,8 @@ export const registerAttendee = async (formData) => {
     checkedIn: false,
     checkInTime: null,
     attendees: Array.isArray(formData.attendees) ? formData.attendees : [],
+    childrenCount: Number(formData.childrenCount) || 0,
+    children: Array.isArray(formData.children) ? formData.children : [],
     createdAt: new Date().toISOString()
   };
 
@@ -480,6 +482,12 @@ export const exportRegistrationsToExcel = (registrations) => {
       ? r.attendees.map((a) => a.aadhaar).join(", ")
       : "N/A";
 
+    const childrenStr = r.childrenCount > 0
+      ? Array.isArray(r.children) && r.children.length > 0
+        ? r.children.map((c) => `${c.name} (${c.age} Yrs - Aadhaar: ${c.aadhaar || "N/A"})`).join("; ")
+        : `${r.childrenCount} Child (≤5 Yrs)`
+      : "None";
+
     return {
       "S.No": index + 1,
       "Pass ID": r.passId,
@@ -492,6 +500,7 @@ export const exportRegistrationsToExcel = (registrations) => {
       "Total Amount (₹)": r.totalAmount,
       "All Attendees & Aadhaar": attendeesStr,
       "Aadhaar Numbers": aadhaarListStr,
+      "Accompanying Kids (≤5 Yrs Free)": childrenStr,
       "Payment Method": r.paymentMethod,
       "Transaction Ref": r.transactionRef,
       "Status": r.status,

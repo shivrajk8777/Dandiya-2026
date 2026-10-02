@@ -135,11 +135,21 @@ export const checkDuplicateAadhaarInDb = (aadhaarStr, existingRegistrations = []
     }
 
     if (Array.isArray(r.attendees)) {
-      return r.attendees.some((a) => {
+      const attMatch = r.attendees.some((a) => {
         if (!a || !a.aadhaar) return false;
         const aNum = String(a.aadhaar).replace(/\D/g, "");
         return aNum === cleanDigits;
       });
+      if (attMatch) return true;
+    }
+
+    if (Array.isArray(r.children)) {
+      const childMatch = r.children.some((c) => {
+        if (!c || !c.aadhaar) return false;
+        const cNum = String(c.aadhaar).replace(/\D/g, "");
+        return cNum === cleanDigits;
+      });
+      if (childMatch) return true;
     }
 
     if (r.aadhaar) {

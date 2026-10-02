@@ -34,18 +34,18 @@ const DEFAULT_TERMS = [
   },
   {
     num: "06",
-    title: "FAMILY SAFE CODE OF CONDUCT",
-    desc: "Zero-tolerance policy for harassment or misconduct. Organizers reserve full rights of admission and immediate ejection without refund."
+    title: "CHILD ENTRY POLICY (MAX 1 CHILD ≤ 5 YRS FREE)",
+    desc: "Strictly max 1 child up to 5 years allowed FREE with Couple Pass. Children above 5 years or more than 1 child are strictly NOT ALLOWED."
   },
   {
     num: "07",
-    title: "ORGANIZER LIABILITY LIMITATION",
-    desc: "Organizers & venue management accept no liability for loss of personal valuables, property damage, or injury inside venue."
+    title: "FAMILY SAFE CODE OF CONDUCT",
+    desc: "Zero-tolerance policy for misconduct or harassment. Organizers reserve full rights of admission & immediate ejection without refund."
   },
   {
     num: "08",
-    title: "MEDIA & BROADCAST CONSENT",
-    desc: "Pass holder consents to photography, filming, and audio recording by event media team and official festival partners for promotion."
+    title: "MEDIA & ORGANIZER LIABILITY",
+    desc: "Organizers accept no liability for loss of personal valuables. Pass holder consents to official event media & photography."
   }
 ];
 
@@ -248,6 +248,11 @@ export default function DigitalPass({ passData, onClose }) {
       ctx.font = "bold 12px monospace";
       const attSummary = passData.attendees
         .map((a, i) => `T${i + 1}: ${a.name} (${a.aadhaar})`)
+        .concat(
+          passData.childrenCount > 0 && Array.isArray(passData.children)
+            ? passData.children.map((c) => `Child: ${c.name} (${c.aadhaar || c.age + "yr"})`)
+            : []
+        )
         .join("  •  ");
       const displaySummary = attSummary.length > 70 ? attSummary.slice(0, 68) + "..." : attSummary;
       ctx.fillText(displaySummary, 60, 204);
@@ -269,10 +274,11 @@ export default function DigitalPass({ passData, onClose }) {
 
     ctx.fillStyle = "#94a3b8";
     ctx.font = "12px sans-serif";
-    ctx.fillText("QUANTITY", 60, 295);
+    ctx.fillText("QUANTITY & ENTRY", 60, 295);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 20px sans-serif";
-    ctx.fillText(`${passData.quantity || 1} Persons`, 60, 323);
+    ctx.font = "bold 18px sans-serif";
+    const childPassStr = passData.childrenCount > 0 ? ` + ${passData.childrenCount} Free Child (≤5 Yrs)` : "";
+    ctx.fillText(`${(passData.quantity || 1) * 2} Persons Entry${childPassStr}`, 60, 323);
 
     ctx.fillStyle = "#94a3b8";
     ctx.font = "12px sans-serif";
@@ -804,6 +810,13 @@ export default function DigitalPass({ passData, onClose }) {
                             T{idx + 1}: <strong className="text-white font-sans font-semibold">{att.name}</strong> • Aadhaar: {att.aadhaar ? att.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3") : "N/A"}
                           </div>
                         ))}
+                        {passData.childrenCount > 0 && Array.isArray(passData.children) && passData.children.length > 0 && (
+                          passData.children.map((child, cIdx) => (
+                            <div key={`c-${cIdx}`} className="text-[10px] sm:text-[11px] text-emerald-300 font-mono">
+                              👶 Child #{cIdx + 1}: <strong className="text-white font-sans font-semibold">{child.name}</strong> ({child.age} Yrs - Free) • Aadhaar: {child.aadhaar ? child.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3") : "N/A"}
+                            </div>
+                          ))
+                        )}
                       </div>
                     )}
                   </div>
@@ -831,6 +844,16 @@ export default function DigitalPass({ passData, onClose }) {
                       <div className="font-bold text-white text-xs sm:text-sm">
                         {passData.quantity} {passData.quantity === 1 ? "Couple Pass" : "Couple Passes"} ({passData.quantity * 2} Pax)
                       </div>
+                      {passData.childrenCount > 0 && (
+                        <div className="text-[10px] sm:text-[11px] text-emerald-300 font-bold flex flex-wrap items-center gap-1 mt-0.5">
+                          <span>👶 +{passData.childrenCount} Free Child (≤5 Yrs)</span>
+                          {Array.isArray(passData.children) && passData.children.length > 0 && (
+                            <span className="text-[9px] text-amber-200/90 font-mono font-normal">
+                              ({passData.children.map((c) => `${c.name} ${c.age}yr`).join(", ")})
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400">

@@ -608,6 +608,29 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                         </div>
                       </div>
 
+                      {gateScanResult.data.childrenCount > 0 && (
+                        <div className="col-span-2 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold flex items-center gap-1 text-amber-300">
+                              👶 Accompanying Child ({gateScanResult.data.childrenCount} Free ≤5 Yrs)
+                            </span>
+                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold">
+                              Free Entry
+                            </span>
+                          </div>
+                          {Array.isArray(gateScanResult.data.children) && gateScanResult.data.children.length > 0 && (
+                            <div className="space-y-0.5 pt-1 border-t border-amber-500/20">
+                              {gateScanResult.data.children.map((c, ci) => (
+                                <div key={ci} className="text-[11px] font-mono text-slate-200 flex justify-between items-center">
+                                  <span>Child #{ci + 1}: <strong className="text-white font-sans">{c.name}</strong> ({c.age} Yrs)</span>
+                                  <span className="text-amber-300">Aadhaar: {c.aadhaar ? c.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3") : "N/A"}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       <div className="col-span-2 pt-2 border-t border-white/10 flex justify-between items-center">
                         <div>
                           <span className="text-[10px] text-slate-400 uppercase block">Pass Code</span>
@@ -914,6 +937,20 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                                   T{i + 1}: {att.name} ({att.aadhaar})
                                 </div>
                               ))}
+                            </div>
+                          )}
+                          {item.childrenCount > 0 && (
+                            <div className="text-[10px] text-emerald-300 font-semibold mt-0.5 space-y-0.5">
+                              <div>👶 Child: {item.childrenCount} (≤5 Yrs Free)</div>
+                              {Array.isArray(item.children) && item.children.length > 0 && (
+                                <div className="space-y-0.5">
+                                  {item.children.map((c, ci) => (
+                                    <div key={ci} className="text-[9px] text-amber-200/90 font-mono">
+                                      • {c.name} ({c.age}yr) - Aadhaar: {c.aadhaar ? c.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3") : "N/A"}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           )}
                           <div className="text-[10px] text-slate-400">{item.city || "N/A"}</div>

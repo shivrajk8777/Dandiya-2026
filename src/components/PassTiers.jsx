@@ -16,7 +16,7 @@ export const PASS_OPTIONS = [
     color: "from-[#e5b869] via-rose-500 to-purple-600",
     features: [
       "Exclusive Entry for 2 Persons (Couple Entry Only)",
-      "2 Pairs of Free Handcrafted Wooden Dandiya Sticks",
+      "Free Entry for 1 Child Up to 5 Years (Max 1 Kid Allowed)",
       "Fast-Track Red Carpet VIP Entry Lane (Zero Waiting)",
       "Access to Kathiyawadi Gourmet Food Village & VIP Lounge",
       "Access to Live 100-Dhol & DJ EDM Concert Ground",
@@ -121,8 +121,8 @@ export default function PassTiers({ onSelectPass }) {
               <div
                 key={tier.id}
                 className={`relative rounded-2xl sm:rounded-3xl p-4 sm:p-8 pt-8 sm:pt-10 flex flex-col justify-between transition-all duration-300 bg-gradient-to-b from-[#250d3e] via-[#140626] to-[#1c0830] border-2 shadow-2xl ${isSoldOut
-                    ? "border-slate-700 opacity-90 shadow-none"
-                    : "border-[#e5b869] shadow-[#e5b869]/25 hover:scale-[1.01]"
+                  ? "border-slate-700 opacity-90 shadow-none"
+                  : "border-[#e5b869] shadow-[#e5b869]/25 hover:scale-[1.01]"
                   }`}
               >
                 {/* Floating Top Ribbon */}
@@ -217,8 +217,8 @@ export default function PassTiers({ onSelectPass }) {
                     onClick={() => !isSoldOut && onSelectPass({ ...tier, price: currentPrice })}
                     disabled={isSoldOut}
                     className={`w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 ${isSoldOut
-                        ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
-                        : "text-black shadow-xl shadow-[#e5b869]/20 bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] hover:opacity-95 active:scale-95"
+                      ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
+                      : "text-black shadow-xl shadow-[#e5b869]/20 bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] hover:opacity-95 active:scale-95"
                       }`}
                   >
                     <span>

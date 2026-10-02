@@ -20,7 +20,7 @@ export default function RulesAndFaq() {
     },
     {
       q: "Are kids allowed and do they require separate tickets?",
-      a: "Children below 5 years of age get free entry with their parents. Entry to the venue is strictly for Couples."
+      a: "Only 1 child up to 5 years of age gets 100% FREE entry with their parents per VIP Couple Pass. Children above 5 years of age or more than 1 child are strictly NOT ALLOWED into the venue."
     },
     {
       q: "Can I retrieve my pass if I lose the download link?",
