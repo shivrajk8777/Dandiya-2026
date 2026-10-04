@@ -282,10 +282,10 @@ export default function DigitalPass({ passData, onClose }) {
 
     ctx.fillStyle = "#94a3b8";
     ctx.font = "12px sans-serif";
-    ctx.fillText("TOTAL PAID", 360, 295);
+    ctx.fillText("TOTAL PAID (INCL. 18% GST)", 360, 295);
     ctx.fillStyle = "#4ade80";
     ctx.font = "bold 20px sans-serif";
-    ctx.fillText(`₹${passData.totalAmount || passData.unitPrice || 0}`, 360, 323);
+    ctx.fillText(`₹${(passData.totalAmount || passData.unitPrice || 0).toLocaleString("en-IN")}`, 360, 323);
 
     // 9. Venue & Date Box
     ctx.fillStyle = "#160729";
@@ -857,10 +857,10 @@ export default function DigitalPass({ passData, onClose }) {
                     </div>
                     <div>
                       <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400">
-                        Total Paid
+                        Total Paid (Incl. 18% GST)
                       </span>
-                      <div className="font-black text-emerald-400 text-xs sm:text-sm">
-                        ₹{passData.totalAmount || passData.unitPrice}
+                      <div className="font-black text-emerald-400 text-xs sm:text-sm font-mono">
+                        ₹{(passData.totalAmount || passData.unitPrice || 0).toLocaleString("en-IN")}
                       </div>
                     </div>
                   </div>

@@ -61,7 +61,7 @@ export default function PassTiers({ onSelectPass }) {
             Get Your <span className="text-gold-gradient font-sans-modern font-black">Royal VIP Pass</span>
           </h2>
           <p className="mt-4 text-slate-300 text-base font-light">
-            All-inclusive access to Rajasthan's most grand Dandiya Mahotsav 2026 including Dandiya sticks, VIP arena, and instant digital QR e-ticket.
+            All-inclusive access to Rajasthan&apos;s most grand Dandiya Mahotsav 2026 including Dandiya sticks, VIP arena, and instant digital QR e-ticket.
           </p>
 
           {/* Live Inventory & Sales Status Card */}
@@ -172,7 +172,7 @@ export default function PassTiers({ onSelectPass }) {
                           ₹{pricing.basePrice}
                         </span>
                       )}
-                      <span className="text-xs sm:text-sm text-slate-300 font-medium">/ all taxes incl.</span>
+
                     </div>
 
                     {isDiscounted && pricing.discountReason && (

@@ -988,8 +988,13 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                         </td>
 
                         {/* Amount */}
-                        <td className="p-3 font-bold text-emerald-400">
-                          ₹{item.totalAmount || item.unitPrice}
+                        <td className="p-3">
+                          <div className="font-bold text-emerald-400 font-mono">
+                            ₹{(Number(item.totalAmount) || Number(item.unitPrice) || 0).toLocaleString("en-IN")}
+                          </div>
+                          <div className="text-[9px] text-slate-400 font-medium">
+                            {item.taxAmount ? `Incl. ₹${item.taxAmount} GST (18%)` : "Incl. 18% GST"}
+                          </div>
                         </td>
 
                         {/* Payment */}

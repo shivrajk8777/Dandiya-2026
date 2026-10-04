@@ -53,8 +53,13 @@ export const initiateRazorpayCheckout = async ({
   email,
   passName,
   quantity,
+  name,
+  description,
+  prefill,
+  themeColor,
   onSuccess,
   onError,
+  onDismiss,
   onModalDismiss
 }) => {
   const isLoaded = await loadRazorpaySDK();
@@ -64,13 +69,15 @@ export const initiateRazorpayCheckout = async ({
   }
 
   const keyId = getRazorpayKeyId();
+  const passQty = Number(quantity) || 1;
+  const passTitle = passName || "Royal VIP Couple Pass";
 
   const options = {
     key: keyId,
     amount: Math.round(Number(amount) * 100), // Amount in paise (INR)
     currency: "INR",
-    name: "RANG TARANG GARBA 2026",
-    description: `${passName} (${quantity} ${quantity === 1 ? "Couple Pass" : "Couple Passes"})`,
+    name: name || "RANG TARANG GARBA 2026",
+    description: description || `${passTitle} (${passQty} ${passQty === 1 ? "Couple Pass" : "Couple Passes"} - Incl. 18% GST)`,
     image: "/logo.png",
     handler: function (response) {
       if (response && response.razorpay_payment_id) {
@@ -87,23 +94,24 @@ export const initiateRazorpayCheckout = async ({
       }
     },
     prefill: {
-      name: fullName || "",
-      email: email || "guest@rangtaranggarba.com",
-      contact: phone || ""
+      name: fullName || prefill?.name || "",
+      email: email || prefill?.email || "guest@rangtaranggarba.com",
+      contact: phone || prefill?.contact || ""
     },
     notes: {
       event: "Rang Tarang Garba 2026",
       venue: "Raj Vilas Garden, Chomu, Rajasthan",
-      passName: passName,
-      quantity: quantity
+      passName: passTitle,
+      quantity: passQty
     },
     theme: {
-      color: "#e5b869",
+      color: themeColor || "#e5b869",
       backdrop_color: "rgba(10, 4, 20, 0.85)"
     },
     modal: {
       ondismiss: function () {
         if (onModalDismiss) onModalDismiss();
+        if (onDismiss) onDismiss();
       }
     }
   };

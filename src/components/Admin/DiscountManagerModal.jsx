@@ -151,21 +151,27 @@ export default function DiscountManagerModal({ isOpen, onClose }) {
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 text-center items-center py-2 bg-black/30 rounded-xl border border-white/10">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center items-center py-2.5 bg-black/40 rounded-xl border border-white/10">
             <div>
-              <div className="text-[10px] uppercase font-bold text-slate-400">Base Price</div>
-              <div className="text-base sm:text-lg font-bold text-slate-300">₹{currentPricing.basePrice}</div>
+              <div className="text-[10px] uppercase font-bold text-slate-400">Base Rate</div>
+              <div className="text-sm sm:text-base font-bold text-slate-300">₹{currentPricing.basePrice}</div>
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-slate-400">Discount Offered</div>
-              <div className="text-base sm:text-lg font-bold text-emerald-400">
+              <div className="text-[10px] uppercase font-bold text-slate-400">Discount</div>
+              <div className="text-sm sm:text-base font-bold text-emerald-400">
                 -₹{currentPricing.totalDiscountAmount}
               </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-amber-400">Final Ticket Price</div>
-              <div className="text-xl sm:text-2xl font-black text-amber-300 font-sans">
-                ₹{currentPricing.finalPrice}
+              <div className="text-[10px] uppercase font-bold text-amber-400">+18% GST Tax</div>
+              <div className="text-sm sm:text-base font-bold text-amber-300">
+                +₹{Math.round((currentPricing.finalPrice * 18) / 100)}
+              </div>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase font-bold text-emerald-400">Final Pay Amount</div>
+              <div className="text-base sm:text-lg font-black text-gold-gradient font-mono">
+                ₹{currentPricing.finalPrice + Math.round((currentPricing.finalPrice * 18) / 100)}
               </div>
             </div>
           </div>
@@ -175,6 +181,9 @@ export default function DiscountManagerModal({ isOpen, onClose }) {
               Active Badge on Site: {currentPricing.discountBadge}
             </div>
           )}
+          <div className="mt-2 text-[10px] text-slate-400 text-center font-medium">
+            💡 18% GST (Tax) is automatically added to the pass price at checkout/payment gateway.
+          </div>
         </div>
 
         {/* 1. Master System Toggle & Base Price */}

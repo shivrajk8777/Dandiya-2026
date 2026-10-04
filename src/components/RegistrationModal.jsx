@@ -123,8 +123,15 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
 
   const pricing = calculateTicketPrice(discountConfig);
   const unitPrice = pricing.finalPrice;
-  const totalAmount = unitPrice * formData.quantity;
-  const originalTotal = pricing.basePrice * formData.quantity;
+  const quantity = Number(formData.quantity) || 1;
+  const subtotal = unitPrice * quantity;
+  const TAX_PERCENT = 18; // 18% GST / Govt Tax
+  const taxAmount = Math.round((subtotal * TAX_PERCENT) / 100);
+  const totalAmount = subtotal + taxAmount; // Final payable amount including 18% tax
+
+  const originalSubtotal = pricing.basePrice * quantity;
+  const originalTax = Math.round((originalSubtotal * TAX_PERCENT) / 100);
+  const originalTotal = originalSubtotal + originalTax;
   const totalSavings = originalTotal - totalAmount;
 
   // Extract all non-empty Aadhaar numbers in the entire booking form (Adults + Children)
@@ -409,8 +416,11 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         email: formData.email.trim(),
         city: formData.city.trim(),
         passType: selectedPass.name,
-        quantity: Number(formData.quantity) || 1,
+        quantity,
         unitPrice,
+        subtotal,
+        taxPercent: TAX_PERCENT,
+        taxAmount,
         totalAmount,
         paymentMethod: "Razorpay Checkout (Initiated)",
         paymentStatus: "Pending",
@@ -435,8 +445,13 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
       await initiateRazorpayCheckout({
         amount: totalAmount,
         currency: "INR",
+        passName: selectedPass.name,
+        quantity,
+        fullName: formData.fullName.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
         name: "Rang Tarang Garba Mahotsav 2026",
-        description: `${formData.quantity}x ${selectedPass.name} - Instant VIP E-Pass`,
+        description: `${quantity}x ${selectedPass.name} (₹${subtotal} + 18% GST ₹${taxAmount} = ₹${totalAmount})`,
         prefill: {
           name: formData.fullName.trim(),
           contact: formData.phone.trim(),
@@ -453,6 +468,11 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               status: "Approved",
               paymentMethod: "Razorpay Online (UPI/Cards)",
               transactionRef: paymentId,
+              unitPrice,
+              subtotal,
+              taxPercent: TAX_PERCENT,
+              taxAmount,
+              totalAmount,
               paidAt: new Date().toISOString(),
               childrenCount: Number(formData.childrenCount) || 0,
               children: childrenList.map((c) => ({
@@ -466,6 +486,11 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               status: "Approved",
               paymentMethod: "Razorpay Online (UPI/Cards)",
               transactionRef: paymentId,
+              unitPrice,
+              subtotal,
+              taxPercent: TAX_PERCENT,
+              taxAmount,
+              totalAmount,
               childrenCount: Number(formData.childrenCount) || 0,
               children: childrenList.map((c) => ({
                 name: c.name.trim(),
@@ -480,8 +505,11 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               email: formData.email.trim(),
               city: formData.city.trim(),
               passType: selectedPass.name,
-              quantity: Number(formData.quantity) || 1,
+              quantity,
               unitPrice,
+              subtotal,
+              taxPercent: TAX_PERCENT,
+              taxAmount,
               totalAmount,
               paymentMethod: "Razorpay Online (UPI/Cards)",
               paymentStatus: "Approved",
@@ -549,8 +577,11 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         email: formData.email.trim(),
         city: formData.city.trim(),
         passType: selectedPass.name,
-        quantity: Number(formData.quantity) || 1,
+        quantity,
         unitPrice,
+        subtotal,
+        taxPercent: TAX_PERCENT,
+        taxAmount,
         totalAmount,
         paymentMethod: "UPI QR Scan & Pay",
         paymentStatus: "Approved",
@@ -765,15 +796,14 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                   return (
                     <div
                       key={idx}
-                      className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#180733] border space-y-2 shadow-md transition-all ${
-                        isThisPersonDuplicate
-                          ? "border-rose-500 bg-rose-950/25 ring-2 ring-rose-500/30"
-                          : isAadhaarSuccess
+                      className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#180733] border space-y-2 shadow-md transition-all ${isThisPersonDuplicate
+                        ? "border-rose-500 bg-rose-950/25 ring-2 ring-rose-500/30"
+                        : isAadhaarSuccess
                           ? "border-emerald-500/40 bg-emerald-950/10"
                           : hasError
-                          ? "border-rose-500/40 bg-rose-950/10"
-                          : "border-amber-500/30"
-                      }`}
+                            ? "border-rose-500/40 bg-rose-950/10"
+                            : "border-amber-500/30"
+                        }`}
                     >
                       <div className="flex items-center justify-between text-xs font-bold text-slate-200">
                         <span className="flex items-center gap-1.5 text-amber-300 font-serif-royal text-[11px] sm:text-xs">
@@ -815,13 +845,12 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                           </label>
                           <div className="relative">
                             <ShieldCheck
-                              className={`w-3.5 h-3.5 absolute left-2.5 top-2 sm:top-2.5 ${
-                                isThisPersonDuplicate || hasError
-                                  ? "text-rose-400"
-                                  : isAadhaarSuccess
+                              className={`w-3.5 h-3.5 absolute left-2.5 top-2 sm:top-2.5 ${isThisPersonDuplicate || hasError
+                                ? "text-rose-400"
+                                : isAadhaarSuccess
                                   ? "text-emerald-400"
                                   : "text-slate-400"
-                              }`}
+                                }`}
                             />
                             <input
                               type="text"
@@ -830,15 +859,14 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                               onChange={(e) => handleAttendeeChange(idx, "aadhaar", e.target.value)}
                               maxLength={12}
                               required
-                              className={`w-full bg-[#0e0320] border rounded-xl pl-8 pr-2.5 py-1.5 sm:py-2 text-xs font-mono tracking-wider text-white placeholder-slate-500 focus:outline-none transition-colors ${
-                                isThisPersonDuplicate
-                                  ? "border-rose-500 text-rose-200 bg-rose-950/40 ring-1 ring-rose-500"
-                                  : isAadhaarSuccess
+                              className={`w-full bg-[#0e0320] border rounded-xl pl-8 pr-2.5 py-1.5 sm:py-2 text-xs font-mono tracking-wider text-white placeholder-slate-500 focus:outline-none transition-colors ${isThisPersonDuplicate
+                                ? "border-rose-500 text-rose-200 bg-rose-950/40 ring-1 ring-rose-500"
+                                : isAadhaarSuccess
                                   ? "border-emerald-500/60 text-emerald-300 bg-emerald-950/20"
                                   : hasError
-                                  ? "border-rose-500/60 text-rose-300 bg-rose-950/20"
-                                  : "border-white/15 focus:border-amber-400"
-                              }`}
+                                    ? "border-rose-500/60 text-rose-300 bg-rose-950/20"
+                                    : "border-white/15 focus:border-amber-400"
+                                }`}
                             />
                           </div>
 
@@ -900,11 +928,10 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                         key={cnt}
                         type="button"
                         onClick={() => handleChildrenCountChange(cnt)}
-                        className={`px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-bold rounded-md transition-all ${
-                          formData.childrenCount === cnt
-                            ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-md"
-                            : "text-slate-300 hover:text-white"
-                        }`}
+                        className={`px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-bold rounded-md transition-all ${formData.childrenCount === cnt
+                          ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-md"
+                          : "text-slate-300 hover:text-white"
+                          }`}
                       >
                         {cnt === 0 ? "No Child (0)" : "Yes, 1 Child (Free Entry)"}
                       </button>
@@ -963,15 +990,14 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                       return (
                         <div
                           key={cIdx}
-                          className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#180733] border space-y-2 shadow-md transition-all ${
-                            isThisChildDuplicate
-                              ? "border-rose-500 bg-rose-950/25 ring-2 ring-rose-500/30"
-                              : isChildAadhaarSuccess
+                          className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#180733] border space-y-2 shadow-md transition-all ${isThisChildDuplicate
+                            ? "border-rose-500 bg-rose-950/25 ring-2 ring-rose-500/30"
+                            : isChildAadhaarSuccess
                               ? "border-emerald-500/40 bg-emerald-950/10"
                               : hasChildError || isAgeInvalid
-                              ? "border-rose-500/40 bg-rose-950/10"
-                              : "border-amber-500/30"
-                          }`}
+                                ? "border-rose-500/40 bg-rose-950/10"
+                                : "border-amber-500/30"
+                            }`}
                         >
                           <div className="flex items-center justify-between text-xs font-bold text-slate-200">
                             <span className="flex items-center gap-1 text-amber-300 font-serif-royal text-[11px] sm:text-xs">
@@ -1011,11 +1037,10 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                                 value={child.age || "3"}
                                 onChange={(e) => handleChildFieldChange(cIdx, "age", e.target.value)}
                                 required
-                                className={`w-full bg-[#0e0320] border rounded-xl px-2.5 py-1.5 sm:py-2 text-xs focus:outline-none transition-colors cursor-pointer ${
-                                  isAgeInvalid
-                                    ? "border-rose-500 text-rose-300 bg-rose-950/30"
-                                    : "border-white/15 text-white focus:border-amber-400"
-                                }`}
+                                className={`w-full bg-[#0e0320] border rounded-xl px-2.5 py-1.5 sm:py-2 text-xs focus:outline-none transition-colors cursor-pointer ${isAgeInvalid
+                                  ? "border-rose-500 text-rose-300 bg-rose-950/30"
+                                  : "border-white/15 text-white focus:border-amber-400"
+                                  }`}
                               >
                                 <option value="1">1 Year Old (Free Entry)</option>
                                 <option value="2">2 Years Old (Free Entry)</option>
@@ -1036,13 +1061,12 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                               </label>
                               <div className="relative">
                                 <ShieldCheck
-                                  className={`w-3.5 h-3.5 absolute left-2.5 top-2 sm:top-2.5 ${
-                                    isThisChildDuplicate || hasChildError
-                                      ? "text-rose-400"
-                                      : isChildAadhaarSuccess
+                                  className={`w-3.5 h-3.5 absolute left-2.5 top-2 sm:top-2.5 ${isThisChildDuplicate || hasChildError
+                                    ? "text-rose-400"
+                                    : isChildAadhaarSuccess
                                       ? "text-emerald-400"
                                       : "text-slate-400"
-                                  }`}
+                                    }`}
                                 />
                                 <input
                                   type="text"
@@ -1051,15 +1075,14 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                                   onChange={(e) => handleChildFieldChange(cIdx, "aadhaar", e.target.value)}
                                   maxLength={12}
                                   required
-                                  className={`w-full bg-[#0e0320] border rounded-xl pl-8 pr-2.5 py-1.5 sm:py-2 text-xs font-mono tracking-wider text-white placeholder-slate-500 focus:outline-none transition-colors ${
-                                    isThisChildDuplicate
-                                      ? "border-rose-500 text-rose-200 bg-rose-950/40 ring-1 ring-rose-500"
-                                      : isChildAadhaarSuccess
+                                  className={`w-full bg-[#0e0320] border rounded-xl pl-8 pr-2.5 py-1.5 sm:py-2 text-xs font-mono tracking-wider text-white placeholder-slate-500 focus:outline-none transition-colors ${isThisChildDuplicate
+                                    ? "border-rose-500 text-rose-200 bg-rose-950/40 ring-1 ring-rose-500"
+                                    : isChildAadhaarSuccess
                                       ? "border-emerald-500/60 text-emerald-300 bg-emerald-950/20"
                                       : hasChildError
-                                      ? "border-rose-500/60 text-rose-300 bg-rose-950/20"
-                                      : "border-white/15 focus:border-amber-400"
-                                  }`}
+                                        ? "border-rose-500/60 text-rose-300 bg-rose-950/20"
+                                        : "border-white/15 focus:border-amber-400"
+                                    }`}
                                 />
                               </div>
 
@@ -1094,6 +1117,60 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               </div>
             </div>
 
+            {/* Transparent Order Summary & 18% Tax Breakdown Card */}
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-b from-[#1e0a3b] via-[#140628] to-[#0c0318] border border-amber-500/35 space-y-2 shadow-xl">
+              <div className="flex items-center justify-between text-xs pb-2 border-b border-white/10">
+                <div className="flex items-center gap-1.5 font-bold text-amber-300 font-serif-royal text-[11px] sm:text-xs">
+                  <Ticket className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>{selectedPass.name} ({quantity} {quantity === 1 ? "Couple Pass" : "Couple Passes"})</span>
+                </div>
+                <span className="text-white font-bold font-mono text-xs">₹{subtotal.toLocaleString("en-IN")}</span>
+              </div>
+
+              <div className="space-y-1.5 text-[10px] sm:text-[11px]">
+                <div className="flex items-center justify-between text-slate-400">
+                  <span>Pass Subtotal ({quantity} x ₹{unitPrice.toLocaleString("en-IN")})</span>
+                  <span className="text-slate-200 font-mono">₹{subtotal.toLocaleString("en-IN")}</span>
+                </div>
+
+                <div className="flex items-center justify-between text-slate-300 font-medium">
+                  <span className="flex items-center gap-1.5">
+                    <span>Tax</span>
+
+                  </span>
+                  <span className="text-amber-300 font-mono font-bold">+₹{taxAmount.toLocaleString("en-IN")}</span>
+                </div>
+
+                {formData.childrenCount > 0 && (
+                  <div className="flex items-center justify-between text-emerald-400 text-[10px]">
+                    <span>👶 Accompanying Child (≤ 5 Yrs Free Entry)</span>
+                    <span className="font-bold">FREE (₹0)</span>
+                  </div>
+                )}
+
+                {pricing.isDiscounted && totalSavings > 0 && (
+                  <div className="flex items-center justify-between text-emerald-400 text-[10px]">
+                    <span>🎉 Special Offer Savings</span>
+                    <span className="font-bold">-₹{totalSavings.toLocaleString("en-IN")}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider block font-serif-royal">
+                    Total Payable Amount
+                  </span>
+
+                </div>
+                <div className="text-right">
+                  <span className="text-base sm:text-xl font-black text-gold-gradient font-mono">
+                    ₹{totalAmount.toLocaleString("en-IN")}
+                  </span>
+                </div>
+              </div>
+            </div>
+
             {/* Direct Proceed to Pay Submit Button */}
             <div className="pt-2 sticky bottom-0 bg-[#110524]/95 backdrop-blur-md pb-1 z-20 space-y-1.5">
               {isSoldOut && (
@@ -1104,27 +1181,26 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               <button
                 type="submit"
                 disabled={loading || isSoldOut || hasDuplicateAadhaarInEntireForm || hasInvalidChildAge}
-                className={`w-full py-3.5 sm:py-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 touch-manipulation ${
-                  isSoldOut || hasDuplicateAadhaarInEntireForm || hasInvalidChildAge
-                    ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
-                    : "text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-xl shadow-amber-500/25"
-                }`}
+                className={`w-full py-3.5 sm:py-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 touch-manipulation ${isSoldOut || hasDuplicateAadhaarInEntireForm || hasInvalidChildAge
+                  ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
+                  : "text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-xl shadow-amber-500/25"
+                  }`}
               >
                 <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 {isSoldOut
                   ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)`
                   : hasDuplicateAadhaarInEntireForm
-                  ? "⚠️ FIX DUPLICATE AADHAAR TO PROCEED"
-                  : hasInvalidChildAge
-                  ? "⚠️ CHILD AGE ABOVE 5 NOT ALLOWED"
-                  : loading
-                  ? "Launching Razorpay Gateway..."
-                  : `PROCEED TO PAY (₹${totalAmount})`}
+                    ? "⚠️ FIX DUPLICATE AADHAAR TO PROCEED"
+                    : hasInvalidChildAge
+                      ? "⚠️ CHILD AGE ABOVE 5 NOT ALLOWED"
+                      : loading
+                        ? "Launching Razorpay Gateway..."
+                        : `PROCEED TO PAY (₹${totalAmount.toLocaleString("en-IN")})`}
               </button>
               {!isSoldOut && (
-                <div className="text-center text-[9px] sm:text-[10px] text-slate-400 flex items-center justify-center gap-1">
+                <div className="text-center text-[9px] sm:text-[10px] text-slate-400 flex items-center justify-center gap-1.5">
                   <Lock className="w-3 h-3 text-emerald-400" />
-                  Secured by Razorpay • Instant Verification & Pass Generation
+                  <span>Secured by Razorpay • Total ₹{totalAmount.toLocaleString("en-IN")} (Includes 18% GST)</span>
                 </div>
               )}
             </div>

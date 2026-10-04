@@ -141,6 +141,13 @@ export const registerAttendee = async (formData) => {
   const { db, isConnected } = getFirebaseInstance();
   const passId = generatePassId();
 
+  const qty = Number(formData.quantity) || 1;
+  const unitPrice = Number(formData.unitPrice) || 1599;
+  const subtotal = Number(formData.subtotal) || unitPrice * qty;
+  const taxPercent = Number(formData.taxPercent) || 18;
+  const taxAmount = Number(formData.taxAmount) || Math.round((subtotal * taxPercent) / 100);
+  const totalAmount = Number(formData.totalAmount) || subtotal + taxAmount;
+
   const registrationRecord = {
     passId,
     fullName: formData.fullName.trim(),
@@ -148,9 +155,12 @@ export const registerAttendee = async (formData) => {
     email: formData.email?.trim() || "",
     city: formData.city?.trim() || "Chomu",
     passType: formData.passType || "Royal VIP Couple Pass",
-    quantity: Number(formData.quantity) || 1,
-    unitPrice: Number(formData.unitPrice) || 1599,
-    totalAmount: Number(formData.totalAmount) || 1599,
+    quantity: qty,
+    unitPrice,
+    subtotal,
+    taxPercent,
+    taxAmount,
+    totalAmount,
     paymentMethod: formData.paymentMethod || "UPI",
     transactionRef: formData.transactionRef?.trim() || "UPI-REF-" + Math.floor(100000 + Math.random() * 900000),
     status: formData.paymentStatus || "Approved",
@@ -488,6 +498,12 @@ export const exportRegistrationsToExcel = (registrations) => {
         : `${r.childrenCount} Child (≤5 Yrs)`
       : "None";
 
+    const qty = Number(r.quantity) || 1;
+    const unitPrice = Number(r.unitPrice) || 1599;
+    const subtotalVal = r.subtotal || unitPrice * qty;
+    const taxVal = r.taxAmount || Math.round((subtotalVal * 18) / 100);
+    const totalVal = r.totalAmount || (subtotalVal + taxVal);
+
     return {
       "S.No": index + 1,
       "Pass ID": r.passId,
@@ -496,8 +512,10 @@ export const exportRegistrationsToExcel = (registrations) => {
       "Email": r.email || "N/A",
       "City": r.city || "N/A",
       "Pass Category": r.passType,
-      "Quantity": r.quantity,
-      "Total Amount (₹)": r.totalAmount,
+      "Quantity": qty,
+      "Pass Subtotal (₹)": subtotalVal,
+      "GST / Tax (18%) (₹)": taxVal,
+      "Total Amount Paid (₹)": totalVal,
       "All Attendees & Aadhaar": attendeesStr,
       "Aadhaar Numbers": aadhaarListStr,
       "Accompanying Kids (≤5 Yrs Free)": childrenStr,
