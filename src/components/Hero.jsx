@@ -4,12 +4,43 @@ import { Sparkles, Calendar, MapPin, Clock, Ticket, Search, ShieldCheck, ArrowRi
 import { subscribeToInventoryConfig, computeTicketStats } from "@/lib/ticketInventoryService";
 import { subscribeToRegistrations } from "@/lib/registrationService";
 
+// Exact Event Gate Opening Date & Time: 17 October 2026 at 07:00 PM (19:00 IST)
+const getEventTargetDate = () => {
+  const target = new Date(2026, 9, 17, 19, 0, 0); // Month index 9 = October
+  const now = new Date();
+  if (target.getTime() < now.getTime()) {
+    // If year 2026 has passed in the future, target 17 Oct of current/next year
+    const fallback = new Date(now.getFullYear(), 9, 17, 19, 0, 0);
+    if (fallback.getTime() < now.getTime()) {
+      fallback.setFullYear(now.getFullYear() + 1);
+    }
+    return fallback;
+  }
+  return target;
+};
+
+const calculateTimeRemaining = () => {
+  const target = getEventTargetDate();
+  const now = new Date().getTime();
+  const difference = target.getTime() - now;
+
+  if (difference > 0) {
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+    return { days, hours, minutes, seconds, isLive: false };
+  }
+  return { days: 0, hours: 0, minutes: 0, seconds: 0, isLive: true };
+};
+
 export default function Hero({ onOpenRegister, onOpenLookup }) {
   const [timeLeft, setTimeLeft] = useState({
-    days: 14,
-    hours: 8,
-    minutes: 42,
-    seconds: 19
+    days: 12,
+    hours: 20,
+    minutes: 0,
+    seconds: 0,
+    isLive: false
   });
   const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300 });
   const [registrations, setRegistrations] = useState([]);
@@ -27,21 +58,11 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
   const stats = computeTicketStats(inventoryConfig, registrations);
 
   useEffect(() => {
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 17);
-    targetDate.setHours(19, 0, 0, 0);
+    // Immediate initial sync
+    setTimeLeft(calculateTimeRemaining());
 
     const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const difference = targetDate.getTime() - now;
-
-      if (difference > 0) {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-        setTimeLeft({ days, hours, minutes, seconds });
-      }
+      setTimeLeft(calculateTimeRemaining());
     }, 1000);
 
     return () => clearInterval(timer);
