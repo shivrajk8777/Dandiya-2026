@@ -48,9 +48,10 @@ export default function BrandAnnouncementBar({ onOpenRegister }) {
 
           <button
             onClick={onOpenRegister}
-            className="flex items-center gap-1 text-[#e5b869] hover:text-white font-semibold transition-colors shrink-0"
+            className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/40 text-[#fef08a] hover:text-white font-black transition-all shrink-0 animate-pulse"
           >
-            <span className="whitespace-nowrap font-bold">
+            <Sparkles className="w-3 h-3 text-amber-300 animate-spin" />
+            <span className="whitespace-nowrap font-black">
               {stats.isSoldOut ? "Check Status" : "Book Pass Now"}
             </span>
             <ArrowRight className="w-3 h-3 shrink-0" />

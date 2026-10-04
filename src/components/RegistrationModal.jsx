@@ -55,6 +55,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   const [upiQrUrl, setUpiQrUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [activePendingRecord, setActivePendingRecord] = useState(null);
 
   useEffect(() => {
     const unsubDisc = subscribeToDiscountConfig((cfg) => setDiscountConfig(cfg));
@@ -80,6 +81,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
       setPaymentMethodTab("razorpay");
       setErrorMsg("");
       setLoading(false);
+      setActivePendingRecord(null);
       setFormData({
         fullName: "",
         phone: "",
@@ -316,7 +318,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
       seenAadhaars.add(cleanAadhaar);
 
       // 3. Duplicate Aadhaar Check across Entire Database Registrations
-      const dbCheck = checkDuplicateAadhaarInDb(cleanAadhaar, registrations);
+      const dbCheck = checkDuplicateAadhaarInDb(cleanAadhaar, registrations, activePendingRecord?.id || activePendingRecord?.passId);
       if (dbCheck.isDuplicate) {
         const existing = dbCheck.existingPass;
         setErrorMsg(
@@ -380,7 +382,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         seenAadhaars.add(cleanChildAadhaar);
 
         // 3. Duplicate in Database
-        const childDbCheck = checkDuplicateAadhaarInDb(cleanChildAadhaar, registrations);
+        const childDbCheck = checkDuplicateAadhaarInDb(cleanChildAadhaar, registrations, activePendingRecord?.id || activePendingRecord?.passId);
         if (childDbCheck.isDuplicate) {
           const existing = childDbCheck.existingPass;
           setErrorMsg(
@@ -407,8 +409,8 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     setErrorMsg("");
     setLoading(true);
 
-    // 1. Immediately record an "Incomplete / Pending Payment" registration lead in database
-    let pendingRecord = null;
+    // 1. Immediately record or update an "Incomplete / Pending Payment" registration lead in database
+    let pendingRecord = activePendingRecord;
     try {
       const initialPayload = {
         fullName: formData.fullName.trim(),
@@ -435,7 +437,12 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
           aadhaar: (c.aadhaar || "").replace(/\D/g, "")
         }))
       };
-      pendingRecord = await registerAttendee(initialPayload);
+      if (pendingRecord && pendingRecord.id) {
+        await updateRegistrationData(pendingRecord.id, initialPayload);
+      } else {
+        pendingRecord = await registerAttendee(initialPayload);
+        setActivePendingRecord(pendingRecord);
+      }
     } catch (e) {
       console.warn("Could not create preliminary pending lead", e);
     }
@@ -767,7 +774,9 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                       allFilledAadhaars.filter((d) => d === rawAadhaar).length > 1);
 
                   // 3. Database duplicate check
-                  const dbDuplicateCheck = isAadhaarFull ? checkDuplicateAadhaarInDb(rawAadhaar, registrations) : { isDuplicate: false };
+                  const dbDuplicateCheck = isAadhaarFull
+                    ? checkDuplicateAadhaarInDb(rawAadhaar, registrations, activePendingRecord?.id || activePendingRecord?.passId)
+                    : { isDuplicate: false };
                   const isDbDuplicate = dbDuplicateCheck.isDuplicate;
 
                   const hasError = isThisPersonDuplicate || (isAadhaarFull && (!isFormatValid || isDbDuplicate));
@@ -958,7 +967,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
 
                       // 3. Database duplicate check
                       const childDbDuplicateCheck = isChildAadhaarFull
-                        ? checkDuplicateAadhaarInDb(rawChildAadhaar, registrations)
+                        ? checkDuplicateAadhaarInDb(rawChildAadhaar, registrations, activePendingRecord?.id || activePendingRecord?.passId)
                         : { isDuplicate: false };
                       const isChildDbDuplicate = childDbDuplicateCheck.isDuplicate;
 

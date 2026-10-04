@@ -413,33 +413,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
               </button>
 
               {/* Quick Fill Credentials for Convenience */}
-              <div className="pt-3 border-t border-white/10 space-y-2">
-                <p className="text-[10px] text-slate-400 uppercase tracking-wider text-center font-bold">
-                  Quick Login Shortcut:
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setUsername("gate1");
-                      setPassword("gatepass2026");
-                    }}
-                    className="p-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-[11px] font-bold text-emerald-300 text-center transition-all"
-                  >
-                    ⚡ Gate Staff (gate1)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setUsername("admin");
-                      setPassword("rangtarang2026");
-                    }}
-                    className="p-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-[11px] font-bold text-amber-300 text-center transition-all"
-                  >
-                    👑 Super Admin
-                  </button>
-                </div>
-              </div>
+
             </form>
           </div>
         ) : authRole === "GATE_STAFF" ? (
@@ -1026,7 +1000,11 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
 
                         {/* Gate Check-In */}
                         <td className="p-3">
-                          {item.checkedIn ? (
+                          {item.status !== "Approved" ? (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md">
+                              Payment Pending
+                            </span>
+                          ) : item.checkedIn ? (
                             <div>
                               <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
                                 <CheckCircle className="w-3 h-3" />
@@ -1050,26 +1028,28 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                           )}
                         </td>
 
-                        {/* Actions */}
+                        {/* Actions: View Ticket allowed ONLY when payment is Approved/Done */}
                         <td className="p-3 text-right space-x-1.5 whitespace-nowrap">
-                          <button
-                            onClick={() => {
-                              if (onViewPass) onViewPass(item);
-                            }}
-                            className="p-1.5 text-slate-300 hover:text-amber-400 bg-white/5 rounded-lg border border-white/10"
-                            title="View / Print Digital Pass"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                          </button>
-
-                          {/* <button
-                            onClick={() => handleDelete(item.id)}
-                            disabled={actionLoading}
-                            className="p-1.5 text-slate-400 hover:text-rose-400 bg-white/5 rounded-lg border border-white/10"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button> */}
+                          {item.status === "Approved" ? (
+                            <button
+                              onClick={() => {
+                                if (onViewPass) onViewPass(item);
+                              }}
+                              className="px-2.5 py-1 text-xs font-bold text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 rounded-lg inline-flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+                              title="View / Print Approved Digital Pass"
+                            >
+                              <Eye className="w-3.5 h-3.5 text-amber-400" />
+                              <span>View Ticket</span>
+                            </button>
+                          ) : (
+                            <span
+                              className="px-2 py-1 text-[10px] font-semibold text-slate-500 bg-white/5 border border-white/10 rounded-lg inline-flex items-center gap-1 cursor-not-allowed opacity-60"
+                              title="Payment not completed. Ticket view is disabled."
+                            >
+                              <Lock className="w-3 h-3 text-slate-500" />
+                              <span>Locked (Unpaid)</span>
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))

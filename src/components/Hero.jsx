@@ -130,11 +130,11 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8">
           <button
             onClick={() => onOpenRegister()}
-            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-[#e5b869] via-[#d4a359] to-[#c9933b] hover:from-[#fef08a] hover:to-[#e5b869] text-black font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-[#e5b869]/15 flex items-center justify-center gap-2 sm:gap-2.5 group hover:scale-[1.01] active:scale-95 transition-all"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] hover:from-white hover:to-[#e5b869] text-black font-black text-xs sm:text-sm uppercase tracking-wider rounded-2xl shadow-xl flex items-center justify-center gap-2 sm:gap-2.5 group hover:scale-[1.02] active:scale-95 transition-all animate-pass-blink"
           >
-            <Ticket className="w-4 h-4 text-black shrink-0" />
-            <span>Book Official Passes</span>
-            <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform shrink-0" />
+            <Ticket className="w-4 h-4 text-black shrink-0 animate-bounce" />
+            <span className="font-black">Book Official Passes</span>
+            <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1.5 transition-transform shrink-0" />
           </button>
 
           <button

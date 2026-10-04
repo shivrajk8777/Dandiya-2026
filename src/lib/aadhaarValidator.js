@@ -129,8 +129,8 @@ export const checkDuplicateAadhaarInDb = (aadhaarStr, existingRegistrations = []
     if (excludePassId && (r.id === excludePassId || r.passId === excludePassId)) {
       return false;
     }
-    // Only check active / approved or pending registrations
-    if (r.status === "Cancelled" || r.status === "Rejected") {
+    // Only check active CONFIRMED / APPROVED passes! Unpaid/Pending leads must not block booking
+    if (r.status !== "Approved") {
       return false;
     }
 

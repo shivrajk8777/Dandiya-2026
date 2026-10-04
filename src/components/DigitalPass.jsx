@@ -282,7 +282,7 @@ export default function DigitalPass({ passData, onClose }) {
 
     ctx.fillStyle = "#94a3b8";
     ctx.font = "12px sans-serif";
-    ctx.fillText("TOTAL PAID (INCL. 18% GST)", 360, 295);
+    ctx.fillText("TOTAL PAID (INCL.Tax)", 360, 295);
     ctx.fillStyle = "#4ade80";
     ctx.font = "bold 20px sans-serif";
     ctx.fillText(`₹${(passData.totalAmount || passData.unitPrice || 0).toLocaleString("en-IN")}`, 360, 323);
@@ -681,7 +681,7 @@ export default function DigitalPass({ passData, onClose }) {
       setTimeout(() => {
         try {
           document.body.removeChild(printIframe);
-        } catch (e) {}
+        } catch (e) { }
       }, 60000);
     } catch (e) {
       console.error("Print error:", e);
@@ -715,31 +715,28 @@ export default function DigitalPass({ passData, onClose }) {
         <div className="grid grid-cols-3 gap-1 p-1 mb-3 rounded-xl bg-white/5 border border-white/10 text-[10px] sm:text-xs font-semibold shrink-0">
           <button
             onClick={() => setActiveTab("front")}
-            className={`py-1.5 px-1 sm:px-3 rounded-lg flex items-center justify-center gap-1 transition-all ${
-              activeTab === "front"
-                ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md"
-                : "text-slate-300 hover:text-white hover:bg-white/5"
-            }`}
+            className={`py-1.5 px-1 sm:px-3 rounded-lg flex items-center justify-center gap-1 transition-all ${activeTab === "front"
+              ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md"
+              : "text-slate-300 hover:text-white hover:bg-white/5"
+              }`}
           >
             <span className="truncate">🎟️ Front</span>
           </button>
           <button
             onClick={() => setActiveTab("back")}
-            className={`py-1.5 px-1 sm:px-3 rounded-lg flex items-center justify-center gap-1 transition-all ${
-              activeTab === "back"
-                ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md"
-                : "text-slate-300 hover:text-white hover:bg-white/5"
-            }`}
+            className={`py-1.5 px-1 sm:px-3 rounded-lg flex items-center justify-center gap-1 transition-all ${activeTab === "back"
+              ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md"
+              : "text-slate-300 hover:text-white hover:bg-white/5"
+              }`}
           >
             <span className="truncate">📜 Back (Rules)</span>
           </button>
           <button
             onClick={() => setActiveTab("both")}
-            className={`py-1.5 px-1 sm:px-3 rounded-lg flex items-center justify-center gap-1 transition-all ${
-              activeTab === "both"
-                ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md"
-                : "text-slate-300 hover:text-white hover:bg-white/5"
-            }`}
+            className={`py-1.5 px-1 sm:px-3 rounded-lg flex items-center justify-center gap-1 transition-all ${activeTab === "both"
+              ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold shadow-md"
+              : "text-slate-300 hover:text-white hover:bg-white/5"
+              }`}
           >
             <Layers className="w-3 h-3 shrink-0" />
             <span className="truncate">Both</span>
@@ -857,7 +854,7 @@ export default function DigitalPass({ passData, onClose }) {
                     </div>
                     <div>
                       <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400">
-                        Total Paid (Incl. 18% GST)
+                        Total Paid (Incl. Tax)
                       </span>
                       <div className="font-black text-emerald-400 text-xs sm:text-sm font-mono">
                         ₹{(passData.totalAmount || passData.unitPrice || 0).toLocaleString("en-IN")}
@@ -904,9 +901,8 @@ export default function DigitalPass({ passData, onClose }) {
                   {STATIC_SPONSORS.map((sp, idx) => (
                     <div
                       key={sp.id || idx}
-                      className={`flex items-center justify-center shrink-0 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-lg border transition-colors shadow-sm ${
-                        sp.bgWhite ? "bg-white border-white" : "bg-white/5 border-amber-500/25 hover:border-amber-400/50"
-                      }`}
+                      className={`flex items-center justify-center shrink-0 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-lg border transition-colors shadow-sm ${sp.bgWhite ? "bg-white border-white" : "bg-white/5 border-amber-500/25 hover:border-amber-400/50"
+                        }`}
                     >
                       <img
                         src={sp.logoUrl}

@@ -58,7 +58,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#07020f] text-white selection:bg-amber-400 selection:text-black">
       {/* 1. Top Brand Announcement Marquee */}
-      <BrandAnnouncementBar />
+      <BrandAnnouncementBar onOpenRegister={() => handleOpenRegister()} />
 
       {/* 2. Top Luxury Navigation */}
       <Navbar

@@ -218,13 +218,13 @@ export default function PassTiers({ onSelectPass }) {
                     disabled={isSoldOut}
                     className={`w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 ${isSoldOut
                       ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
-                      : "text-black shadow-xl shadow-[#e5b869]/20 bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] hover:opacity-95 active:scale-95"
+                      : "text-black shadow-xl shadow-[#e5b869]/30 bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] hover:from-white hover:to-[#e5b869] active:scale-95 animate-pass-blink"
                       }`}
                   >
                     <span>
                       {isSoldOut ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)` : `Book VIP Couple Pass (₹${currentPrice})`}
                     </span>
-                    {!isSoldOut && <ArrowRight className="w-4 h-4 text-black" />}
+                    {!isSoldOut && <ArrowRight className="w-4 h-4 text-black animate-bounce" />}
                   </button>
                 </div>
 

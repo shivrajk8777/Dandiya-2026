@@ -85,11 +85,12 @@ export default function Navbar({ onOpenRegister, onOpenLookup, onOpenAdmin }) {
           {/* Book Passes CTA */}
           <button
             onClick={() => onOpenRegister()}
-            className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#e5b869] via-[#d4a359] to-[#c9933b] hover:from-[#fef08a] hover:to-[#e5b869] text-black font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#e5b869]/15 active:scale-95 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0"
+            className="relative px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] hover:from-white hover:to-[#e5b869] text-black font-black text-xs uppercase tracking-wider shadow-lg active:scale-95 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 animate-pass-blink"
           >
-            <Ticket className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black shrink-0" />
-            <span className="whitespace-nowrap">Book Passes</span>
-            <span className="hidden sm:inline-flex px-1.5 py-0.5 rounded-full text-[9px] font-black bg-black/20 text-black">
+            <Ticket className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black shrink-0 animate-bounce" />
+            <span className="whitespace-nowrap font-black">Book Passes</span>
+            <span className="hidden sm:inline-flex px-1.5 py-0.5 rounded-full text-[9px] font-black bg-black/25 text-black border border-black/20">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-600 mr-1 animate-blink-dot" />
               {stats.remainingTickets} Left
             </span>
           </button>
@@ -159,9 +160,9 @@ export default function Navbar({ onOpenRegister, onOpenLookup, onOpenAdmin }) {
                 setMobileMenuOpen(false);
                 onOpenRegister();
               }}
-              className="w-full py-3 bg-gradient-to-r from-[#e5b869] to-[#c9933b] text-black font-bold uppercase text-xs tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-lg"
+              className="w-full py-3.5 bg-gradient-to-r from-[#fef08a] via-[#e5b869] to-[#c9933b] text-black font-black uppercase text-xs tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-xl animate-pass-blink"
             >
-              <Ticket className="w-4 h-4 text-black" />
+              <Ticket className="w-4 h-4 text-black animate-bounce" />
               <span>Book Passes ({stats.remainingTickets} Left)</span>
             </button>
 

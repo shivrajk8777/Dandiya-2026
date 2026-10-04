@@ -120,7 +120,7 @@ export default function Footer({ onOpenAdmin, onOpenRegister, onOpenLookup }) {
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                 <span className="text-slate-300 font-normal">
-                  Raj Vilas Garden, Main Highway Road, Chomu, Rajasthan
+                  Raj Vilas Garden Chomu, Rajasthan
                 </span>
               </div>
               <div className="flex items-center gap-2">
