@@ -135,7 +135,8 @@ export default function DigitalPass({ passData, onClose }) {
   }, [passData]);
 
   // Native 2D Canvas Pass Generator (Side A Front + Side B Back with Terms & Conditions only)
-  const generateNativeCanvasPass = async (scale = 2.0) => {
+  // Native 2D Canvas Pass Generator (Side A Front + Side B Back with Terms & Conditions only)
+  const generateNativeCanvasPass = async (scale = 2.0, isLightMode = false) => {
     const baseWidth = 1200;
     const baseHeight = 1260;
     const cvs = document.createElement("canvas");
@@ -146,15 +147,126 @@ export default function DigitalPass({ passData, onClose }) {
     // Scale canvas context for 300DPI Ultra-HD sharpness
     ctx.scale(scale, scale);
 
+    // Color theme configuration: PDF Download Theme (Ticket card in #5b221b Royal Maroon, canvas page background clean white #ffffff)
+    const colors = isLightMode
+      ? {
+        canvasPageBg: "#ffffff",
+        bgGrad1: "#5b221b",
+        bgGrad2: "#3d1510",
+        bgGrad3: "#6e2921",
+        outerBorder: "#e5b869",
+        topBar1: "#fcd34d",
+        topBar2: "#f97316",
+        topBar3: "#fcd34d",
+        headerSubtitle: "#fcd34d",
+        headerTitle: "#ffffff",
+        headerDesc: "#f1f5f9",
+        badgeBg1: "#fbbf24",
+        badgeBg2: "#f97316",
+        badgeText: "#000000",
+        divider: "rgba(229, 184, 105, 0.4)",
+        label: "#fca5a5",
+        valueMain: "#ffffff",
+        valueSub: "#fcd34d",
+        totalPaid: "#4ade80",
+        venueBoxBg: "#3a130f",
+        venueBoxBorder: "rgba(229, 184, 105, 0.35)",
+        venueDate: "#fcd34d",
+        venueLoc: "#ffffff",
+        qrBoxBg: "#ffffff",
+        qrBoxBorder: "#ffffff",
+        qrPassId: "#0f172a",
+        qrSubText: "#475569",
+        partnerStripBg: "#300f0c",
+        partnerStripBorder: "rgba(229, 184, 105, 0.35)",
+        partnerItemBg: "rgba(255, 255, 255, 0.12)",
+        partnerItemBorder: "rgba(229, 184, 105, 0.3)",
+        secStripText: "#f1f5f9",
+        perfBg: "#ffffff",
+        perfLine: "#5b221b",
+        perfBadgeBg: "#5b221b",
+        perfBadgeBorder: "#e5b869",
+        perfBadgeText: "#fcd34d",
+        backBg1: "#4a1914",
+        backBg2: "#33100c",
+        backBg3: "#5c211a",
+        backHeaderSub: "#fcd34d",
+        backHeaderTitle: "#ffffff",
+        backDivider: "rgba(229, 184, 105, 0.4)",
+        ruleBoxBg: "rgba(255, 255, 255, 0.05)",
+        ruleBoxBorder: "rgba(229, 184, 105, 0.3)",
+        numCircleBg: "#fcd34d",
+        numCircleText: "#000000",
+        ruleTitle: "#fcd34d",
+        ruleDesc: "#f1f5f9",
+        backSecText: "#e2e8f0"
+      }
+      : {
+        canvasPageBg: "#0c0316",
+        bgGrad1: "#1c0836",
+        bgGrad2: "#100422",
+        bgGrad3: "#240a44",
+        outerBorder: "#e5b869",
+        topBar1: "#fcd34d",
+        topBar2: "#fb7185",
+        topBar3: "#fcd34d",
+        headerSubtitle: "#e5b869",
+        headerTitle: "#ffffff",
+        headerDesc: "#cbd5e1",
+        badgeBg1: "#fbbf24",
+        badgeBg2: "#f97316",
+        badgeText: "#000000",
+        divider: "rgba(229, 184, 105, 0.4)",
+        label: "#94a3b8",
+        valueMain: "#ffffff",
+        valueSub: "#fbbf24",
+        totalPaid: "#4ade80",
+        venueBoxBg: "#160729",
+        venueBoxBorder: "rgba(229, 184, 105, 0.3)",
+        venueDate: "#fcd34d",
+        venueLoc: "#f1f5f9",
+        qrBoxBg: "#ffffff",
+        qrBoxBorder: "#ffffff",
+        qrPassId: "#0f172a",
+        qrSubText: "#64748b",
+        partnerStripBg: "rgba(0, 0, 0, 0.45)",
+        partnerStripBorder: "rgba(229, 184, 105, 0.35)",
+        partnerItemBg: "rgba(255, 255, 255, 0.08)",
+        partnerItemBorder: "rgba(229, 184, 105, 0.3)",
+        secStripText: "#cbd5e1",
+        perfBg: "#0c0316",
+        perfLine: "#fbbf24",
+        perfBadgeBg: "#1e1133",
+        perfBadgeBorder: "#e5b869",
+        perfBadgeText: "#fcd34d",
+        backBg1: "#14052b",
+        backBg2: "#0b0318",
+        backBg3: "#1b0838",
+        backHeaderSub: "#e5b869",
+        backHeaderTitle: "#ffffff",
+        backDivider: "rgba(229, 184, 105, 0.3)",
+        ruleBoxBg: "rgba(255, 255, 255, 0.03)",
+        ruleBoxBorder: "rgba(229, 184, 105, 0.25)",
+        numCircleBg: "#fbbf24",
+        numCircleText: "#000000",
+        ruleTitle: "#fcd34d",
+        ruleDesc: "#cbd5e1",
+        backSecText: "#94a3b8"
+      };
+
+    // 0. Fill canvas background (White for PDF mode so background outside ticket is removed/white)
+    ctx.fillStyle = colors.canvasPageBg;
+    ctx.fillRect(0, 0, baseWidth, baseHeight);
+
     // ==========================================
     // SIDE A: FRONT PASS (0 to 640 px)
     // ==========================================
 
     // 1. Background gradient with 28px rounded corners (border radius)
     const bgGrad = ctx.createLinearGradient(0, 0, 1200, 640);
-    bgGrad.addColorStop(0, "#1c0836");
-    bgGrad.addColorStop(0.5, "#100422");
-    bgGrad.addColorStop(1, "#240a44");
+    bgGrad.addColorStop(0, colors.bgGrad1);
+    bgGrad.addColorStop(0.5, colors.bgGrad2);
+    bgGrad.addColorStop(1, colors.bgGrad3);
     ctx.fillStyle = bgGrad;
     ctx.beginPath();
     ctx.roundRect(12, 12, 1176, 616, 28);
@@ -166,15 +278,15 @@ export default function DigitalPass({ passData, onClose }) {
     ctx.roundRect(12, 12, 1176, 616, 28);
     ctx.clip();
     const goldGrad = ctx.createLinearGradient(0, 0, 1200, 0);
-    goldGrad.addColorStop(0, "#fcd34d");
-    goldGrad.addColorStop(0.5, "#fb7185");
-    goldGrad.addColorStop(1, "#fcd34d");
+    goldGrad.addColorStop(0, colors.topBar1);
+    goldGrad.addColorStop(0.5, colors.topBar2);
+    goldGrad.addColorStop(1, colors.topBar3);
     ctx.fillStyle = goldGrad;
     ctx.fillRect(12, 12, 1176, 14);
     ctx.restore();
 
     // 3. Outer Border with Rounded Corners
-    ctx.strokeStyle = "#e5b869";
+    ctx.strokeStyle = colors.outerBorder;
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.roundRect(12, 12, 1176, 616, 28);
@@ -195,15 +307,15 @@ export default function DigitalPass({ passData, onClose }) {
     }
 
     // 5. Header Title & Subtitle
-    ctx.fillStyle = "#e5b869";
+    ctx.fillStyle = colors.headerSubtitle;
     ctx.font = "bold 13px sans-serif";
     ctx.fillText("GRAND HERITAGE • SEASON 6", textOffsetX, 48);
 
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = colors.headerTitle;
     ctx.font = "bold 30px Georgia, serif";
     ctx.fillText("RANG TARANG GARBA", textOffsetX, 80);
 
-    ctx.fillStyle = "#cbd5e1";
+    ctx.fillStyle = colors.headerDesc;
     ctx.font = "12px sans-serif";
     ctx.fillText("OFFICIAL DIGITAL ACCESS PASS 2026", textOffsetX, 100);
 
@@ -214,20 +326,20 @@ export default function DigitalPass({ passData, onClose }) {
     const badgeX = 1145 - badgeWidth;
 
     const bGrad = ctx.createLinearGradient(badgeX, 0, 1145, 0);
-    bGrad.addColorStop(0, "#fbbf24");
-    bGrad.addColorStop(1, "#f97316");
+    bGrad.addColorStop(0, colors.badgeBg1);
+    bGrad.addColorStop(1, colors.badgeBg2);
     ctx.fillStyle = bGrad;
 
     ctx.beginPath();
     ctx.roundRect(badgeX, 44, badgeWidth, 36, 18);
     ctx.fill();
 
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = colors.badgeText;
     ctx.font = "bold 13px sans-serif";
     ctx.fillText(badgeText, badgeX + 18, 67);
 
     // 7. Horizontal Divider
-    ctx.strokeStyle = "rgba(229, 184, 105, 0.4)";
+    ctx.strokeStyle = colors.divider;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(55, 118);
@@ -235,16 +347,16 @@ export default function DigitalPass({ passData, onClose }) {
     ctx.stroke();
 
     // 8. Attendee Name & Details Grid
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = colors.label;
     ctx.font = "12px sans-serif";
     ctx.fillText("PASS HOLDER NAME & AADHAAR", 60, 150);
 
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = colors.valueMain;
     ctx.font = "bold 28px Georgia, serif";
     ctx.fillText(passData.fullName || "Valued Guest", 60, 182);
 
     if (Array.isArray(passData.attendees) && passData.attendees.length > 0) {
-      ctx.fillStyle = "#fbbf24";
+      ctx.fillStyle = colors.valueSub;
       ctx.font = "bold 12px monospace";
       const attSummary = passData.attendees
         .map((a, i) => `T${i + 1}: ${a.name} (${a.aadhaar})`)
@@ -258,51 +370,51 @@ export default function DigitalPass({ passData, onClose }) {
       ctx.fillText(displaySummary, 60, 204);
     }
 
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = colors.label;
     ctx.font = "12px sans-serif";
     ctx.fillText("PHONE / WHATSAPP", 60, 230);
-    ctx.fillStyle = "#f1f5f9";
+    ctx.fillStyle = colors.valueMain;
     ctx.font = "bold 20px monospace";
     ctx.fillText(passData.phone || "-", 60, 258);
 
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = colors.label;
     ctx.font = "12px sans-serif";
     ctx.fillText("TIER CATEGORY", 360, 230);
-    ctx.fillStyle = "#fbbf24";
+    ctx.fillStyle = colors.valueSub;
     ctx.font = "bold 20px sans-serif";
     ctx.fillText(passData.passType || "Single Entry", 360, 258);
 
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = colors.label;
     ctx.font = "12px sans-serif";
     ctx.fillText("QUANTITY & ENTRY", 60, 295);
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = colors.valueMain;
     ctx.font = "bold 18px sans-serif";
     const childPassStr = passData.childrenCount > 0 ? ` + ${passData.childrenCount} Free Child (≤5 Yrs)` : "";
     ctx.fillText(`${(passData.quantity || 1) * 2} Persons Entry${childPassStr}`, 60, 323);
 
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = colors.label;
     ctx.font = "12px sans-serif";
     ctx.fillText("TOTAL PAID", 360, 295);
-    ctx.fillStyle = "#4ade80";
+    ctx.fillStyle = colors.totalPaid;
     ctx.font = "bold 20px sans-serif";
     ctx.fillText(`₹${(passData.totalAmount || passData.unitPrice || 0).toLocaleString("en-IN")}`, 360, 323);
 
     // 9. Venue & Date Box
-    ctx.fillStyle = "#160729";
-    ctx.strokeStyle = "rgba(229, 184, 105, 0.3)";
+    ctx.fillStyle = colors.venueBoxBg;
+    ctx.strokeStyle = colors.venueBoxBorder;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(55, 350, 680, 95, 12);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = "#fcd34d";
+    ctx.fillStyle = colors.venueDate;
     ctx.font = "bold 15px sans-serif";
     ctx.fillText("📅  Oct 17 - 19, 2026  (07:00 PM Onwards)", 75, 385);
 
-    ctx.fillStyle = "#f1f5f9";
+    ctx.fillStyle = colors.venueLoc;
     ctx.font = "14px sans-serif";
-    ctx.fillText("📍  Raj Vilas Garden, Main Highway Road, Chomu, Rajasthan", 75, 422);
+    ctx.fillText("📍  Raj Vilas Garden, Chomu, Rajasthan", 75, 422);
 
     // 10. QR Code Box
     if (qrDataUrl) {
@@ -312,27 +424,30 @@ export default function DigitalPass({ passData, onClose }) {
         qrImg.onload = resolve;
         setTimeout(resolve, 150);
       });
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = colors.qrBoxBg;
+      ctx.strokeStyle = colors.qrBoxBorder;
+      ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.roundRect(785, 135, 360, 310, 18);
       ctx.fill();
+      ctx.stroke();
 
       drawCanvasAspectContain(ctx, qrImg, 825, 150, 280, 245, 5);
 
-      ctx.fillStyle = "#0f172a";
+      ctx.fillStyle = colors.qrPassId;
       ctx.font = "bold 15px monospace";
       ctx.textAlign = "center";
       ctx.fillText(passData.passId || "", 965, 415);
 
-      ctx.fillStyle = "#64748b";
+      ctx.fillStyle = colors.qrSubText;
       ctx.font = "bold 11px sans-serif";
       ctx.fillText("SCAN AT GATE FOR ENTRY", 965, 432);
       ctx.textAlign = "left";
     }
 
     // 11. Front Side Partners Banner Strip with LOGOS (Single Horizontal Row)
-    ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
-    ctx.strokeStyle = "rgba(229, 184, 105, 0.35)";
+    ctx.fillStyle = colors.partnerStripBg;
+    ctx.strokeStyle = colors.partnerStripBorder;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(55, 452, 1090, 64, 12);
@@ -369,10 +484,10 @@ export default function DigitalPass({ passData, onClose }) {
       if (lx + logoBoxW <= 1140) {
         if (item.bgWhite) {
           ctx.fillStyle = "#ffffff";
-          ctx.strokeStyle = "#ffffff";
+          ctx.strokeStyle = "#cbd5e1";
         } else {
-          ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
-          ctx.strokeStyle = "rgba(229, 184, 105, 0.3)";
+          ctx.fillStyle = colors.partnerItemBg;
+          ctx.strokeStyle = colors.partnerItemBorder;
         }
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -383,7 +498,7 @@ export default function DigitalPass({ passData, onClose }) {
         if (item.img) {
           drawCanvasAspectContain(ctx, item.img, lx, ly, logoBoxW, logoBoxH, 4);
         } else {
-          ctx.fillStyle = item.bgWhite ? "#000000" : "#ffffff";
+          ctx.fillStyle = isLightMode ? "#0f172a" : (item.bgWhite ? "#000000" : "#ffffff");
           ctx.font = "bold 8.5px sans-serif";
           ctx.textAlign = "center";
           ctx.fillText(item.name || "PARTNER", lx + logoBoxW / 2, ly + 20);
@@ -393,7 +508,7 @@ export default function DigitalPass({ passData, onClose }) {
     });
 
     // 12. Bottom Security Strip (Front)
-    ctx.strokeStyle = "rgba(229, 184, 105, 0.3)";
+    ctx.strokeStyle = colors.divider;
     ctx.lineWidth = 1.5;
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
@@ -402,7 +517,7 @@ export default function DigitalPass({ passData, onClose }) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = "#cbd5e1";
+    ctx.fillStyle = colors.secStripText;
     ctx.font = "12px monospace";
     ctx.fillText(`PASS ID: ${passData.passId || "DND-2026"}`, 60, 560);
     ctx.fillText(`STATUS: ${passData.status || "CONFIRMED"}`, 450, 560);
@@ -411,10 +526,10 @@ export default function DigitalPass({ passData, onClose }) {
     // ==========================================
     // PERFORATION DIVIDER (640 to 685 px)
     // ==========================================
-    ctx.fillStyle = "#0c0316";
+    ctx.fillStyle = colors.perfBg;
     ctx.fillRect(0, 640, 1200, 45);
 
-    ctx.strokeStyle = "#fbbf24";
+    ctx.strokeStyle = colors.perfLine;
     ctx.lineWidth = 2;
     ctx.setLineDash([10, 8]);
     ctx.beginPath();
@@ -424,15 +539,15 @@ export default function DigitalPass({ passData, onClose }) {
     ctx.setLineDash([]);
 
     // Perforation Tag Badge
-    ctx.fillStyle = "#1e1133";
-    ctx.strokeStyle = "#e5b869";
+    ctx.fillStyle = colors.perfBadgeBg;
+    ctx.strokeStyle = colors.perfBadgeBorder;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.roundRect(390, 645, 420, 32, 16);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = "#fcd34d";
+    ctx.fillStyle = colors.perfBadgeText;
     ctx.font = "bold 12px sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("✂️  FLIP SIDE  •  TERMS & CONDITIONS OF ENTRY  ✂️", 600, 666);
@@ -444,9 +559,9 @@ export default function DigitalPass({ passData, onClose }) {
 
     // 13. Back Pass Background Gradient with 28px rounded corners
     const bgGradBack = ctx.createLinearGradient(0, 685, 1200, 1260);
-    bgGradBack.addColorStop(0, "#14052b");
-    bgGradBack.addColorStop(0.5, "#0b0318");
-    bgGradBack.addColorStop(1, "#1b0838");
+    bgGradBack.addColorStop(0, colors.backBg1);
+    bgGradBack.addColorStop(0.5, colors.backBg2);
+    bgGradBack.addColorStop(1, colors.backBg3);
     ctx.fillStyle = bgGradBack;
     ctx.beginPath();
     ctx.roundRect(12, 695, 1176, 550, 28);
@@ -458,31 +573,31 @@ export default function DigitalPass({ passData, onClose }) {
     ctx.roundRect(12, 695, 1176, 550, 28);
     ctx.clip();
     const bHeaderGrad = ctx.createLinearGradient(0, 695, 1200, 0);
-    bHeaderGrad.addColorStop(0, "#fbbf24");
-    bHeaderGrad.addColorStop(0.5, "#f97316");
-    bHeaderGrad.addColorStop(1, "#fbbf24");
+    bHeaderGrad.addColorStop(0, colors.topBar1);
+    bHeaderGrad.addColorStop(0.5, colors.topBar2);
+    bHeaderGrad.addColorStop(1, colors.topBar3);
     ctx.fillStyle = bHeaderGrad;
     ctx.fillRect(12, 695, 1176, 10);
     ctx.restore();
 
     // 15. Back Outer Border with Rounded Corners
-    ctx.strokeStyle = "#e5b869";
+    ctx.strokeStyle = colors.outerBorder;
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.roundRect(12, 695, 1176, 550, 28);
     ctx.stroke();
 
     // Header Titles
-    ctx.fillStyle = "#e5b869";
+    ctx.fillStyle = colors.backHeaderSub;
     ctx.font = "bold 13px sans-serif";
     ctx.fillText("RANG TARANG GARBA 2026 • OFFICIAL TICKET BACK SIDE", 55, 730);
 
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = colors.backHeaderTitle;
     ctx.font = "bold 25px Georgia, serif";
     ctx.fillText("TERMS & CONDITIONS OF ENTRY", 55, 762);
 
     // Divider
-    ctx.strokeStyle = "rgba(229, 184, 105, 0.3)";
+    ctx.strokeStyle = colors.backDivider;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(55, 775);
@@ -504,8 +619,8 @@ export default function DigitalPass({ passData, onClose }) {
       const ty = tStartY + row * (termH + tRowGap);
 
       // Rule Box Background
-      ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
-      ctx.strokeStyle = "rgba(229, 184, 105, 0.25)";
+      ctx.fillStyle = colors.ruleBoxBg;
+      ctx.strokeStyle = colors.ruleBoxBorder;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.roundRect(tx, ty, termW, termH, 10);
@@ -513,24 +628,24 @@ export default function DigitalPass({ passData, onClose }) {
       ctx.stroke();
 
       // Number Circle
-      ctx.fillStyle = "#fbbf24";
+      ctx.fillStyle = colors.numCircleBg;
       ctx.beginPath();
       ctx.arc(tx + 26, ty + 26, 14, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = "#000000";
+      ctx.fillStyle = colors.numCircleText;
       ctx.font = "bold 12px sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(term.num, tx + 26, ty + 30);
       ctx.textAlign = "left";
 
       // Rule Title
-      ctx.fillStyle = "#fcd34d";
+      ctx.fillStyle = colors.ruleTitle;
       ctx.font = "bold 12.5px sans-serif";
       ctx.fillText(term.title, tx + 52, ty + 26);
 
       // Rule Description (Wrapped into 2 lines)
-      ctx.fillStyle = "#cbd5e1";
+      ctx.fillStyle = colors.ruleDesc;
       ctx.font = "11px sans-serif";
 
       const words = term.desc.split(" ");
@@ -551,7 +666,7 @@ export default function DigitalPass({ passData, onClose }) {
     });
 
     // 17. Bottom Security Strip (Back)
-    ctx.strokeStyle = "rgba(229, 184, 105, 0.3)";
+    ctx.strokeStyle = colors.backDivider;
     ctx.lineWidth = 1.5;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -560,7 +675,7 @@ export default function DigitalPass({ passData, onClose }) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = colors.backSecText;
     ctx.font = "11px monospace";
     ctx.fillText(`PASS SECURITY ID: ${passData.passId || "DND-2026"}`, 60, 1210);
     ctx.fillText("AUTHENTICATED BY RANG TARANG GARBA 2026 COMMITTEE", 380, 1210);
@@ -573,7 +688,7 @@ export default function DigitalPass({ passData, onClose }) {
     if (!passData) return;
     setDownloading(true);
     try {
-      const cvs = await generateNativeCanvasPass(2.0);
+      const cvs = await generateNativeCanvasPass(2.0, true); // <--- Light Mode for PDF download
       const imgData = cvs.toDataURL("image/jpeg", 0.95);
 
       const pdf = new jsPDF({
@@ -603,7 +718,7 @@ export default function DigitalPass({ passData, onClose }) {
     if (!passData) return;
     setDownloading(true);
     try {
-      const cvs = await generateNativeCanvasPass(2.0);
+      const cvs = await generateNativeCanvasPass(2.0, true);
       const image = cvs.toDataURL("image/png");
       const link = document.createElement("a");
       link.download = `RangTarangGarba_Pass_${passData?.passId || "2026"}.png`;
@@ -622,7 +737,7 @@ export default function DigitalPass({ passData, onClose }) {
   const handlePrint = async () => {
     if (!passData) return;
     try {
-      const cvs = await generateNativeCanvasPass(2.0);
+      const cvs = await generateNativeCanvasPass(2.0, true);
       const imgData = cvs.toDataURL("image/png");
 
       const printIframe = document.createElement("iframe");
