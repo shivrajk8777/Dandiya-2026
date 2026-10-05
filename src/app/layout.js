@@ -18,7 +18,7 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata = {
   title: "RANG TARANG GARBA 2026 | The Grand Heritage Dandiya & Garba Mahotsav",
   description:
-    "Step into Gujarat's most prestigious Rang Tarang Garba Mahotsav 2026. Featuring celebrity headliners, 100-piece live Dhol symphony, royal VIP cabanas, and instant digital QR passes.",
+    "Step into Rajasthan's most prestigious Rang Tarang Garba Mahotsav 2026. Featuring celebrity headliners, 100-piece live Dhol symphony, royal VIP cabanas, and instant digital QR passes.",
   keywords: [
     "Rang Tarang Garba 2026",
     "Rang Tarang Garba",

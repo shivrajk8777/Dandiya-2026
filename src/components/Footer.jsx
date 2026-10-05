@@ -32,7 +32,7 @@ export default function Footer({ onOpenAdmin, onOpenRegister, onOpenLookup }) {
               </div>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed font-light">
-              India’s premier cultural fest celebrating the sublime divinity of Maa Ambe with royal Gujarati traditions, concert audio architecture, and world-class hospitality.
+              India’s premier cultural fest celebrating the sublime divinity of Maa Ambe with royal rajasthani traditions, concert audio architecture, and world-class hospitality.
             </p>
             <div className="text-[11px] text-amber-300 font-bold flex items-center gap-1.5 font-serif-royal">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />

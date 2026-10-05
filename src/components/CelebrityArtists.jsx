@@ -23,12 +23,12 @@ export default function CelebrityArtists() {
       time: "08:15 PM – 09:45 PM"
     },
     {
-      name: "Radhika Vyas & Folk Ensemble",
+      name: "Anchor krishna soni",
       role: "Traditional Dayro & Raas Vocalist",
       genre: "3-Taali Classical • Sanedo • Heritage Garbi",
       tag: "Day 1 Cultural Special",
       icon: Mic2,
-      badge: "Gujarat State Sangeet Ratna",
+      badge: "Rajasthan State Sangeet Ratna",
       time: "07:30 PM – 09:30 PM"
     },
     {

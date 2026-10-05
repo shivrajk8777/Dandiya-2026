@@ -21,7 +21,7 @@ export default function EventSchedule() {
     {
       time: "08:15 PM",
       title: "Phase 1: 100-Dhol Symphony & 3-Taali Classical Raas",
-      desc: "Authentic Gujarati folk melodies, rhythmic claps, and massive concentric circles with live Puneri & Nagada percussionists.",
+      desc: "Authentic Rajasthani folk melodies, rhythmic claps, and massive concentric circles with live Puneri & Nagada percussionists.",
       icon: Music,
       tag: "Folk Raas"
     },

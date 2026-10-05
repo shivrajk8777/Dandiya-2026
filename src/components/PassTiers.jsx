@@ -17,8 +17,9 @@ export const PASS_OPTIONS = [
     features: [
       "Exclusive Entry for 2 Persons (Couple Entry Only)",
       "Free Entry for 1 Child Up to 5 Years (Max 1 Kid Allowed)",
+      "Complimentary Delicious Food & Snacks Stalls Included (Free Food)",
       "Fast-Track Red Carpet VIP Entry Lane (Zero Waiting)",
-      "Access to Kathiyawadi Gourmet Food Village & VIP Lounge",
+      "Access to Gourmet Food Village & VIP Lounge",
       "Access to Live 100-Dhol & DJ EDM Concert Ground",
       "Automatic Entry into 'Best Royal Couple' Trophy Contest"
     ]

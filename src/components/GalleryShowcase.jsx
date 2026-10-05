@@ -12,7 +12,7 @@ export default function GalleryShowcase() {
     },
     {
       title: "Royal Chaniya Choli Couture",
-      caption: "Vibrant traditional mirror-work and heirloom Gujarati ethnic couture.",
+      caption: "Vibrant traditional mirror-work and heirloom Rajasthani ethnic couture.",
       tag: "Fashion Gala",
       stat: "Red Carpet"
     },

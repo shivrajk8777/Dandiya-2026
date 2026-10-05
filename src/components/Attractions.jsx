@@ -13,7 +13,7 @@ export default function Attractions() {
     },
     {
       icon: UtensilsCrossed,
-      title: "Gujarati & Street Food Bazaar",
+      title: "Rajasthan & Street Food Bazaar",
       desc: "Indulge in mouthwatering Jalebi-Fafda, spicy Chaat, Pav Bhaji, Kulfi, mocktails and sweet delicacies.",
       tag: "Food Mela",
       gradient: "from-rose-500/20 to-purple-500/20"

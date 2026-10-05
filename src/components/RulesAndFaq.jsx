@@ -27,8 +27,12 @@ export default function RulesAndFaq() {
       a: "Yes! You can use the 'Find My Pass' button on our header anytime, enter your registered WhatsApp phone number, and instantly view or re-download your digital pass."
     },
     {
+      q: "Is food included for free with the pass?",
+      a: "Yes! Complimentary delicious Rajasthani food, festive snacks & refreshments are included free with your Royal VIP Couple Pass."
+    },
+    {
       q: "Is outside food and drinks permitted?",
-      a: "Outside food and drinks are strictly prohibited. A multi-cuisine food court with authentic Gujarati food stalls, snacks, and fresh mocktails is available inside the venue."
+      a: "Outside food and drinks are strictly prohibited since free multi-cuisine food stalls, snacks, and fresh mocktails are already available inside the venue for pass holders."
     }
   ];
 
@@ -57,7 +61,7 @@ export default function RulesAndFaq() {
             </div>
             <h3 className="text-lg font-bold text-white mb-2">Traditional Attire</h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Step in your best vibrant Chaniya Choli or Kedia/Kurta. Let’s celebrate the rich heritage of Gujarat in full traditional color!
+              Step in your best vibrant Chaniya Choli or Kedia/Kurta. Let’s celebrate the rich heritage of Rajasthan in full traditional color!
             </p>
           </div>
 
@@ -100,9 +104,8 @@ export default function RulesAndFaq() {
                 >
                   <span>{faq.q}</span>
                   <ChevronDown
-                    className={`w-5 h-5 text-amber-400 shrink-0 transition-transform duration-300 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-5 h-5 text-amber-400 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
                 {isOpen && (
