@@ -45,8 +45,8 @@ export default function PassLookupModal({ isOpen, onClose, onSelectPass }) {
     const qty = Number(pass.quantity) || 1;
     const unitPrice = Number(pass.unitPrice) || 1599;
     const subtotal = Number(pass.subtotal) || unitPrice * qty;
-    const taxAmount = Number(pass.taxAmount) || Math.round((subtotal * 18) / 100);
-    const totalAmount = Number(pass.totalAmount) || subtotal + taxAmount;
+    const taxAmount = Number(pass.taxAmount) || 0;
+    const totalAmount = Number(pass.totalAmount) || subtotal;
 
     try {
       await initiateRazorpayCheckout({
@@ -58,7 +58,7 @@ export default function PassLookupModal({ isOpen, onClose, onSelectPass }) {
         phone: pass.phone,
         email: pass.email,
         name: "Rang Tarang Garba Mahotsav 2026",
-        description: `Complete Payment for ${pass.passId} (₹${subtotal} + 18% GST ₹${taxAmount} = ₹${totalAmount})`,
+        description: `Complete Payment for ${pass.passId} (Total: ₹${totalAmount})`,
         prefill: {
           name: pass.fullName,
           contact: pass.phone,
@@ -75,8 +75,8 @@ export default function PassLookupModal({ isOpen, onClose, onSelectPass }) {
             transactionRef: paymentId,
             paidAt: new Date().toISOString(),
             subtotal,
-            taxPercent: 18,
-            taxAmount,
+            taxPercent: 0,
+            taxAmount: 0,
             totalAmount
           };
 
@@ -88,8 +88,8 @@ export default function PassLookupModal({ isOpen, onClose, onSelectPass }) {
               transactionRef: paymentId,
               paidAt: new Date().toISOString(),
               subtotal,
-              taxPercent: 18,
-              taxAmount,
+              taxPercent: 0,
+              taxAmount: 0,
               totalAmount
             });
           }
@@ -192,8 +192,8 @@ export default function PassLookupModal({ isOpen, onClose, onSelectPass }) {
               const qty = Number(pass.quantity) || 1;
               const unitPrice = Number(pass.unitPrice) || 1599;
               const subtotal = Number(pass.subtotal) || unitPrice * qty;
-              const taxAmount = Number(pass.taxAmount) || Math.round((subtotal * 18) / 100);
-              const totalAmount = Number(pass.totalAmount) || subtotal + taxAmount;
+              const taxAmount = Number(pass.taxAmount) || 0;
+              const totalAmount = Number(pass.totalAmount) || subtotal;
               const isThisPaying = payingPassId === (pass.id || pass.passId);
 
               return (
@@ -240,7 +240,7 @@ export default function PassLookupModal({ isOpen, onClose, onSelectPass }) {
                           {pass.passId}
                         </span>
                         <span className="text-emerald-400 font-bold">
-                          ₹{totalAmount.toLocaleString("en-IN")} <span className="text-[9px] text-slate-400 font-sans font-normal">(Incl.Tax)</span>
+                          ₹{totalAmount.toLocaleString("en-IN")}
                         </span>
                       </div>
                     </div>

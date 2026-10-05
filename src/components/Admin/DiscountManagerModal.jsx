@@ -163,15 +163,9 @@ export default function DiscountManagerModal({ isOpen, onClose }) {
               </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-amber-400">+18% GST Tax</div>
-              <div className="text-sm sm:text-base font-bold text-amber-300">
-                +₹{Math.round((currentPricing.finalPrice * 18) / 100)}
-              </div>
-            </div>
-            <div>
               <div className="text-[10px] uppercase font-bold text-emerald-400">Final Pay Amount</div>
               <div className="text-base sm:text-lg font-black text-gold-gradient font-mono">
-                ₹{currentPricing.finalPrice + Math.round((currentPricing.finalPrice * 18) / 100)}
+                ₹{currentPricing.finalPrice}
               </div>
             </div>
           </div>
@@ -182,7 +176,7 @@ export default function DiscountManagerModal({ isOpen, onClose }) {
             </div>
           )}
           <div className="mt-2 text-[10px] text-slate-400 text-center font-medium">
-            💡 18% GST (Tax) is automatically added to the pass price at checkout/payment gateway.
+            💡 Ticket price displayed is the final net payable amount at checkout (No extra tax added).
           </div>
         </div>
 

@@ -77,7 +77,7 @@ export const initiateRazorpayCheckout = async ({
     amount: Math.round(Number(amount) * 100), // Amount in paise (INR)
     currency: "INR",
     name: name || "RANG TARANG GARBA 2026",
-    description: description || `${passTitle} (${passQty} ${passQty === 1 ? "Couple Pass" : "Couple Passes"} - Incl. 18% GST)`,
+    description: description || `${passTitle} (${passQty} ${passQty === 1 ? "Couple Pass" : "Couple Passes"})`,
     image: "/logo.png",
     handler: function (response) {
       if (response && response.razorpay_payment_id) {

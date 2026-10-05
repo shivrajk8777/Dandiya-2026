@@ -127,13 +127,13 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   const unitPrice = pricing.finalPrice;
   const quantity = Number(formData.quantity) || 1;
   const subtotal = unitPrice * quantity;
-  const TAX_PERCENT = 18; // 18% GST / Govt Tax
-  const taxAmount = Math.round((subtotal * TAX_PERCENT) / 100);
-  const totalAmount = subtotal + taxAmount; // Final payable amount including 18% tax
+  const TAX_PERCENT = 0; // Tax removed as per requirement
+  const taxAmount = 0;
+  const totalAmount = subtotal; // Final payable amount equals ticket price
 
   const originalSubtotal = pricing.basePrice * quantity;
-  const originalTax = Math.round((originalSubtotal * TAX_PERCENT) / 100);
-  const originalTotal = originalSubtotal + originalTax;
+  const originalTax = 0;
+  const originalTotal = originalSubtotal;
   const totalSavings = originalTotal - totalAmount;
 
   // Extract all non-empty Aadhaar numbers in the entire booking form (Adults + Children)
@@ -458,7 +458,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         phone: formData.phone.trim(),
         email: formData.email.trim(),
         name: "Rang Tarang Garba Mahotsav 2026",
-        description: `${quantity}x ${selectedPass.name} (₹${subtotal} + 18% GST ₹${taxAmount} = ₹${totalAmount})`,
+        description: `${quantity}x ${selectedPass.name} (Total: ₹${totalAmount})`,
         prefill: {
           name: formData.fullName.trim(),
           contact: formData.phone.trim(),
@@ -1142,13 +1142,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                   <span className="text-slate-200 font-mono">₹{subtotal.toLocaleString("en-IN")}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-slate-300 font-medium">
-                  <span className="flex items-center gap-1.5">
-                    <span>Tax</span>
-
-                  </span>
-                  <span className="text-amber-300 font-mono font-bold">+₹{taxAmount.toLocaleString("en-IN")}</span>
-                </div>
+                {/* Tax line removed */}
 
                 {formData.childrenCount > 0 && (
                   <div className="flex items-center justify-between text-emerald-400 text-[10px]">
@@ -1209,7 +1203,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               {!isSoldOut && (
                 <div className="text-center text-[9px] sm:text-[10px] text-slate-400 flex items-center justify-center gap-1.5">
                   <Lock className="w-3 h-3 text-emerald-400" />
-                  <span>Secured by Razorpay • Total ₹{totalAmount.toLocaleString("en-IN")} (Includes 18% GST)</span>
+                  <span>Secured by Razorpay • Total Payable ₹{totalAmount.toLocaleString("en-IN")}</span>
                 </div>
               )}
             </div>

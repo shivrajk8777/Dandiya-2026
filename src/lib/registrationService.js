@@ -144,9 +144,9 @@ export const registerAttendee = async (formData) => {
   const qty = Number(formData.quantity) || 1;
   const unitPrice = Number(formData.unitPrice) || 1599;
   const subtotal = Number(formData.subtotal) || unitPrice * qty;
-  const taxPercent = Number(formData.taxPercent) || 18;
-  const taxAmount = Number(formData.taxAmount) || Math.round((subtotal * taxPercent) / 100);
-  const totalAmount = Number(formData.totalAmount) || subtotal + taxAmount;
+  const taxPercent = Number(formData.taxPercent) || 0;
+  const taxAmount = Number(formData.taxAmount) || 0;
+  const totalAmount = Number(formData.totalAmount) || subtotal;
 
   const registrationRecord = {
     passId,
@@ -501,8 +501,8 @@ export const exportRegistrationsToExcel = (registrations) => {
     const qty = Number(r.quantity) || 1;
     const unitPrice = Number(r.unitPrice) || 1599;
     const subtotalVal = r.subtotal || unitPrice * qty;
-    const taxVal = r.taxAmount || Math.round((subtotalVal * 18) / 100);
-    const totalVal = r.totalAmount || (subtotalVal + taxVal);
+    const taxVal = r.taxAmount || 0;
+    const totalVal = r.totalAmount || subtotalVal;
 
     return {
       "S.No": index + 1,
@@ -514,7 +514,7 @@ export const exportRegistrationsToExcel = (registrations) => {
       "Pass Category": r.passType,
       "Quantity": qty,
       "Pass Subtotal (₹)": subtotalVal,
-      "GST / Tax (18%) (₹)": taxVal,
+      "GST / Tax (₹)": taxVal,
       "Total Amount Paid (₹)": totalVal,
       "All Attendees & Aadhaar": attendeesStr,
       "Aadhaar Numbers": aadhaarListStr,
