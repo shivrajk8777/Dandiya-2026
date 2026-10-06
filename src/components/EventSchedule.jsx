@@ -5,7 +5,7 @@ import { Clock, Music, Flame, Sparkles, Award, Star, Crown } from "lucide-react"
 export default function EventSchedule() {
   const scheduleItems = [
     {
-      time: "07:00 PM",
+      time: "06:00 PM",
       title: "Royal Red Carpet Entry & Welcome Tilak",
       desc: "Traditional welcome with Chandan & Kesar tilak, complimentary handcrafted Dandiya sticks distribution & 360 photo studio access.",
       icon: Sparkles,

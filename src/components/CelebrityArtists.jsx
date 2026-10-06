@@ -16,7 +16,7 @@ export default function CelebrityArtists() {
     {
       name: "Saurabh & The 100-Dhol Symphony",
       role: "Acoustic Percussion Masterminds",
-      genre: "Puneri Dhol • Gujarati Nagada • Tasha Percussion",
+      genre: "Puneri Dhol • Tasha Percussion",
       tag: "All 3 Nights Opening",
       icon: Music,
       badge: "World Record Percussionists",

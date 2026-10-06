@@ -410,7 +410,7 @@ export default function DigitalPass({ passData, onClose }) {
 
     ctx.fillStyle = colors.venueDate;
     ctx.font = "bold 15px sans-serif";
-    ctx.fillText("📅  Oct 17 - 19, 2026  (07:00 PM Onwards)", 75, 385);
+    ctx.fillText("📅  Oct 17 2026  (06:00 PM Onwards)", 75, 385);
 
     ctx.fillStyle = colors.venueLoc;
     ctx.font = "14px sans-serif";
@@ -981,7 +981,7 @@ export default function DigitalPass({ passData, onClose }) {
                   <div className="pt-2 border-t border-white/10 space-y-1 text-[10px] sm:text-[11px] text-slate-300">
                     <div className="flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                      <span>Oct 17 - 19, 2026 (07:00 PM Onwards)</span>
+                      <span>Oct 17 2026 (06:00 PM Onwards)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />

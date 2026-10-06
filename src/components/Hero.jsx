@@ -4,7 +4,7 @@ import { Sparkles, Calendar, MapPin, Clock, Ticket, Search, ShieldCheck, ArrowRi
 import { subscribeToInventoryConfig, computeTicketStats } from "@/lib/ticketInventoryService";
 import { subscribeToRegistrations } from "@/lib/registrationService";
 
-// Exact Event Gate Opening Date & Time: 17 October 2026 at 07:00 PM (19:00 IST)
+// Exact Event Gate Opening Date & Time: 17 October 2026 at 06:00 PM (19:00 IST)
 const getEventTargetDate = () => {
   const target = new Date(2026, 9, 17, 19, 0, 0); // Month index 9 = October
   const now = new Date();
@@ -139,7 +139,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl editorial-card text-[11px] sm:text-xs">
             <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#fb7185] shrink-0" />
-            <span className="font-medium whitespace-nowrap">07:00 PM to 01:00 AM</span>
+            <span className="font-medium whitespace-nowrap">06:00 PM to 10:00 PM</span>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl editorial-card text-[11px] sm:text-xs">
             <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400 shrink-0" />
@@ -171,7 +171,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
         <div className="max-w-xl mx-auto mb-8 p-4 sm:p-5 rounded-3xl bg-gradient-to-b from-[#1c0830]/90 via-[#130524]/95 to-[#0b0314]/95 border border-amber-500/30 backdrop-blur-md shadow-2xl relative overflow-hidden">
           {/* Subtle glowing radial background */}
           <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-          
+
           {/* Header Row */}
           <div className="flex items-center justify-between gap-2 mb-3.5 pb-2.5 border-b border-white/10 text-xs">
             <div className="flex items-center gap-2">
@@ -184,11 +184,10 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-                stats.isSoldOut 
-                  ? "bg-rose-500/20 border-rose-500/40 text-rose-300"
-                  : "bg-amber-500/15 border-amber-500/30 text-amber-300"
-              }`}>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${stats.isSoldOut
+                ? "bg-rose-500/20 border-rose-500/40 text-rose-300"
+                : "bg-amber-500/15 border-amber-500/30 text-amber-300"
+                }`}>
                 {stats.isSoldOut ? "Sold Out" : `${stats.soldPercentage}% Passes Booked`}
               </span>
             </div>
@@ -212,11 +211,10 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
                 {stats.soldPasses}
               </span>
             </div>
-            <div className={`p-2 sm:p-3 rounded-2xl border ${
-              stats.isSoldOut 
-                ? "bg-rose-500/15 border-rose-500/30 text-rose-300" 
-                : "bg-emerald-500/15 border-emerald-500/30 text-emerald-300"
-            }`}>
+            <div className={`p-2 sm:p-3 rounded-2xl border ${stats.isSoldOut
+              ? "bg-rose-500/15 border-rose-500/30 text-rose-300"
+              : "bg-emerald-500/15 border-emerald-500/30 text-emerald-300"
+              }`}>
               <span className="text-[9px] sm:text-[10px] uppercase font-bold block mb-0.5">
                 Available Left
               </span>
