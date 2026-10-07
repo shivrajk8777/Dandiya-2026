@@ -44,7 +44,7 @@ import DiscountManagerModal from "./DiscountManagerModal";
 import RazorpayConfigModal from "./RazorpayConfigModal";
 import TicketInventoryModal from "./TicketInventoryModal";
 import MobileCameraScanner from "./MobileCameraScanner";
-import { subscribeToInventoryConfig } from "@/lib/ticketInventoryService";
+import { subscribeToInventoryConfig, computeTicketStats } from "@/lib/ticketInventoryService";
 
 // Audio sound feedback helper using Web Audio API
 const playTone = (type) => {
@@ -109,7 +109,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [showRazorpayModal, setShowRazorpayModal] = useState(false);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
-  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300 });
+  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 55 });
   const [actionLoading, setActionLoading] = useState(false);
 
   // Gate staff scanner state
@@ -216,6 +216,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
   };
 
   // Metrics calculation
+  const stats = computeTicketStats(inventoryConfig, registrations);
   const totalRegistrations = registrations.length;
   const totalPasses = registrations.reduce((acc, r) => acc + (Number(r.quantity) || 1), 0);
   const totalRevenue = registrations.filter((r) => r.status !== "Pending").reduce(
@@ -782,7 +783,12 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                   <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                     Passes Sold
                   </div>
-                  <div className="text-base sm:text-xl font-black text-white">{totalPasses}</div>
+                  <div className="text-base sm:text-xl font-black text-white">
+                    {stats.soldPasses}{" "}
+                    <span className="text-[11px] font-normal text-amber-300">
+                      / {stats.maxTickets}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -1107,7 +1113,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
       <TicketInventoryModal
         isOpen={showInventoryModal}
         onClose={() => setShowInventoryModal(false)}
-        totalSoldPasses={totalPasses}
+        totalSoldPasses={stats.soldPasses}
       />
     </div>
   );

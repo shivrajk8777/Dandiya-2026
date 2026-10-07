@@ -8,6 +8,7 @@ const COLLECTION_NAME = "dandiya_settings";
 
 const DEFAULT_INVENTORY = {
   maxTickets: 300,
+  baseSoldTickets: 55,
   updatedAt: new Date().toISOString()
 };
 
@@ -15,12 +16,20 @@ export const getLocalInventoryConfig = () => {
   if (typeof window === "undefined") return DEFAULT_INVENTORY;
   try {
     const raw = localStorage.getItem(INVENTORY_LOCAL_KEY);
-    if (!raw) return DEFAULT_INVENTORY;
+    if (!raw) {
+      localStorage.setItem(INVENTORY_LOCAL_KEY, JSON.stringify(DEFAULT_INVENTORY));
+      return DEFAULT_INVENTORY;
+    }
     const parsed = JSON.parse(raw);
-    return {
+    const config = {
       maxTickets: Number(parsed.maxTickets) || 300,
+      baseSoldTickets: parsed.baseSoldTickets !== undefined ? Number(parsed.baseSoldTickets) : 55,
       updatedAt: parsed.updatedAt || new Date().toISOString()
     };
+    if (parsed.baseSoldTickets === undefined) {
+      localStorage.setItem(INVENTORY_LOCAL_KEY, JSON.stringify(config));
+    }
+    return config;
   } catch (e) {
     return DEFAULT_INVENTORY;
   }
@@ -49,6 +58,7 @@ export const subscribeToInventoryConfig = (callback) => {
             const data = snapshot.data();
             const config = {
               maxTickets: Number(data.maxTickets) || 300,
+              baseSoldTickets: data.baseSoldTickets !== undefined ? Number(data.baseSoldTickets) : 55,
               updatedAt: data.updatedAt || new Date().toISOString()
             };
             saveLocalInventoryConfig(config);
@@ -78,11 +88,20 @@ export const subscribeToInventoryConfig = (callback) => {
   return () => window.removeEventListener("dandiya_inventory_update", sendLocal);
 };
 
-export const updateInventoryLimit = async (newMaxTickets) => {
+export const updateInventoryLimit = async (newMaxTickets, newBaseSoldTickets) => {
   const { db, isConnected } = getFirebaseInstance();
-  const max = Math.max(1, Number(newMaxTickets) || 300);
+  const current = getLocalInventoryConfig();
+  const max = Math.max(1, Number(newMaxTickets) || current.maxTickets || 300);
+  const baseSold =
+    newBaseSoldTickets !== undefined
+      ? Math.max(0, Number(newBaseSoldTickets))
+      : current.baseSoldTickets !== undefined
+      ? Number(current.baseSoldTickets)
+      : 55;
+
   const payload = {
     maxTickets: max,
+    baseSoldTickets: baseSold,
     updatedAt: new Date().toISOString()
   };
 
@@ -99,28 +118,41 @@ export const updateInventoryLimit = async (newMaxTickets) => {
   return payload;
 };
 
+export const updateBaseSoldTickets = async (newBaseSold) => {
+  const current = getLocalInventoryConfig();
+  return await updateInventoryLimit(current.maxTickets, newBaseSold);
+};
+
 export const addMoreTickets = async (countToAdd) => {
   const current = getLocalInventoryConfig();
   const currentMax = Number(current.maxTickets) || 300;
   const newMax = currentMax + (Number(countToAdd) || 0);
-  return await updateInventoryLimit(newMax);
+  return await updateInventoryLimit(newMax, current.baseSoldTickets !== undefined ? current.baseSoldTickets : 55);
 };
 
 export const computeTicketStats = (inventoryConfig, registrations = []) => {
   const maxTickets = Number(inventoryConfig?.maxTickets) || 300;
-  const soldPasses = (registrations || [])
-    .filter((r) => r.status === "Approved")
+  const baseSold =
+    inventoryConfig?.baseSoldTickets !== undefined
+      ? Number(inventoryConfig.baseSoldTickets)
+      : 55;
+
+  // Real new online approved registrations (excluding default seed demo data if any)
+  const realOnlineApproved = (registrations || [])
+    .filter((r) => r.status === "Approved" && !r.id?.startsWith("dnd-demo-"))
     .reduce((sum, r) => sum + (Number(r.quantity) || 1), 0);
+
+  const soldPasses = Math.min(maxTickets, baseSold + realOnlineApproved);
   const remainingTickets = Math.max(0, maxTickets - soldPasses);
   const isSoldOut = soldPasses >= maxTickets;
   const soldPercentage = maxTickets > 0 ? Math.min(100, Math.round((soldPasses / maxTickets) * 100)) : 0;
 
   return {
     maxTickets,
+    baseSold,
     soldPasses,
     remainingTickets,
     isSoldOut,
     soldPercentage
   };
 };
-

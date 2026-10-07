@@ -7,7 +7,7 @@ import { subscribeToRegistrations } from "@/lib/registrationService";
 export default function Navbar({ onOpenRegister, onOpenLookup, onOpenAdmin }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300 });
+  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 55 });
   const [registrations, setRegistrations] = useState([]);
 
   useEffect(() => {

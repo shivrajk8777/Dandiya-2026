@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { X, Ticket, CheckCircle, AlertCircle, Plus, Sparkles, RefreshCw } from "lucide-react";
-import { getLocalInventoryConfig, updateInventoryLimit, addMoreTickets } from "@/lib/ticketInventoryService";
+import {
+  getLocalInventoryConfig,
+  updateInventoryLimit,
+  addMoreTickets,
+  updateBaseSoldTickets
+} from "@/lib/ticketInventoryService";
 
-export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses = 0 }) {
+export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses = 55 }) {
   const [currentMax, setCurrentMax] = useState(300);
+  const [currentBaseSold, setCurrentBaseSold] = useState(55);
   const [addQuantity, setAddQuantity] = useState(50);
   const [exactMax, setExactMax] = useState(300);
-  const [activeTab, setActiveTab] = useState("add"); // "add" or "set_exact"
+  const [exactSold, setExactSold] = useState(55);
+  const [activeTab, setActiveTab] = useState("add"); // "add", "set_exact", or "set_sold"
   const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
   const [loading, setLoading] = useState(false);
 
@@ -14,8 +21,11 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
     if (isOpen) {
       const cfg = getLocalInventoryConfig();
       const max = cfg.maxTickets || 300;
+      const sold = cfg.baseSoldTickets !== undefined ? cfg.baseSoldTickets : 55;
       setCurrentMax(max);
       setExactMax(max);
+      setCurrentBaseSold(sold);
+      setExactSold(sold);
       setAddQuantity(50);
       setStatusMsg({ type: "", text: "" });
     }
@@ -87,7 +97,7 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
         return;
       }
 
-      await updateInventoryLimit(num);
+      await updateInventoryLimit(num, currentBaseSold);
       setCurrentMax(num);
       setStatusMsg({
         type: "success",
@@ -100,8 +110,36 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
     }
   };
 
-  const remaining = Math.max(0, currentMax - totalSoldPasses);
-  const isSoldOut = totalSoldPasses >= currentMax;
+  // Handler for setting passes sold count
+  const handleSetExactSold = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatusMsg({ type: "", text: "" });
+
+    try {
+      const num = Number(exactSold);
+      if (isNaN(num) || num < 0) {
+        setStatusMsg({ type: "error", text: "Please enter a valid passes sold count (minimum 0)." });
+        setLoading(false);
+        return;
+      }
+
+      await updateBaseSoldTickets(num);
+      setCurrentBaseSold(num);
+      setStatusMsg({
+        type: "success",
+        text: `Passes sold set to ${num} passes out of ${currentMax}!`
+      });
+    } catch (err) {
+      setStatusMsg({ type: "error", text: "Failed to update sold count: " + err.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const displaySold = totalSoldPasses > 0 ? totalSoldPasses : currentBaseSold;
+  const remaining = Math.max(0, currentMax - displaySold);
+  const isSoldOut = displaySold >= currentMax;
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
@@ -122,25 +160,31 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
             Ticket Capacity & Stock Manager
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white font-serif-royal">
-            Add More Tickets to Stock
+            Live Ticket Stock & Sales
           </h2>
           <p className="text-xs text-slate-400">
-            Aap 300 capacity me jitni chahe utni tickets add kar sakte hain. Website automatic stock update karegi.
+            Total capacity 300 passes me se sold count ko manage karein. Website par real-time update hoga.
           </p>
         </div>
 
         {/* Inventory Summary Metrics */}
         <div className="grid grid-cols-3 gap-2 text-center text-xs">
           <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-[10px] text-slate-400 uppercase font-bold block">Current Capacity</span>
+            <span className="text-[10px] text-slate-400 uppercase font-bold block">Total Capacity</span>
             <span className="text-lg font-black text-amber-400 font-sans">{currentMax}</span>
           </div>
           <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
             <span className="text-[10px] text-slate-400 uppercase font-bold block">Passes Sold</span>
-            <span className="text-lg font-black text-emerald-400 font-sans">{totalSoldPasses}</span>
+            <span className="text-lg font-black text-amber-300 font-sans">{displaySold}</span>
           </div>
-          <div className={`p-3 rounded-2xl border ${isSoldOut ? "bg-rose-500/20 border-rose-500/40 text-rose-300" : "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"}`}>
-            <span className="text-[10px] uppercase font-bold block">Stock Remaining</span>
+          <div
+            className={`p-3 rounded-2xl border ${
+              isSoldOut
+                ? "bg-rose-500/20 border-rose-500/40 text-rose-300"
+                : "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+            }`}
+          >
+            <span className="text-[10px] uppercase font-bold block">Available Left</span>
             <span className="text-lg font-black font-sans">{remaining}</span>
           </div>
         </div>
@@ -153,36 +197,52 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
                 : "bg-rose-500/20 text-rose-300 border border-rose-500/40"
             }`}
           >
-            {statusMsg.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+            {statusMsg.type === "success" ? (
+              <CheckCircle className="w-4 h-4 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 shrink-0" />
+            )}
             <span>{statusMsg.text}</span>
           </div>
         )}
 
         {/* Tab Switcher */}
-        <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold">
+        <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold">
           <button
             type="button"
             onClick={() => setActiveTab("add")}
-            className={`py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+            className={`py-2 px-1 sm:px-2 rounded-lg flex items-center justify-center gap-1 transition-all ${
               activeTab === "add"
                 ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-extrabold shadow"
                 : "text-slate-300 hover:text-white"
             }`}
           >
-            <Plus className="w-4 h-4 shrink-0" />
-            <span>+ Add Extra Tickets</span>
+            <Plus className="w-3.5 h-3.5 shrink-0" />
+            <span>+ Add Stock</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("set_exact")}
-            className={`py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+            className={`py-2 px-1 sm:px-2 rounded-lg flex items-center justify-center gap-1 transition-all ${
               activeTab === "set_exact"
                 ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-extrabold shadow"
                 : "text-slate-300 hover:text-white"
             }`}
           >
             <RefreshCw className="w-3.5 h-3.5 shrink-0" />
-            <span>Set Exact Capacity</span>
+            <span>Set Capacity</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("set_sold")}
+            className={`py-2 px-1 sm:px-2 rounded-lg flex items-center justify-center gap-1 transition-all ${
+              activeTab === "set_sold"
+                ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black font-extrabold shadow"
+                : "text-slate-300 hover:text-white"
+            }`}
+          >
+            <Ticket className="w-3.5 h-3.5 shrink-0" />
+            <span>Passes Sold</span>
           </button>
         </div>
 
@@ -232,11 +292,11 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
                     className="px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:opacity-95 shadow-lg active:scale-95 transition-all shrink-0 flex items-center gap-1"
                   >
                     <Plus className="w-4 h-4" />
-                    {loading ? "Adding..." : "Add to Capacity"}
+                    {loading ? "Adding..." : "Add"}
                   </button>
                 </div>
                 <p className="text-[10px] text-amber-300/80 mt-1.5 font-medium">
-                  💡 Calculation: Current Limit ({currentMax}) + ({Number(addQuantity) || 0}) = New Total:{" "}
+                  💡 Current ({currentMax}) + ({Number(addQuantity) || 0}) = New Total:{" "}
                   <strong className="text-white">{currentMax + (Number(addQuantity) || 0)} Passes</strong>
                 </p>
               </div>
@@ -258,11 +318,11 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
                 value={exactMax}
                 onChange={(e) => setExactMax(e.target.value)}
                 required
-                placeholder="e.g. 500"
+                placeholder="e.g. 300"
                 className="w-full bg-[#090214] border border-amber-500/40 rounded-xl px-4 py-3 text-base text-white font-mono font-bold focus:outline-none focus:border-amber-400"
               />
               <p className="text-[10px] text-slate-400 mt-1">
-                This will overwrite current total capacity to exact number specified above.
+                This will overwrite total capacity (default is 300).
               </p>
             </div>
 
@@ -271,7 +331,39 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
               disabled={loading}
               className="w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:opacity-95 shadow-xl active:scale-95 transition-all"
             >
-              {loading ? "Updating..." : "Save Exact Capacity"}
+              {loading ? "Updating..." : "Save Total Capacity"}
+            </button>
+          </form>
+        )}
+
+        {/* TAB 3: SET PASSES SOLD */}
+        {activeTab === "set_sold" && (
+          <form onSubmit={handleSetExactSold} className="space-y-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-300 mb-1 uppercase tracking-wider">
+                Set Passes Sold Count (e.g. 55):
+              </label>
+              <input
+                type="number"
+                min="0"
+                max={currentMax}
+                value={exactSold}
+                onChange={(e) => setExactSold(e.target.value)}
+                required
+                placeholder="e.g. 55"
+                className="w-full bg-[#090214] border border-amber-500/40 rounded-xl px-4 py-3 text-base text-white font-mono font-bold focus:outline-none focus:border-amber-400"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">
+                Website par {currentMax} me se yahi passes sold dikhayega (Current: {displaySold} passes sold).
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-wider text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:opacity-95 shadow-xl active:scale-95 transition-all"
+            >
+              {loading ? "Updating..." : "Save Sold Passes Count"}
             </button>
           </form>
         )}
