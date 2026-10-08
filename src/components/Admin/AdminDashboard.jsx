@@ -109,7 +109,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [showRazorpayModal, setShowRazorpayModal] = useState(false);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
-  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 55 });
+  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 107 });
   const [actionLoading, setActionLoading] = useState(false);
 
   // Gate staff scanner state

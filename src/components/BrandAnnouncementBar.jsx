@@ -5,7 +5,7 @@ import { subscribeToInventoryConfig, computeTicketStats } from "@/lib/ticketInve
 import { subscribeToRegistrations } from "@/lib/registrationService";
 
 export default function BrandAnnouncementBar({ onOpenRegister }) {
-  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 55 });
+  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 107 });
   const [registrations, setRegistrations] = useState([]);
 
   useEffect(() => {

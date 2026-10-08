@@ -7,12 +7,12 @@ import {
   updateBaseSoldTickets
 } from "@/lib/ticketInventoryService";
 
-export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses = 55 }) {
+export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses = 107 }) {
   const [currentMax, setCurrentMax] = useState(300);
-  const [currentBaseSold, setCurrentBaseSold] = useState(55);
+  const [currentBaseSold, setCurrentBaseSold] = useState(107);
   const [addQuantity, setAddQuantity] = useState(50);
   const [exactMax, setExactMax] = useState(300);
-  const [exactSold, setExactSold] = useState(55);
+  const [exactSold, setExactSold] = useState(107);
   const [activeTab, setActiveTab] = useState("add"); // "add", "set_exact", or "set_sold"
   const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
     if (isOpen) {
       const cfg = getLocalInventoryConfig();
       const max = cfg.maxTickets || 300;
-      const sold = cfg.baseSoldTickets !== undefined ? cfg.baseSoldTickets : 55;
+      const sold = cfg.baseSoldTickets !== undefined ? cfg.baseSoldTickets : 107;
       setCurrentMax(max);
       setExactMax(max);
       setCurrentBaseSold(sold);
@@ -341,7 +341,7 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
           <form onSubmit={handleSetExactSold} className="space-y-3">
             <div>
               <label className="block text-xs font-bold text-slate-300 mb-1 uppercase tracking-wider">
-                Set Passes Sold Count (e.g. 55):
+                Set Passes Sold Count (e.g. 107):
               </label>
               <input
                 type="number"
@@ -350,7 +350,7 @@ export default function TicketInventoryModal({ isOpen, onClose, totalSoldPasses 
                 value={exactSold}
                 onChange={(e) => setExactSold(e.target.value)}
                 required
-                placeholder="e.g. 55"
+                placeholder="e.g. 107"
                 className="w-full bg-[#090214] border border-amber-500/40 rounded-xl px-4 py-3 text-base text-white font-mono font-bold focus:outline-none focus:border-amber-400"
               />
               <p className="text-[10px] text-slate-400 mt-1">

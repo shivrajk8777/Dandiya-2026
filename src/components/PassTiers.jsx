@@ -28,7 +28,7 @@ export const PASS_OPTIONS = [
 
 export default function PassTiers({ onSelectPass }) {
   const [discountConfig, setDiscountConfig] = useState(null);
-  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 55 });
+  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 107 });
   const [registrations, setRegistrations] = useState([]);
 
   useEffect(() => {
