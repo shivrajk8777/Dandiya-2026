@@ -52,13 +52,13 @@ export default function CouponManagerModal({ isOpen, onClose }) {
   const redeemedCount = coupons.filter((c) => c.isUsed).length;
   const availableCount = totalCount - redeemedCount;
 
-  const mahaveerCount = coupons.filter((c) => (c.sponsor === "Mahaveer Agro" || c.code.startsWith("MAHAVEER"))).length;
+  const mahaveerCount = coupons.filter((c) => (c.sponsor === "Mahaveer" || c.code.startsWith("MAHAVEER"))).length;
   const shreejiCount = coupons.filter((c) => (c.sponsor === "Shreeji" || c.code.startsWith("SHREEJI"))).length;
   const skjCount = coupons.filter((c) => (c.sponsor === "SKJ" || c.code.startsWith("SKJ"))).length;
 
   // Filtered list
   const filteredCoupons = coupons.filter((c) => {
-    if (selectedSponsor === "MAHAVEER" && !(c.sponsor === "Mahaveer Agro" || c.code.startsWith("MAHAVEER"))) return false;
+    if (selectedSponsor === "MAHAVEER" && !(c.sponsor === "Mahaveer" || c.code.startsWith("MAHAVEER"))) return false;
     if (selectedSponsor === "SHREEJI" && !(c.sponsor === "Shreeji" || c.code.startsWith("SHREEJI"))) return false;
     if (selectedSponsor === "SKJ" && !(c.sponsor === "SKJ" || c.code.startsWith("SKJ"))) return false;
 
@@ -192,7 +192,7 @@ export default function CouponManagerModal({ isOpen, onClose }) {
                 : "bg-white/5 text-slate-300 hover:text-white border border-white/10"
             }`}
           >
-            🌾 Mahaveer Agro ({mahaveerCount})
+            🌾 Mahaveer ({mahaveerCount})
           </button>
           <button
             onClick={() => setSelectedSponsor("SHREEJI")}

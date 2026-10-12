@@ -13,7 +13,7 @@ import {
 import { getFirebaseInstance } from "./firebase";
 import * as XLSX from "xlsx";
 
-const LOCAL_STORAGE_KEY = "dandiya_vip_coupons_v2";
+const LOCAL_STORAGE_KEY = "dandiya_vip_coupons_v3";
 const COLLECTION_NAME = "dandiya_coupons";
 const CONFIG_DOC_PATH = "dandiya_config";
 const CONFIG_DOC_ID = "vip_coupons_state";
@@ -22,26 +22,26 @@ const CONFIG_DOC_ID = "vip_coupons_state";
 export const getCouponSponsor = (code) => {
   if (!code) return "VIP";
   const upper = code.toUpperCase();
-  if (upper.startsWith("MAHAVEERAGRO-") || upper.startsWith("MAHAVEER")) return "Mahaveer Agro";
+  if (upper.startsWith("MAHAVEER-") || upper.startsWith("MAHAVEER")) return "Mahaveer";
   if (upper.startsWith("SHREEJI-") || upper.startsWith("SHREEJI")) return "Shreeji";
   if (upper.startsWith("SKJ-") || upper.startsWith("SKJ")) return "SKJ";
   return "VIP Guest";
 };
 
 // 175 Unique VIP Complimentary Codes Seed
-// Mahaveer Agro: 50 | Shreeji: 100 | SKJ: 25
+// Mahaveer: 50 | Shreeji: 100 | SKJ: 25
 export const RAW_VIP_CODES = [
-  // Mahaveer Agro (50 Coupons)
-  "MAHAVEERAGRO-JAV2", "MAHAVEERAGRO-VWXK", "MAHAVEERAGRO-LV5K", "MAHAVEERAGRO-UZBN", "MAHAVEERAGRO-KCWW",
-  "MAHAVEERAGRO-YL43", "MAHAVEERAGRO-WGPJ", "MAHAVEERAGRO-8UKD", "MAHAVEERAGRO-WRLY", "MAHAVEERAGRO-KP2B",
-  "MAHAVEERAGRO-D5FF", "MAHAVEERAGRO-VGUF", "MAHAVEERAGRO-NBXV", "MAHAVEERAGRO-FAWT", "MAHAVEERAGRO-SXUS",
-  "MAHAVEERAGRO-2WFS", "MAHAVEERAGRO-YE3Q", "MAHAVEERAGRO-VV6Y", "MAHAVEERAGRO-CQKS", "MAHAVEERAGRO-RJG7",
-  "MAHAVEERAGRO-Q6PQ", "MAHAVEERAGRO-84YA", "MAHAVEERAGRO-QLSC", "MAHAVEERAGRO-97AX", "MAHAVEERAGRO-ZGGW",
-  "MAHAVEERAGRO-FBV9", "MAHAVEERAGRO-MEW3", "MAHAVEERAGRO-6955", "MAHAVEERAGRO-3L3L", "MAHAVEERAGRO-AMFQ",
-  "MAHAVEERAGRO-E7EN", "MAHAVEERAGRO-GDSH", "MAHAVEERAGRO-9PCQ", "MAHAVEERAGRO-MCJ8", "MAHAVEERAGRO-ZD9B",
-  "MAHAVEERAGRO-4HKH", "MAHAVEERAGRO-6JWQ", "MAHAVEERAGRO-JV5G", "MAHAVEERAGRO-S3VX", "MAHAVEERAGRO-A2VN",
-  "MAHAVEERAGRO-P7WD", "MAHAVEERAGRO-EMVE", "MAHAVEERAGRO-SDG7", "MAHAVEERAGRO-2V57", "MAHAVEERAGRO-2QAQ",
-  "MAHAVEERAGRO-VVAH", "MAHAVEERAGRO-VMXB", "MAHAVEERAGRO-5GBW", "MAHAVEERAGRO-S8EK", "MAHAVEERAGRO-BPXJ",
+  // Mahaveer (50 Coupons)
+  "MAHAVEER-JAV2", "MAHAVEER-VWXK", "MAHAVEER-LV5K", "MAHAVEER-UZBN", "MAHAVEER-KCWW",
+  "MAHAVEER-YL43", "MAHAVEER-WGPJ", "MAHAVEER-8UKD", "MAHAVEER-WRLY", "MAHAVEER-KP2B",
+  "MAHAVEER-D5FF", "MAHAVEER-VGUF", "MAHAVEER-NBXV", "MAHAVEER-FAWT", "MAHAVEER-SXUS",
+  "MAHAVEER-2WFS", "MAHAVEER-YE3Q", "MAHAVEER-VV6Y", "MAHAVEER-CQKS", "MAHAVEER-RJG7",
+  "MAHAVEER-Q6PQ", "MAHAVEER-84YA", "MAHAVEER-QLSC", "MAHAVEER-97AX", "MAHAVEER-ZGGW",
+  "MAHAVEER-FBV9", "MAHAVEER-MEW3", "MAHAVEER-6955", "MAHAVEER-3L3L", "MAHAVEER-AMFQ",
+  "MAHAVEER-E7EN", "MAHAVEER-GDSH", "MAHAVEER-9PCQ", "MAHAVEER-MCJ8", "MAHAVEER-ZD9B",
+  "MAHAVEER-4HKH", "MAHAVEER-6JWQ", "MAHAVEER-JV5G", "MAHAVEER-S3VX", "MAHAVEER-A2VN",
+  "MAHAVEER-P7WD", "MAHAVEER-EMVE", "MAHAVEER-SDG7", "MAHAVEER-2V57", "MAHAVEER-2QAQ",
+  "MAHAVEER-VVAH", "MAHAVEER-VMXB", "MAHAVEER-5GBW", "MAHAVEER-S8EK", "MAHAVEER-BPXJ",
 
   // Shreeji (100 Coupons)
   "SHREEJI-QEDA", "SHREEJI-4L8S", "SHREEJI-7TX9", "SHREEJI-K9M5", "SHREEJI-8G7W",
@@ -251,7 +251,7 @@ export const validateCoupon = async (inputCode) => {
   if (clean.startsWith("VIP26") || clean.startsWith("VIP-")) {
     return {
       valid: false,
-      message: `Old VIP26 codes are no longer active. Please use your valid Mahaveer Agro, Shreeji, or SKJ coupon code.`
+      message: `Old VIP26 codes are no longer active. Please use your valid Mahaveer, Shreeji, or SKJ coupon code.`
     };
   }
 

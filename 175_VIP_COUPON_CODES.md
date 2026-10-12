@@ -1,67 +1,67 @@
 # 🎟️ Rang Tarang Garba Mahotsav 2026 - 175 VIP Complimentary Coupon Codes
 
 Aapke request ke anusaar **Old VIP26- codes ko delete karke** naye 175 VIP Codes database me live create kar diye gaye hain:
-- 🌾 **Mahaveer Agro:** 50 VIP Codes
+- 🌾 **Mahaveer:** 50 VIP Codes
 - 🪔 **Shreeji:** 100 VIP Codes
 - ⭐ **SKJ:** 25 VIP Codes
 - **Total:** 175 VIP Complimentary Codes (100% Free Entry - ₹0 Pass)
 
 ---
 
-## 🌾 1. Mahaveer Agro (50 VIP Codes)
+## 🌾 1. Mahaveer (50 VIP Codes)
 
 | S.No | VIP Code | Sponsor / Category | Discount | Status |
 |:---:|:---|:---|:---:|:---:|
-| 1 | `MAHAVEERAGRO-JAV2` | Mahaveer Agro | 100% FREE PASS | Available |
-| 2 | `MAHAVEERAGRO-VWXK` | Mahaveer Agro | 100% FREE PASS | Available |
-| 3 | `MAHAVEERAGRO-LV5K` | Mahaveer Agro | 100% FREE PASS | Available |
-| 4 | `MAHAVEERAGRO-UZBN` | Mahaveer Agro | 100% FREE PASS | Available |
-| 5 | `MAHAVEERAGRO-KCWW` | Mahaveer Agro | 100% FREE PASS | Available |
-| 6 | `MAHAVEERAGRO-YL43` | Mahaveer Agro | 100% FREE PASS | Available |
-| 7 | `MAHAVEERAGRO-WGPJ` | Mahaveer Agro | 100% FREE PASS | Available |
-| 8 | `MAHAVEERAGRO-8UKD` | Mahaveer Agro | 100% FREE PASS | Available |
-| 9 | `MAHAVEERAGRO-WRLY` | Mahaveer Agro | 100% FREE PASS | Available |
-| 10 | `MAHAVEERAGRO-KP2B` | Mahaveer Agro | 100% FREE PASS | Available |
-| 11 | `MAHAVEERAGRO-D5FF` | Mahaveer Agro | 100% FREE PASS | Available |
-| 12 | `MAHAVEERAGRO-VGUF` | Mahaveer Agro | 100% FREE PASS | Available |
-| 13 | `MAHAVEERAGRO-NBXV` | Mahaveer Agro | 100% FREE PASS | Available |
-| 14 | `MAHAVEERAGRO-FAWT` | Mahaveer Agro | 100% FREE PASS | Available |
-| 15 | `MAHAVEERAGRO-SXUS` | Mahaveer Agro | 100% FREE PASS | Available |
-| 16 | `MAHAVEERAGRO-2WFS` | Mahaveer Agro | 100% FREE PASS | Available |
-| 17 | `MAHAVEERAGRO-YE3Q` | Mahaveer Agro | 100% FREE PASS | Available |
-| 18 | `MAHAVEERAGRO-VV6Y` | Mahaveer Agro | 100% FREE PASS | Available |
-| 19 | `MAHAVEERAGRO-CQKS` | Mahaveer Agro | 100% FREE PASS | Available |
-| 20 | `MAHAVEERAGRO-RJG7` | Mahaveer Agro | 100% FREE PASS | Available |
-| 21 | `MAHAVEERAGRO-Q6PQ` | Mahaveer Agro | 100% FREE PASS | Available |
-| 22 | `MAHAVEERAGRO-84YA` | Mahaveer Agro | 100% FREE PASS | Available |
-| 23 | `MAHAVEERAGRO-QLSC` | Mahaveer Agro | 100% FREE PASS | Available |
-| 24 | `MAHAVEERAGRO-97AX` | Mahaveer Agro | 100% FREE PASS | Available |
-| 25 | `MAHAVEERAGRO-ZGGW` | Mahaveer Agro | 100% FREE PASS | Available |
-| 26 | `MAHAVEERAGRO-FBV9` | Mahaveer Agro | 100% FREE PASS | Available |
-| 27 | `MAHAVEERAGRO-MEW3` | Mahaveer Agro | 100% FREE PASS | Available |
-| 28 | `MAHAVEERAGRO-6955` | Mahaveer Agro | 100% FREE PASS | Available |
-| 29 | `MAHAVEERAGRO-3L3L` | Mahaveer Agro | 100% FREE PASS | Available |
-| 30 | `MAHAVEERAGRO-AMFQ` | Mahaveer Agro | 100% FREE PASS | Available |
-| 31 | `MAHAVEERAGRO-E7EN` | Mahaveer Agro | 100% FREE PASS | Available |
-| 32 | `MAHAVEERAGRO-GDSH` | Mahaveer Agro | 100% FREE PASS | Available |
-| 33 | `MAHAVEERAGRO-9PCQ` | Mahaveer Agro | 100% FREE PASS | Available |
-| 34 | `MAHAVEERAGRO-MCJ8` | Mahaveer Agro | 100% FREE PASS | Available |
-| 35 | `MAHAVEERAGRO-ZD9B` | Mahaveer Agro | 100% FREE PASS | Available |
-| 36 | `MAHAVEERAGRO-4HKH` | Mahaveer Agro | 100% FREE PASS | Available |
-| 37 | `MAHAVEERAGRO-6JWQ` | Mahaveer Agro | 100% FREE PASS | Available |
-| 38 | `MAHAVEERAGRO-JV5G` | Mahaveer Agro | 100% FREE PASS | Available |
-| 39 | `MAHAVEERAGRO-S3VX` | Mahaveer Agro | 100% FREE PASS | Available |
-| 40 | `MAHAVEERAGRO-A2VN` | Mahaveer Agro | 100% FREE PASS | Available |
-| 41 | `MAHAVEERAGRO-P7WD` | Mahaveer Agro | 100% FREE PASS | Available |
-| 42 | `MAHAVEERAGRO-EMVE` | Mahaveer Agro | 100% FREE PASS | Available |
-| 43 | `MAHAVEERAGRO-SDG7` | Mahaveer Agro | 100% FREE PASS | Available |
-| 44 | `MAHAVEERAGRO-2V57` | Mahaveer Agro | 100% FREE PASS | Available |
-| 45 | `MAHAVEERAGRO-2QAQ` | Mahaveer Agro | 100% FREE PASS | Available |
-| 46 | `MAHAVEERAGRO-VVAH` | Mahaveer Agro | 100% FREE PASS | Available |
-| 47 | `MAHAVEERAGRO-VMXB` | Mahaveer Agro | 100% FREE PASS | Available |
-| 48 | `MAHAVEERAGRO-5GBW` | Mahaveer Agro | 100% FREE PASS | Available |
-| 49 | `MAHAVEERAGRO-S8EK` | Mahaveer Agro | 100% FREE PASS | Available |
-| 50 | `MAHAVEERAGRO-BPXJ` | Mahaveer Agro | 100% FREE PASS | Available |
+| 1 | `MAHAVEER-JAV2` | Mahaveer | 100% FREE PASS | Available |
+| 2 | `MAHAVEER-VWXK` | Mahaveer | 100% FREE PASS | Available |
+| 3 | `MAHAVEER-LV5K` | Mahaveer | 100% FREE PASS | Available |
+| 4 | `MAHAVEER-UZBN` | Mahaveer | 100% FREE PASS | Available |
+| 5 | `MAHAVEER-KCWW` | Mahaveer | 100% FREE PASS | Available |
+| 6 | `MAHAVEER-YL43` | Mahaveer | 100% FREE PASS | Available |
+| 7 | `MAHAVEER-WGPJ` | Mahaveer | 100% FREE PASS | Available |
+| 8 | `MAHAVEER-8UKD` | Mahaveer | 100% FREE PASS | Available |
+| 9 | `MAHAVEER-WRLY` | Mahaveer | 100% FREE PASS | Available |
+| 10 | `MAHAVEER-KP2B` | Mahaveer | 100% FREE PASS | Available |
+| 11 | `MAHAVEER-D5FF` | Mahaveer | 100% FREE PASS | Available |
+| 12 | `MAHAVEER-VGUF` | Mahaveer | 100% FREE PASS | Available |
+| 13 | `MAHAVEER-NBXV` | Mahaveer | 100% FREE PASS | Available |
+| 14 | `MAHAVEER-FAWT` | Mahaveer | 100% FREE PASS | Available |
+| 15 | `MAHAVEER-SXUS` | Mahaveer | 100% FREE PASS | Available |
+| 16 | `MAHAVEER-2WFS` | Mahaveer | 100% FREE PASS | Available |
+| 17 | `MAHAVEER-YE3Q` | Mahaveer | 100% FREE PASS | Available |
+| 18 | `MAHAVEER-VV6Y` | Mahaveer | 100% FREE PASS | Available |
+| 19 | `MAHAVEER-CQKS` | Mahaveer | 100% FREE PASS | Available |
+| 20 | `MAHAVEER-RJG7` | Mahaveer | 100% FREE PASS | Available |
+| 21 | `MAHAVEER-Q6PQ` | Mahaveer | 100% FREE PASS | Available |
+| 22 | `MAHAVEER-84YA` | Mahaveer | 100% FREE PASS | Available |
+| 23 | `MAHAVEER-QLSC` | Mahaveer | 100% FREE PASS | Available |
+| 24 | `MAHAVEER-97AX` | Mahaveer | 100% FREE PASS | Available |
+| 25 | `MAHAVEER-ZGGW` | Mahaveer | 100% FREE PASS | Available |
+| 26 | `MAHAVEER-FBV9` | Mahaveer | 100% FREE PASS | Available |
+| 27 | `MAHAVEER-MEW3` | Mahaveer | 100% FREE PASS | Available |
+| 28 | `MAHAVEER-6955` | Mahaveer | 100% FREE PASS | Available |
+| 29 | `MAHAVEER-3L3L` | Mahaveer | 100% FREE PASS | Available |
+| 30 | `MAHAVEER-AMFQ` | Mahaveer | 100% FREE PASS | Available |
+| 31 | `MAHAVEER-E7EN` | Mahaveer | 100% FREE PASS | Available |
+| 32 | `MAHAVEER-GDSH` | Mahaveer | 100% FREE PASS | Available |
+| 33 | `MAHAVEER-9PCQ` | Mahaveer | 100% FREE PASS | Available |
+| 34 | `MAHAVEER-MCJ8` | Mahaveer | 100% FREE PASS | Available |
+| 35 | `MAHAVEER-ZD9B` | Mahaveer | 100% FREE PASS | Available |
+| 36 | `MAHAVEER-4HKH` | Mahaveer | 100% FREE PASS | Available |
+| 37 | `MAHAVEER-6JWQ` | Mahaveer | 100% FREE PASS | Available |
+| 38 | `MAHAVEER-JV5G` | Mahaveer | 100% FREE PASS | Available |
+| 39 | `MAHAVEER-S3VX` | Mahaveer | 100% FREE PASS | Available |
+| 40 | `MAHAVEER-A2VN` | Mahaveer | 100% FREE PASS | Available |
+| 41 | `MAHAVEER-P7WD` | Mahaveer | 100% FREE PASS | Available |
+| 42 | `MAHAVEER-EMVE` | Mahaveer | 100% FREE PASS | Available |
+| 43 | `MAHAVEER-SDG7` | Mahaveer | 100% FREE PASS | Available |
+| 44 | `MAHAVEER-2V57` | Mahaveer | 100% FREE PASS | Available |
+| 45 | `MAHAVEER-2QAQ` | Mahaveer | 100% FREE PASS | Available |
+| 46 | `MAHAVEER-VVAH` | Mahaveer | 100% FREE PASS | Available |
+| 47 | `MAHAVEER-VMXB` | Mahaveer | 100% FREE PASS | Available |
+| 48 | `MAHAVEER-5GBW` | Mahaveer | 100% FREE PASS | Available |
+| 49 | `MAHAVEER-S8EK` | Mahaveer | 100% FREE PASS | Available |
+| 50 | `MAHAVEER-BPXJ` | Mahaveer | 100% FREE PASS | Available |
 
 ---
 
