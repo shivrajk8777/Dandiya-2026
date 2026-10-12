@@ -29,6 +29,7 @@ import { PASS_OPTIONS } from "./PassTiers";
 import { subscribeToDiscountConfig, calculateTicketPrice } from "@/lib/discountService";
 import { initiateRazorpayCheckout } from "@/lib/razorpayService";
 import { subscribeToInventoryConfig, computeTicketStats } from "@/lib/ticketInventoryService";
+import { validateCoupon, redeemCoupon, subscribeToCoupons } from "@/lib/couponService";
 
 export default function RegistrationModal({ initialPass, isOpen, onClose, onSuccess }) {
   const [selectedPass, setSelectedPass] = useState(initialPass || PASS_OPTIONS[0]);
@@ -57,15 +58,24 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   const [errorMsg, setErrorMsg] = useState("");
   const [activePendingRecord, setActivePendingRecord] = useState(null);
 
+  // VIP Coupon / Promo Code State
+  const [bookingMode, setBookingMode] = useState("payment"); // "payment" or "coupon"
+  const [couponCodeInput, setCouponCodeInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponValidationMsg, setCouponValidationMsg] = useState(null);
+  const [couponValidating, setCouponValidating] = useState(false);
+
   useEffect(() => {
     const unsubDisc = subscribeToDiscountConfig((cfg) => setDiscountConfig(cfg));
     const unsubInv = subscribeToInventoryConfig((inv) => setInventoryConfig(inv));
     const unsubReg = subscribeToRegistrations((list) => setRegistrations(list));
+    const unsubCpn = subscribeToCoupons(() => { });
 
     return () => {
       if (typeof unsubDisc === "function") unsubDisc();
       if (typeof unsubInv === "function") unsubInv();
       if (typeof unsubReg === "function") unsubReg();
+      if (typeof unsubCpn === "function") unsubCpn();
     };
   }, []);
 
@@ -82,6 +92,10 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
       setErrorMsg("");
       setLoading(false);
       setActivePendingRecord(null);
+      setBookingMode("payment");
+      setCouponCodeInput("");
+      setAppliedCoupon(null);
+      setCouponValidationMsg(null);
       setFormData({
         fullName: "",
         phone: "",
@@ -124,17 +138,18 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   }, [formData.quantity, formData.fullName]);
 
   const pricing = calculateTicketPrice(discountConfig);
-  const unitPrice = pricing.finalPrice;
+  const isCouponApplied = !!appliedCoupon;
+  const unitPrice = isCouponApplied ? 0 : pricing.finalPrice;
   const quantity = Number(formData.quantity) || 1;
-  const subtotal = unitPrice * quantity;
+  const subtotal = isCouponApplied ? 0 : unitPrice * quantity;
   const TAX_PERCENT = 0; // Tax removed as per requirement
   const taxAmount = 0;
-  const totalAmount = subtotal; // Final payable amount equals ticket price
+  const totalAmount = isCouponApplied ? 0 : subtotal; // Final payable amount equals ticket price
 
   const originalSubtotal = pricing.basePrice * quantity;
   const originalTax = 0;
   const originalTotal = originalSubtotal;
-  const totalSavings = originalTotal - totalAmount;
+  const totalSavings = isCouponApplied ? originalTotal : originalTotal - totalAmount;
 
   // Extract all non-empty Aadhaar numbers in the entire booking form (Adults + Children)
   const cleanAadhaar1 = (attendees[0]?.aadhaar || "").replace(/\D/g, "");
@@ -397,9 +412,118 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
     return true;
   };
 
+  const handleApplyCoupon = async (e) => {
+    if (e) e.preventDefault();
+    if (!couponCodeInput.trim()) {
+      setCouponValidationMsg({ type: "error", text: "Please enter a VIP coupon code." });
+      return;
+    }
+    setCouponValidating(true);
+    setCouponValidationMsg({ type: "loading", text: "Connecting to database..." });
+    setErrorMsg("");
+
+    try {
+      const res = await validateCoupon(couponCodeInput);
+      if (res.valid) {
+        setAppliedCoupon(res.coupon);
+        setBookingMode("coupon");
+        setCouponValidationMsg({ type: "success", text: res.message });
+        setErrorMsg("");
+      } else {
+        setAppliedCoupon(null);
+        setCouponValidationMsg({ type: "error", text: res.message });
+      }
+    } catch (err) {
+      setCouponValidationMsg({ type: "error", text: "Database connection error: " + err.message });
+    } finally {
+      setCouponValidating(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCodeInput("");
+    setCouponValidationMsg(null);
+  };
+
+  const handleCouponPassConfirmation = async (coupon) => {
+    setErrorMsg("");
+    setLoading(true);
+    try {
+      const code = coupon.code;
+      const finalPass = await registerAttendee({
+        fullName: formData.fullName.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        city: formData.city.trim(),
+        passType: selectedPass.name,
+        quantity,
+        unitPrice: 0,
+        subtotal: 0,
+        taxPercent: TAX_PERCENT,
+        taxAmount: 0,
+        totalAmount: 0,
+        paymentMethod: `VIP Coupon (${code})`,
+        paymentStatus: "Approved",
+        status: "Approved",
+        transactionRef: `VIP_${code}`,
+        couponCode: code,
+        attendees: attendees.map((a) => ({
+          name: a.name.trim(),
+          aadhaar: a.aadhaar.trim()
+        })),
+        childrenCount: Number(formData.childrenCount) || 0,
+        children: childrenList.map((c) => ({
+          name: c.name.trim(),
+          age: Number(c.age) || 0,
+          aadhaar: (c.aadhaar || "").replace(/\D/g, "")
+        }))
+      });
+
+      // Mark coupon as redeemed in local & Firebase
+      await redeemCoupon(code, {
+        fullName: formData.fullName.trim(),
+        phone: formData.phone.trim(),
+        passId: finalPass.passId || finalPass.id
+      });
+
+      confetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 }
+      });
+
+      setLoading(false);
+      if (onSuccess) {
+        onSuccess(finalPass);
+      }
+    } catch (err) {
+      console.error("Coupon redemption error:", err);
+      setLoading(false);
+      setErrorMsg("Failed to confirm pass with VIP code: " + err.message);
+    }
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (validateStep1()) {
+    if (!validateStep1()) return;
+
+    if (appliedCoupon || (bookingMode === "coupon" && couponCodeInput.trim())) {
+      let couponToRedeem = appliedCoupon;
+      if (!couponToRedeem && couponCodeInput.trim()) {
+        setCouponValidating(true);
+        const valRes = await validateCoupon(couponCodeInput);
+        setCouponValidating(false);
+        if (!valRes.valid) {
+          setErrorMsg(valRes.message);
+          setCouponValidationMsg({ type: "error", text: valRes.message });
+          return;
+        }
+        couponToRedeem = valRes.coupon;
+        setAppliedCoupon(couponToRedeem);
+      }
+      await handleCouponPassConfirmation(couponToRedeem);
+    } else {
       handleRazorpayPayment();
     }
   };
@@ -682,6 +806,128 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                   Children above 5 years of age are strictly NOT ALLOWED into the venue arena! Only children up to 5 years (≤ 5 Yrs) are permitted with FREE entry.
                 </span>
               </div>
+            </div>
+          )}
+
+          {/* Booking Option Selector: Online Payment vs VIP Coupon Code */}
+          <div className="grid grid-cols-2 gap-1.5 sm:gap-2 p-1 bg-black/40 rounded-2xl border border-white/10">
+            <button
+              type="button"
+              onClick={() => {
+                setBookingMode("payment");
+                handleRemoveCoupon();
+              }}
+              className={`py-2 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${bookingMode === "payment" && !appliedCoupon
+                ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-md"
+                : "text-slate-300 hover:text-white"
+                }`}
+            >
+              <CreditCard className="w-3.5 h-3.5 shrink-0" />
+              <span>Pay Online (₹{pricing.finalPrice})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setBookingMode("coupon")}
+              className={`py-2 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${bookingMode === "coupon" || appliedCoupon
+                ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-md"
+                : "text-slate-300 hover:text-white"
+                }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+              <span>Apply VIP Code (Free)</span>
+            </button>
+          </div>
+
+          {/* VIP Promo / Coupon Code Section - ONLY SHOWN WHEN 'Apply VIP Code (Free)' IS CLICKED OR CODE IS APPLIED */}
+          {(bookingMode === "coupon" || appliedCoupon) && (
+            <div
+              className={`p-3 sm:p-3.5 rounded-2xl border transition-all space-y-2 animate-in fade-in duration-200 ${appliedCoupon
+                ? "bg-emerald-950/30 border-emerald-500/50"
+                : "bg-amber-500/10 border-amber-500/50 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500/40"
+                }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] sm:text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5 font-serif-royal">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  Enter VIP Access / Coupon Code
+                </span>
+                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold uppercase border border-emerald-500/30">
+                  100% Free VIP Pass
+                </span>
+              </div>
+
+              {!appliedCoupon ? (
+                <div className="space-y-1.5">
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        autoFocus
+                        value={couponCodeInput}
+                        onChange={(e) => {
+                          setCouponCodeInput(e.target.value.toUpperCase());
+                          setCouponValidationMsg(null);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleApplyCoupon();
+                          }
+                        }}
+                        placeholder="Enter Coupon Code"
+                        className="w-full bg-[#090214] border border-amber-500/40 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono font-bold text-amber-300 placeholder-slate-500 focus:outline-none focus:border-amber-400 uppercase tracking-wider"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      disabled={couponValidating}
+                      onClick={handleApplyCoupon}
+                      className="px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:opacity-95 text-black font-black text-xs uppercase tracking-wider shadow-md active:scale-95 transition-all shrink-0 disabled:opacity-50"
+                    >
+                      {couponValidating ? "Checking DB..." : "Apply Code"}
+                    </button>
+                  </div>
+
+                </div>
+              ) : (
+                <div className="p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div>
+                      <div className="font-mono font-black text-white text-xs sm:text-sm tracking-wider">
+                        {appliedCoupon.code}
+                      </div>
+                      <span className="text-[10px] text-emerald-300 block font-semibold">
+                        ✓ 100% Complimentary VIP Pass Applied (Payable: ₹0)
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-[11px] text-rose-300 hover:text-rose-200 underline font-semibold px-2 py-1"
+                  >
+                    Remove Code
+                  </button>
+                </div>
+              )}
+
+              {couponValidationMsg && (
+                <div
+                  className={`p-2 rounded-lg text-xs font-medium flex items-center gap-1.5 ${couponValidationMsg.type === "success"
+                    ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+                    : "bg-rose-500/15 text-rose-300 border border-rose-500/30"
+                    }`}
+                >
+                  {couponValidationMsg.type === "success" ? (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  ) : (
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                  )}
+                  <span>{couponValidationMsg.text}</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -1126,35 +1372,46 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               </div>
             </div>
 
-            {/* Transparent Order Summary & 18% Tax Breakdown Card */}
+
+
+            {/* Transparent Order Summary Card */}
             <div className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-b from-[#1e0a3b] via-[#140628] to-[#0c0318] border border-amber-500/35 space-y-2 shadow-xl">
               <div className="flex items-center justify-between text-xs pb-2 border-b border-white/10">
                 <div className="flex items-center gap-1.5 font-bold text-amber-300 font-serif-royal text-[11px] sm:text-xs">
                   <Ticket className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span>{selectedPass.name} ({quantity} {quantity === 1 ? "Couple Pass" : "Couple Passes"})</span>
                 </div>
-                <span className="text-white font-bold font-mono text-xs">₹{subtotal.toLocaleString("en-IN")}</span>
+                <span className="text-white font-bold font-mono text-xs">
+                  {appliedCoupon ? "₹0 (FREE)" : `₹${subtotal.toLocaleString("en-IN")}`}
+                </span>
               </div>
 
               <div className="space-y-1.5 text-[10px] sm:text-[11px]">
                 <div className="flex items-center justify-between text-slate-400">
                   <span>Pass Subtotal ({quantity} x ₹{unitPrice.toLocaleString("en-IN")})</span>
-                  <span className="text-slate-200 font-mono">₹{subtotal.toLocaleString("en-IN")}</span>
+                  <span className="text-slate-200 font-mono">
+                    {appliedCoupon ? "₹0 (FREE)" : `₹${subtotal.toLocaleString("en-IN")}`}
+                  </span>
                 </div>
 
-                {/* Tax line removed */}
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between text-emerald-400 text-[10px] sm:text-[11px] font-bold">
+                    <span>🎟️ VIP Complimentary Pass ({appliedCoupon.code})</span>
+                    <span>100% OFF (FREE VIP ENTRY)</span>
+                  </div>
+                ) : (
+                  pricing.isDiscounted && totalSavings > 0 && (
+                    <div className="flex items-center justify-between text-emerald-400 text-[10px]">
+                      <span>🎉 Special Offer Savings</span>
+                      <span className="font-bold">-₹{totalSavings.toLocaleString("en-IN")}</span>
+                    </div>
+                  )
+                )}
 
                 {formData.childrenCount > 0 && (
                   <div className="flex items-center justify-between text-emerald-400 text-[10px]">
                     <span>👶 Accompanying Child (≤ 5 Yrs Free Entry)</span>
                     <span className="font-bold">FREE (₹0)</span>
-                  </div>
-                )}
-
-                {pricing.isDiscounted && totalSavings > 0 && (
-                  <div className="flex items-center justify-between text-emerald-400 text-[10px]">
-                    <span>🎉 Special Offer Savings</span>
-                    <span className="font-bold">-₹{totalSavings.toLocaleString("en-IN")}</span>
                   </div>
                 )}
               </div>
@@ -1164,17 +1421,19 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                   <span className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider block font-serif-royal">
                     Total Payable Amount
                   </span>
-
                 </div>
                 <div className="text-right">
-                  <span className="text-base sm:text-xl font-black text-gold-gradient font-mono">
-                    ₹{totalAmount.toLocaleString("en-IN")}
+                  <span
+                    className={`text-base sm:text-xl font-black font-mono ${appliedCoupon ? "text-emerald-400" : "text-gold-gradient"
+                      }`}
+                  >
+                    {appliedCoupon ? "₹0 (FREE PASS)" : `₹${totalAmount.toLocaleString("en-IN")}`}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Direct Proceed to Pay Submit Button */}
+            {/* Direct Proceed / Confirm Submit Button */}
             <div className="pt-2 sticky bottom-0 bg-[#110524]/95 backdrop-blur-md pb-1 z-20 space-y-1.5">
               {isSoldOut && (
                 <div className="p-2 sm:p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center">
@@ -1186,10 +1445,16 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                 disabled={loading || isSoldOut || hasDuplicateAadhaarInEntireForm || hasInvalidChildAge}
                 className={`w-full py-3.5 sm:py-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 touch-manipulation ${isSoldOut || hasDuplicateAadhaarInEntireForm || hasInvalidChildAge
                   ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
-                  : "text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-xl shadow-amber-500/25"
+                  : appliedCoupon
+                    ? "text-black bg-gradient-to-r from-emerald-400 via-amber-300 to-amber-400 hover:opacity-95 shadow-xl shadow-amber-500/25"
+                    : "text-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:opacity-95 shadow-xl shadow-amber-500/25"
                   }`}
               >
-                <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                {appliedCoupon || bookingMode === "coupon" ? (
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                ) : (
+                  <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                )}
                 {isSoldOut
                   ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)`
                   : hasDuplicateAadhaarInEntireForm
@@ -1197,13 +1462,28 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                     : hasInvalidChildAge
                       ? "⚠️ CHILD AGE ABOVE 5 NOT ALLOWED"
                       : loading
-                        ? "Launching Razorpay Gateway..."
-                        : `PROCEED TO PAY (₹${totalAmount.toLocaleString("en-IN")})`}
+                        ? appliedCoupon
+                          ? "Confirming VIP Free Pass..."
+                          : "Launching Razorpay Gateway..."
+                        : appliedCoupon
+                          ? "CONFIRM FREE VIP PASS (₹0)"
+                          : bookingMode === "coupon"
+                            ? "CONFIRM WITH VIP CODE (₹0)"
+                            : `PROCEED TO PAY (₹${totalAmount.toLocaleString("en-IN")})`}
               </button>
               {!isSoldOut && (
                 <div className="text-center text-[9px] sm:text-[10px] text-slate-400 flex items-center justify-center gap-1.5">
-                  <Lock className="w-3 h-3 text-emerald-400" />
-                  <span>Secured by Razorpay • Total Payable ₹{totalAmount.toLocaleString("en-IN")}</span>
+                  {appliedCoupon ? (
+                    <>
+                      <Sparkles className="w-3 h-3 text-amber-400" />
+                      <span>100% Complimentary VIP Access • Pass Confirmed with Code {appliedCoupon.code}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-3 h-3 text-emerald-400" />
+                      <span>Secured by Razorpay • Total Payable ₹{totalAmount.toLocaleString("en-IN")}</span>
+                    </>
+                  )}
                 </div>
               )}
             </div>

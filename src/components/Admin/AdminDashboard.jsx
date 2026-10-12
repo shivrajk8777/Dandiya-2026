@@ -43,6 +43,7 @@ import GateStaffManagerModal, { getGateStaffUsers, DEFAULT_STAFF_USERS } from ".
 import DiscountManagerModal from "./DiscountManagerModal";
 import RazorpayConfigModal from "./RazorpayConfigModal";
 import TicketInventoryModal from "./TicketInventoryModal";
+import CouponManagerModal from "./CouponManagerModal";
 import MobileCameraScanner from "./MobileCameraScanner";
 import { subscribeToInventoryConfig, computeTicketStats } from "@/lib/ticketInventoryService";
 
@@ -109,6 +110,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [showRazorpayModal, setShowRazorpayModal] = useState(false);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [showCouponModal, setShowCouponModal] = useState(false);
   const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 178 });
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -680,7 +682,7 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                         : "bg-amber-500/20 border-amber-500/40 text-amber-300"
                         }`}
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
+                      <span className={`w-1.5 h-1.5 rounded-full ${isFirebaseLive ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
                       {isFirebaseLive ? "Firebase Live" : "Local Mode"}
                     </span>
                   </div>
@@ -706,7 +708,15 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
                   className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5"
                 >
                   <Tag className="w-3.5 h-3.5" />
-                  Discounts & Coupons
+                  Discounts & Pricing
+                </button>
+
+                <button
+                  onClick={() => setShowCouponModal(true)}
+                  className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 flex items-center gap-1.5 shadow-sm"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  VIP Codes (175)
                 </button>
 
                 <button
@@ -1114,6 +1124,11 @@ export default function AdminDashboard({ isOpen, onClose, onViewPass }) {
         isOpen={showInventoryModal}
         onClose={() => setShowInventoryModal(false)}
         totalSoldPasses={stats.soldPasses}
+      />
+
+      <CouponManagerModal
+        isOpen={showCouponModal}
+        onClose={() => setShowCouponModal(false)}
       />
     </div>
   );

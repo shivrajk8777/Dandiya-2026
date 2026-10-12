@@ -1,0 +1,203 @@
+# 🎟️ Rang Tarang Garba Mahotsav 2026 - 175 VIP Complimentary Coupon Codes
+
+Aapke request ke anusaar **Old VIP26- codes ko delete karke** naye 175 VIP Codes database me live create kar diye gaye hain:
+- 🌾 **Mahaveer Agro:** 50 VIP Codes
+- 🪔 **Shreeji:** 100 VIP Codes
+- ⭐ **SKJ:** 25 VIP Codes
+- **Total:** 175 VIP Complimentary Codes (100% Free Entry - ₹0 Pass)
+
+---
+
+## 🌾 1. Mahaveer Agro (50 VIP Codes)
+
+| S.No | VIP Code | Sponsor / Category | Discount | Status |
+|:---:|:---|:---|:---:|:---:|
+| 1 | `MAHAVEERAGRO-JAV2` | Mahaveer Agro | 100% FREE PASS | Available |
+| 2 | `MAHAVEERAGRO-VWXK` | Mahaveer Agro | 100% FREE PASS | Available |
+| 3 | `MAHAVEERAGRO-LV5K` | Mahaveer Agro | 100% FREE PASS | Available |
+| 4 | `MAHAVEERAGRO-UZBN` | Mahaveer Agro | 100% FREE PASS | Available |
+| 5 | `MAHAVEERAGRO-KCWW` | Mahaveer Agro | 100% FREE PASS | Available |
+| 6 | `MAHAVEERAGRO-YL43` | Mahaveer Agro | 100% FREE PASS | Available |
+| 7 | `MAHAVEERAGRO-WGPJ` | Mahaveer Agro | 100% FREE PASS | Available |
+| 8 | `MAHAVEERAGRO-8UKD` | Mahaveer Agro | 100% FREE PASS | Available |
+| 9 | `MAHAVEERAGRO-WRLY` | Mahaveer Agro | 100% FREE PASS | Available |
+| 10 | `MAHAVEERAGRO-KP2B` | Mahaveer Agro | 100% FREE PASS | Available |
+| 11 | `MAHAVEERAGRO-D5FF` | Mahaveer Agro | 100% FREE PASS | Available |
+| 12 | `MAHAVEERAGRO-VGUF` | Mahaveer Agro | 100% FREE PASS | Available |
+| 13 | `MAHAVEERAGRO-NBXV` | Mahaveer Agro | 100% FREE PASS | Available |
+| 14 | `MAHAVEERAGRO-FAWT` | Mahaveer Agro | 100% FREE PASS | Available |
+| 15 | `MAHAVEERAGRO-SXUS` | Mahaveer Agro | 100% FREE PASS | Available |
+| 16 | `MAHAVEERAGRO-2WFS` | Mahaveer Agro | 100% FREE PASS | Available |
+| 17 | `MAHAVEERAGRO-YE3Q` | Mahaveer Agro | 100% FREE PASS | Available |
+| 18 | `MAHAVEERAGRO-VV6Y` | Mahaveer Agro | 100% FREE PASS | Available |
+| 19 | `MAHAVEERAGRO-CQKS` | Mahaveer Agro | 100% FREE PASS | Available |
+| 20 | `MAHAVEERAGRO-RJG7` | Mahaveer Agro | 100% FREE PASS | Available |
+| 21 | `MAHAVEERAGRO-Q6PQ` | Mahaveer Agro | 100% FREE PASS | Available |
+| 22 | `MAHAVEERAGRO-84YA` | Mahaveer Agro | 100% FREE PASS | Available |
+| 23 | `MAHAVEERAGRO-QLSC` | Mahaveer Agro | 100% FREE PASS | Available |
+| 24 | `MAHAVEERAGRO-97AX` | Mahaveer Agro | 100% FREE PASS | Available |
+| 25 | `MAHAVEERAGRO-ZGGW` | Mahaveer Agro | 100% FREE PASS | Available |
+| 26 | `MAHAVEERAGRO-FBV9` | Mahaveer Agro | 100% FREE PASS | Available |
+| 27 | `MAHAVEERAGRO-MEW3` | Mahaveer Agro | 100% FREE PASS | Available |
+| 28 | `MAHAVEERAGRO-6955` | Mahaveer Agro | 100% FREE PASS | Available |
+| 29 | `MAHAVEERAGRO-3L3L` | Mahaveer Agro | 100% FREE PASS | Available |
+| 30 | `MAHAVEERAGRO-AMFQ` | Mahaveer Agro | 100% FREE PASS | Available |
+| 31 | `MAHAVEERAGRO-E7EN` | Mahaveer Agro | 100% FREE PASS | Available |
+| 32 | `MAHAVEERAGRO-GDSH` | Mahaveer Agro | 100% FREE PASS | Available |
+| 33 | `MAHAVEERAGRO-9PCQ` | Mahaveer Agro | 100% FREE PASS | Available |
+| 34 | `MAHAVEERAGRO-MCJ8` | Mahaveer Agro | 100% FREE PASS | Available |
+| 35 | `MAHAVEERAGRO-ZD9B` | Mahaveer Agro | 100% FREE PASS | Available |
+| 36 | `MAHAVEERAGRO-4HKH` | Mahaveer Agro | 100% FREE PASS | Available |
+| 37 | `MAHAVEERAGRO-6JWQ` | Mahaveer Agro | 100% FREE PASS | Available |
+| 38 | `MAHAVEERAGRO-JV5G` | Mahaveer Agro | 100% FREE PASS | Available |
+| 39 | `MAHAVEERAGRO-S3VX` | Mahaveer Agro | 100% FREE PASS | Available |
+| 40 | `MAHAVEERAGRO-A2VN` | Mahaveer Agro | 100% FREE PASS | Available |
+| 41 | `MAHAVEERAGRO-P7WD` | Mahaveer Agro | 100% FREE PASS | Available |
+| 42 | `MAHAVEERAGRO-EMVE` | Mahaveer Agro | 100% FREE PASS | Available |
+| 43 | `MAHAVEERAGRO-SDG7` | Mahaveer Agro | 100% FREE PASS | Available |
+| 44 | `MAHAVEERAGRO-2V57` | Mahaveer Agro | 100% FREE PASS | Available |
+| 45 | `MAHAVEERAGRO-2QAQ` | Mahaveer Agro | 100% FREE PASS | Available |
+| 46 | `MAHAVEERAGRO-VVAH` | Mahaveer Agro | 100% FREE PASS | Available |
+| 47 | `MAHAVEERAGRO-VMXB` | Mahaveer Agro | 100% FREE PASS | Available |
+| 48 | `MAHAVEERAGRO-5GBW` | Mahaveer Agro | 100% FREE PASS | Available |
+| 49 | `MAHAVEERAGRO-S8EK` | Mahaveer Agro | 100% FREE PASS | Available |
+| 50 | `MAHAVEERAGRO-BPXJ` | Mahaveer Agro | 100% FREE PASS | Available |
+
+---
+
+## 🪔 2. Shreeji (100 VIP Codes)
+
+| S.No | VIP Code | Sponsor / Category | Discount | Status |
+|:---:|:---|:---|:---:|:---:|
+| 1 | `SHREEJI-QEDA` | Shreeji | 100% FREE PASS | Available |
+| 2 | `SHREEJI-4L8S` | Shreeji | 100% FREE PASS | Available |
+| 3 | `SHREEJI-7TX9` | Shreeji | 100% FREE PASS | Available |
+| 4 | `SHREEJI-K9M5` | Shreeji | 100% FREE PASS | Available |
+| 5 | `SHREEJI-8G7W` | Shreeji | 100% FREE PASS | Available |
+| 6 | `SHREEJI-WNGB` | Shreeji | 100% FREE PASS | Available |
+| 7 | `SHREEJI-X9N9` | Shreeji | 100% FREE PASS | Available |
+| 8 | `SHREEJI-53N5` | Shreeji | 100% FREE PASS | Available |
+| 9 | `SHREEJI-K8DX` | Shreeji | 100% FREE PASS | Available |
+| 10 | `SHREEJI-485Z` | Shreeji | 100% FREE PASS | Available |
+| 11 | `SHREEJI-ZYC4` | Shreeji | 100% FREE PASS | Available |
+| 12 | `SHREEJI-C436` | Shreeji | 100% FREE PASS | Available |
+| 13 | `SHREEJI-QCTW` | Shreeji | 100% FREE PASS | Available |
+| 14 | `SHREEJI-TCEP` | Shreeji | 100% FREE PASS | Available |
+| 15 | `SHREEJI-87AH` | Shreeji | 100% FREE PASS | Available |
+| 16 | `SHREEJI-KRMV` | Shreeji | 100% FREE PASS | Available |
+| 17 | `SHREEJI-YJ69` | Shreeji | 100% FREE PASS | Available |
+| 18 | `SHREEJI-LB8R` | Shreeji | 100% FREE PASS | Available |
+| 19 | `SHREEJI-X4SG` | Shreeji | 100% FREE PASS | Available |
+| 20 | `SHREEJI-PHLJ` | Shreeji | 100% FREE PASS | Available |
+| 21 | `SHREEJI-UH96` | Shreeji | 100% FREE PASS | Available |
+| 22 | `SHREEJI-LRGY` | Shreeji | 100% FREE PASS | Available |
+| 23 | `SHREEJI-JZ6L` | Shreeji | 100% FREE PASS | Available |
+| 24 | `SHREEJI-GLB3` | Shreeji | 100% FREE PASS | Available |
+| 25 | `SHREEJI-K7JP` | Shreeji | 100% FREE PASS | Available |
+| 26 | `SHREEJI-TAGB` | Shreeji | 100% FREE PASS | Available |
+| 27 | `SHREEJI-X2P3` | Shreeji | 100% FREE PASS | Available |
+| 28 | `SHREEJI-KQT9` | Shreeji | 100% FREE PASS | Available |
+| 29 | `SHREEJI-RP36` | Shreeji | 100% FREE PASS | Available |
+| 30 | `SHREEJI-X3Z3` | Shreeji | 100% FREE PASS | Available |
+| 31 | `SHREEJI-THWZ` | Shreeji | 100% FREE PASS | Available |
+| 32 | `SHREEJI-3HC6` | Shreeji | 100% FREE PASS | Available |
+| 33 | `SHREEJI-Z5XW` | Shreeji | 100% FREE PASS | Available |
+| 34 | `SHREEJI-SZJ8` | Shreeji | 100% FREE PASS | Available |
+| 35 | `SHREEJI-5Z5C` | Shreeji | 100% FREE PASS | Available |
+| 36 | `SHREEJI-YWYG` | Shreeji | 100% FREE PASS | Available |
+| 37 | `SHREEJI-4JSN` | Shreeji | 100% FREE PASS | Available |
+| 38 | `SHREEJI-UHRB` | Shreeji | 100% FREE PASS | Available |
+| 39 | `SHREEJI-SFW9` | Shreeji | 100% FREE PASS | Available |
+| 40 | `SHREEJI-AC4H` | Shreeji | 100% FREE PASS | Available |
+| 41 | `SHREEJI-BS2E` | Shreeji | 100% FREE PASS | Available |
+| 42 | `SHREEJI-Q75B` | Shreeji | 100% FREE PASS | Available |
+| 43 | `SHREEJI-E8DV` | Shreeji | 100% FREE PASS | Available |
+| 44 | `SHREEJI-926E` | Shreeji | 100% FREE PASS | Available |
+| 45 | `SHREEJI-LJF5` | Shreeji | 100% FREE PASS | Available |
+| 46 | `SHREEJI-A8M6` | Shreeji | 100% FREE PASS | Available |
+| 47 | `SHREEJI-DWP2` | Shreeji | 100% FREE PASS | Available |
+| 48 | `SHREEJI-KEX5` | Shreeji | 100% FREE PASS | Available |
+| 49 | `SHREEJI-ZQ6L` | Shreeji | 100% FREE PASS | Available |
+| 50 | `SHREEJI-7ME8` | Shreeji | 100% FREE PASS | Available |
+| 51 | `SHREEJI-6GRD` | Shreeji | 100% FREE PASS | Available |
+| 52 | `SHREEJI-8CAC` | Shreeji | 100% FREE PASS | Available |
+| 53 | `SHREEJI-8P4C` | Shreeji | 100% FREE PASS | Available |
+| 54 | `SHREEJI-N3R7` | Shreeji | 100% FREE PASS | Available |
+| 55 | `SHREEJI-4ZJZ` | Shreeji | 100% FREE PASS | Available |
+| 56 | `SHREEJI-GUGP` | Shreeji | 100% FREE PASS | Available |
+| 57 | `SHREEJI-C6GH` | Shreeji | 100% FREE PASS | Available |
+| 58 | `SHREEJI-P3JC` | Shreeji | 100% FREE PASS | Available |
+| 59 | `SHREEJI-7ZJZ` | Shreeji | 100% FREE PASS | Available |
+| 60 | `SHREEJI-52C7` | Shreeji | 100% FREE PASS | Available |
+| 61 | `SHREEJI-DWRY` | Shreeji | 100% FREE PASS | Available |
+| 62 | `SHREEJI-4R3D` | Shreeji | 100% FREE PASS | Available |
+| 63 | `SHREEJI-7YA5` | Shreeji | 100% FREE PASS | Available |
+| 64 | `SHREEJI-3S4V` | Shreeji | 100% FREE PASS | Available |
+| 65 | `SHREEJI-2LGZ` | Shreeji | 100% FREE PASS | Available |
+| 66 | `SHREEJI-S5BF` | Shreeji | 100% FREE PASS | Available |
+| 67 | `SHREEJI-ZND3` | Shreeji | 100% FREE PASS | Available |
+| 68 | `SHREEJI-A9H7` | Shreeji | 100% FREE PASS | Available |
+| 69 | `SHREEJI-244Y` | Shreeji | 100% FREE PASS | Available |
+| 70 | `SHREEJI-F95P` | Shreeji | 100% FREE PASS | Available |
+| 71 | `SHREEJI-NZ88` | Shreeji | 100% FREE PASS | Available |
+| 72 | `SHREEJI-57XS` | Shreeji | 100% FREE PASS | Available |
+| 73 | `SHREEJI-2NPB` | Shreeji | 100% FREE PASS | Available |
+| 74 | `SHREEJI-V2UN` | Shreeji | 100% FREE PASS | Available |
+| 75 | `SHREEJI-SFHP` | Shreeji | 100% FREE PASS | Available |
+| 76 | `SHREEJI-73CU` | Shreeji | 100% FREE PASS | Available |
+| 77 | `SHREEJI-HKDW` | Shreeji | 100% FREE PASS | Available |
+| 78 | `SHREEJI-44K8` | Shreeji | 100% FREE PASS | Available |
+| 79 | `SHREEJI-6CGB` | Shreeji | 100% FREE PASS | Available |
+| 80 | `SHREEJI-3NUV` | Shreeji | 100% FREE PASS | Available |
+| 81 | `SHREEJI-C4T2` | Shreeji | 100% FREE PASS | Available |
+| 82 | `SHREEJI-5W9W` | Shreeji | 100% FREE PASS | Available |
+| 83 | `SHREEJI-R96X` | Shreeji | 100% FREE PASS | Available |
+| 84 | `SHREEJI-XC7P` | Shreeji | 100% FREE PASS | Available |
+| 85 | `SHREEJI-22MS` | Shreeji | 100% FREE PASS | Available |
+| 86 | `SHREEJI-MGBG` | Shreeji | 100% FREE PASS | Available |
+| 87 | `SHREEJI-YGDU` | Shreeji | 100% FREE PASS | Available |
+| 88 | `SHREEJI-QQSN` | Shreeji | 100% FREE PASS | Available |
+| 89 | `SHREEJI-J5VR` | Shreeji | 100% FREE PASS | Available |
+| 90 | `SHREEJI-HV9X` | Shreeji | 100% FREE PASS | Available |
+| 91 | `SHREEJI-ANQ8` | Shreeji | 100% FREE PASS | Available |
+| 92 | `SHREEJI-VQF6` | Shreeji | 100% FREE PASS | Available |
+| 93 | `SHREEJI-SHJS` | Shreeji | 100% FREE PASS | Available |
+| 94 | `SHREEJI-JGL5` | Shreeji | 100% FREE PASS | Available |
+| 95 | `SHREEJI-PUYD` | Shreeji | 100% FREE PASS | Available |
+| 96 | `SHREEJI-VNQQ` | Shreeji | 100% FREE PASS | Available |
+| 97 | `SHREEJI-KXW3` | Shreeji | 100% FREE PASS | Available |
+| 98 | `SHREEJI-C4AJ` | Shreeji | 100% FREE PASS | Available |
+| 99 | `SHREEJI-PBWD` | Shreeji | 100% FREE PASS | Available |
+| 100 | `SHREEJI-85GV` | Shreeji | 100% FREE PASS | Available |
+
+---
+
+## ⭐ 3. SKJ (25 VIP Codes)
+
+| S.No | VIP Code | Sponsor / Category | Discount | Status |
+|:---:|:---|:---|:---:|:---:|
+| 1 | `SKJ-Z4D2` | SKJ | 100% FREE PASS | Available |
+| 2 | `SKJ-EZJP` | SKJ | 100% FREE PASS | Available |
+| 3 | `SKJ-5MMQ` | SKJ | 100% FREE PASS | Available |
+| 4 | `SKJ-BU4T` | SKJ | 100% FREE PASS | Available |
+| 5 | `SKJ-C2NU` | SKJ | 100% FREE PASS | Available |
+| 6 | `SKJ-Y5UT` | SKJ | 100% FREE PASS | Available |
+| 7 | `SKJ-HDLT` | SKJ | 100% FREE PASS | Available |
+| 8 | `SKJ-AE9G` | SKJ | 100% FREE PASS | Available |
+| 9 | `SKJ-D2ES` | SKJ | 100% FREE PASS | Available |
+| 10 | `SKJ-GBXR` | SKJ | 100% FREE PASS | Available |
+| 11 | `SKJ-DGJA` | SKJ | 100% FREE PASS | Available |
+| 12 | `SKJ-HJC6` | SKJ | 100% FREE PASS | Available |
+| 13 | `SKJ-NJ5U` | SKJ | 100% FREE PASS | Available |
+| 14 | `SKJ-FB9L` | SKJ | 100% FREE PASS | Available |
+| 15 | `SKJ-MEFR` | SKJ | 100% FREE PASS | Available |
+| 16 | `SKJ-QKB8` | SKJ | 100% FREE PASS | Available |
+| 17 | `SKJ-MKNR` | SKJ | 100% FREE PASS | Available |
+| 18 | `SKJ-RL5M` | SKJ | 100% FREE PASS | Available |
+| 19 | `SKJ-PEWJ` | SKJ | 100% FREE PASS | Available |
+| 20 | `SKJ-EK2P` | SKJ | 100% FREE PASS | Available |
+| 21 | `SKJ-BA37` | SKJ | 100% FREE PASS | Available |
+| 22 | `SKJ-G7MK` | SKJ | 100% FREE PASS | Available |
+| 23 | `SKJ-STS4` | SKJ | 100% FREE PASS | Available |
+| 24 | `SKJ-VRYA` | SKJ | 100% FREE PASS | Available |
+| 25 | `SKJ-Y6NV` | SKJ | 100% FREE PASS | Available |
