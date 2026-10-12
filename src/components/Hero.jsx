@@ -42,7 +42,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
     seconds: 0,
     isLive: false
   });
-  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 107 });
+  const [inventoryConfig, setInventoryConfig] = useState({ maxTickets: 300, baseSoldTickets: 178 });
   const [registrations, setRegistrations] = useState([]);
 
   useEffect(() => {

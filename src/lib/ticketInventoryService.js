@@ -8,7 +8,7 @@ const COLLECTION_NAME = "dandiya_settings";
 
 const DEFAULT_INVENTORY = {
   maxTickets: 300,
-  baseSoldTickets: 107,
+  baseSoldTickets: 178,
   updatedAt: new Date().toISOString()
 };
 
@@ -23,11 +23,11 @@ export const getLocalInventoryConfig = () => {
     const parsed = JSON.parse(raw);
     const config = {
       maxTickets: Number(parsed.maxTickets) || 300,
-      baseSoldTickets: parsed.baseSoldTickets !== undefined ? Number(parsed.baseSoldTickets) : 107,
+      baseSoldTickets: parsed.baseSoldTickets !== undefined ? Number(parsed.baseSoldTickets) : 178,
       updatedAt: parsed.updatedAt || new Date().toISOString()
     };
-    if (parsed.baseSoldTickets === undefined || parsed.baseSoldTickets === 55) {
-      config.baseSoldTickets = 107;
+    if (parsed.baseSoldTickets === undefined || parsed.baseSoldTickets === 55 || parsed.baseSoldTickets === 107) {
+      config.baseSoldTickets = 178;
       localStorage.setItem(INVENTORY_LOCAL_KEY, JSON.stringify(config));
     }
     return config;
@@ -59,7 +59,7 @@ export const subscribeToInventoryConfig = (callback) => {
             const data = snapshot.data();
             const config = {
               maxTickets: Number(data.maxTickets) || 300,
-              baseSoldTickets: data.baseSoldTickets !== undefined ? Number(data.baseSoldTickets) : 107,
+              baseSoldTickets: data.baseSoldTickets !== undefined ? Number(data.baseSoldTickets) : 178,
               updatedAt: data.updatedAt || new Date().toISOString()
             };
             saveLocalInventoryConfig(config);
@@ -98,7 +98,7 @@ export const updateInventoryLimit = async (newMaxTickets, newBaseSoldTickets) =>
       ? Math.max(0, Number(newBaseSoldTickets))
       : current.baseSoldTickets !== undefined
       ? Number(current.baseSoldTickets)
-      : 107;
+      : 178;
 
   const payload = {
     maxTickets: max,
@@ -128,7 +128,7 @@ export const addMoreTickets = async (countToAdd) => {
   const current = getLocalInventoryConfig();
   const currentMax = Number(current.maxTickets) || 300;
   const newMax = currentMax + (Number(countToAdd) || 0);
-  return await updateInventoryLimit(newMax, current.baseSoldTickets !== undefined ? current.baseSoldTickets : 107);
+  return await updateInventoryLimit(newMax, current.baseSoldTickets !== undefined ? current.baseSoldTickets : 178);
 };
 
 export const computeTicketStats = (inventoryConfig, registrations = []) => {
@@ -136,7 +136,7 @@ export const computeTicketStats = (inventoryConfig, registrations = []) => {
   const baseSold =
     inventoryConfig?.baseSoldTickets !== undefined
       ? Number(inventoryConfig.baseSoldTickets)
-      : 107;
+      : 178;
 
   // Real new online approved registrations (excluding default seed demo data if any)
   const realOnlineApproved = (registrations || [])
