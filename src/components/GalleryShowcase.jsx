@@ -87,7 +87,7 @@ export default function GalleryShowcase() {
                   <Star className="w-3.5 h-3.5 fill-[#e5b869]" />
                   Archival Highlight
                 </span>
-                <span className="text-[11px] text-slate-500">Season 5 Retrospective</span>
+                <span className="text-[11px] text-slate-500">Season 1 Retrospective</span>
               </div>
             </div>
           ))}
