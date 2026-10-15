@@ -347,9 +347,10 @@ export default function DigitalPass({ passData, onClose }) {
     ctx.stroke();
 
     // 8. Attendee Name & Details Grid
+    const hasAnyAadhaar = Array.isArray(passData.attendees) && passData.attendees.some((a) => (a.aadhaar || "").trim());
     ctx.fillStyle = colors.label;
     ctx.font = "12px sans-serif";
-    ctx.fillText("PASS HOLDER NAME & AADHAAR", 60, 150);
+    ctx.fillText(hasAnyAadhaar ? "PASS HOLDER NAME & AADHAAR" : "PASS HOLDER NAME", 60, 150);
 
     ctx.fillStyle = colors.valueMain;
     ctx.font = "bold 28px Georgia, serif";
@@ -359,10 +360,10 @@ export default function DigitalPass({ passData, onClose }) {
       ctx.fillStyle = colors.valueSub;
       ctx.font = "bold 12px monospace";
       const attSummary = passData.attendees
-        .map((a, i) => `T${i + 1}: ${a.name} (${a.aadhaar})`)
+        .map((a, i) => (a.aadhaar || "").trim() ? `T${i + 1}: ${a.name} (${a.aadhaar})` : `T${i + 1}: ${a.name}`)
         .concat(
           passData.childrenCount > 0 && Array.isArray(passData.children)
-            ? passData.children.map((c) => `Child: ${c.name} (${c.aadhaar || c.age + "yr"})`)
+            ? passData.children.map((c) => (c.aadhaar || "").trim() ? `Child: ${c.name} (${c.aadhaar})` : `Child: ${c.name} (${c.age}yr)`)
             : []
         )
         .join("  •  ");
@@ -910,7 +911,7 @@ export default function DigitalPass({ passData, onClose }) {
                 <div className="sm:col-span-2 space-y-2 sm:space-y-3">
                   <div>
                     <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                      Pass Holder Name & Aadhaar
+                      Pass Holder Name{passData.attendees?.some((a) => (a.aadhaar || "").trim()) ? " & Aadhaar" : ""}
                     </span>
                     <div className="text-base sm:text-xl font-black text-white capitalize font-serif-royal leading-tight">
                       {passData.fullName}
@@ -919,13 +920,19 @@ export default function DigitalPass({ passData, onClose }) {
                       <div className="mt-1 space-y-0.5">
                         {passData.attendees.map((att, idx) => (
                           <div key={idx} className="text-[10px] sm:text-[11px] text-amber-300 font-mono">
-                            T{idx + 1}: <strong className="text-white font-sans font-semibold">{att.name}</strong> • Aadhaar: {att.aadhaar ? att.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3") : "N/A"}
+                            T{idx + 1}: <strong className="text-white font-sans font-semibold">{att.name}</strong>
+                            {(att.aadhaar || "").trim() && (
+                              <span> • Aadhaar: {att.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3")}</span>
+                            )}
                           </div>
                         ))}
                         {passData.childrenCount > 0 && Array.isArray(passData.children) && passData.children.length > 0 && (
                           passData.children.map((child, cIdx) => (
                             <div key={`c-${cIdx}`} className="text-[10px] sm:text-[11px] text-emerald-300 font-mono">
-                              👶 Child #{cIdx + 1}: <strong className="text-white font-sans font-semibold">{child.name}</strong> ({child.age} Yrs - Free) • Aadhaar: {child.aadhaar ? child.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3") : "N/A"}
+                              👶 Child #{cIdx + 1}: <strong className="text-white font-sans font-semibold">{child.name}</strong> ({child.age} Yrs - Free)
+                              {(child.aadhaar || "").trim() && (
+                                <span> • Aadhaar: {child.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3")}</span>
+                              )}
                             </div>
                           ))
                         )}

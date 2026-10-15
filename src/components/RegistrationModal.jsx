@@ -24,7 +24,6 @@ import {
   Baby
 } from "lucide-react";
 import { registerAttendee, updateRegistrationData, subscribeToRegistrations } from "@/lib/registrationService";
-import { validateAadhaar, checkDuplicateAadhaarInDb, formatAadhaar } from "@/lib/aadhaarValidator";
 import { PASS_OPTIONS } from "./PassTiers";
 import { subscribeToDiscountConfig, calculateTicketPrice } from "@/lib/discountService";
 import { initiateRazorpayCheckout } from "@/lib/razorpayService";
@@ -151,22 +150,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   const originalTotal = originalSubtotal;
   const totalSavings = isCouponApplied ? originalTotal : originalTotal - totalAmount;
 
-  // Extract all non-empty Aadhaar numbers in the entire booking form (Adults + Children)
-  const cleanAadhaar1 = (attendees[0]?.aadhaar || "").replace(/\D/g, "");
-  const cleanAadhaar2 = (attendees[1]?.aadhaar || "").replace(/\D/g, "");
-  const isSameAadhaarBetweenPersons =
-    cleanAadhaar1.length >= 4 &&
-    cleanAadhaar2.length >= 4 &&
-    cleanAadhaar1 === cleanAadhaar2;
-
-  const allFilledAadhaars = [
-    ...attendees.map((a) => (a.aadhaar || "").replace(/\D/g, "")),
-    ...(formData.childrenCount > 0 ? childrenList.map((c) => (c.aadhaar || "").replace(/\D/g, "")) : [])
-  ].filter((digits) => digits.length >= 4);
-
-  const hasDuplicateAadhaarInEntireForm =
-    allFilledAadhaars.length > 1 &&
-    new Set(allFilledAadhaars).size !== allFilledAadhaars.length;
+  const hasDuplicateAadhaarInEntireForm = false;
 
   // Real-time invalid child age check (> 5 years)
   const hasInvalidChildAge =
@@ -290,16 +274,13 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
       return false;
     }
 
-    // MANDATORY NAME & UNIQUE 12-DIGIT AADHAAR FOR ALL ATTENDEES (UIDAI VERHOEFF + NO DUPLICATE)
-    const seenAadhaars = new Set();
+    // Mandatory Name for all Attendees
     for (let i = 0; i < attendees.length; i++) {
       const att = attendees[i] || {};
       const pNum = i + 1;
       const passIndex = Math.floor(i / 2) + 1;
       const personLetter = i % 2 === 0 ? "Person 1" : "Person 2";
       const attName = (att.name || "").trim();
-      const rawAadhaar = (att.aadhaar || "").trim();
-      const cleanAadhaar = rawAadhaar.replace(/\D/g, "");
 
       if (!attName) {
         setErrorMsg(`Please enter Full Name for Person #${pNum} (Pass ${passIndex} - ${personLetter})`);
@@ -309,49 +290,15 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         setErrorMsg(`Full Name for Person #${pNum} must be at least 3 characters`);
         return false;
       }
-      if (!cleanAadhaar) {
-        setErrorMsg(`Please enter 12-digit Aadhaar Card Number for Person #${pNum} (${personLetter})`);
-        return false;
-      }
-      if (cleanAadhaar.length !== 12) {
-        setErrorMsg(`Aadhaar Card Number for Person #${pNum} (${personLetter}) must be exactly 12 numeric digits (${cleanAadhaar.length}/12 entered)`);
-        return false;
-      }
-
-      // 1. UIDAI Verhoeff Checksum & Algorithm Validation
-      const aadhaarCheck = validateAadhaar(cleanAadhaar);
-      if (!aadhaarCheck.isValid) {
-        setErrorMsg(`Person #${pNum} (${personLetter}) Aadhaar Error: ${aadhaarCheck.message}`);
-        return false;
-      }
-
-      // 2. Duplicate Aadhaar Check inside Current Booking Form
-      if (seenAadhaars.has(cleanAadhaar)) {
-        setErrorMsg(`Duplicate Aadhaar Error: Person 1 and Person 2 cannot have the same Aadhaar Card Number! Please enter a unique 12-digit Aadhaar for each attendee.`);
-        return false;
-      }
-      seenAadhaars.add(cleanAadhaar);
-
-      // 3. Duplicate Aadhaar Check across Entire Database Registrations
-      const dbCheck = checkDuplicateAadhaarInDb(cleanAadhaar, registrations, activePendingRecord?.id || activePendingRecord?.passId);
-      if (dbCheck.isDuplicate) {
-        const existing = dbCheck.existingPass;
-        setErrorMsg(
-          `Aadhaar Number (${formatAadhaar(cleanAadhaar)}) is ALREADY REGISTERED for Pass ID "${existing?.passId || "CONFIRMED"}" (Booked by: ${existing?.fullName || "Guest"}). Only 1 VIP pass per Aadhaar card is permitted!`
-        );
-        return false;
-      }
     }
 
-    // 4. Accompanying Children Validation (≤ 5 Years FREE, > 5 Years strictly blocked + Mandatory Name & 12-Digit Aadhaar)
+    // Accompanying Children Validation (≤ 5 Years FREE, > 5 Years strictly blocked + Mandatory Name)
     if (formData.childrenCount > 0) {
       for (let c = 0; c < childrenList.length; c++) {
         const child = childrenList[c] || {};
         const cNum = c + 1;
         const cName = (child.name || "").trim();
         const cAge = Number(child.age);
-        const rawChildAadhaar = (child.aadhaar || "").trim();
-        const cleanChildAadhaar = rawChildAadhaar.replace(/\D/g, "");
 
         if (!cName) {
           setErrorMsg(`Please enter Full Name for Accompanying Child #${cNum}`);
@@ -368,40 +315,6 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         if (cAge > 5) {
           setErrorMsg(
             `Child Policy Violation: Child #${cNum} (${cName}) age is ${cAge} years. Children above 5 years are strictly NOT ALLOWED into the venue!`
-          );
-          return false;
-        }
-
-        // Child 12-Digit Aadhaar Validation
-        if (!cleanChildAadhaar) {
-          setErrorMsg(`Please enter 12-digit Aadhaar Card Number for Child #${cNum} (${cName})`);
-          return false;
-        }
-        if (cleanChildAadhaar.length !== 12) {
-          setErrorMsg(`Aadhaar Card Number for Child #${cNum} (${cName}) must be exactly 12 numeric digits (${cleanChildAadhaar.length}/12 entered)`);
-          return false;
-        }
-
-        // 1. UIDAI Verhoeff Checksum
-        const childAadhaarCheck = validateAadhaar(cleanChildAadhaar);
-        if (!childAadhaarCheck.isValid) {
-          setErrorMsg(`Child #${cNum} (${cName}) Aadhaar Error: ${childAadhaarCheck.message}`);
-          return false;
-        }
-
-        // 2. Duplicate inside Form (Adults + Children)
-        if (seenAadhaars.has(cleanChildAadhaar)) {
-          setErrorMsg(`Duplicate Aadhaar Error: Child #${cNum} (${cName}) has the same Aadhaar Card Number as another attendee or child in this booking! Every person must have a unique Aadhaar.`);
-          return false;
-        }
-        seenAadhaars.add(cleanChildAadhaar);
-
-        // 3. Duplicate in Database
-        const childDbCheck = checkDuplicateAadhaarInDb(cleanChildAadhaar, registrations, activePendingRecord?.id || activePendingRecord?.passId);
-        if (childDbCheck.isDuplicate) {
-          const existing = childDbCheck.existingPass;
-          setErrorMsg(
-            `Child Aadhaar Number (${formatAadhaar(cleanChildAadhaar)}) is ALREADY REGISTERED for Pass ID "${existing?.passId || "CONFIRMED"}" (Booked by: ${existing?.fullName || "Guest"}). Only 1 pass per Aadhaar card is permitted!`
           );
           return false;
         }
@@ -779,20 +692,6 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
             </div>
           )}
 
-          {/* Real-time Form Duplicate Aadhaar Error Banner */}
-          {hasDuplicateAadhaarInEntireForm && (
-            <div className="p-3 sm:p-3.5 rounded-2xl bg-rose-500/20 border-2 border-rose-500 text-rose-200 text-xs font-bold flex items-start gap-2.5 shadow-lg shadow-rose-500/25 animate-pulse">
-              <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
-              <div>
-                <span className="font-extrabold text-rose-300 block text-xs sm:text-sm">
-                  ⚠️ DUPLICATE AADHAAR CARD DETECTED (ERROR)
-                </span>
-                <span>
-                  All attendees (Person 1, Person 2, and accompanying children) must have unique 12-digit Aadhaar Card Numbers! The same Aadhaar number cannot be used twice.
-                </span>
-              </div>
-            </div>
-          )}
 
           {/* Real-time Child Policy Age Violation Banner */}
           {hasInvalidChildAge && (
@@ -1007,140 +906,38 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               <div className="space-y-2 sm:space-y-2.5">
                 {attendees.map((att, idx) => {
                   const personLabel = idx === 0 ? "Person 1 (Primary Pass Holder)" : "Person 2 (Accompanying Partner)";
-                  const rawAadhaar = (att.aadhaar || "").replace(/\D/g, "");
-                  const isAadhaarFull = rawAadhaar.length === 12;
-
-                  // 1. Format & Verhoeff validation
-                  const aadhaarValidation = validateAadhaar(rawAadhaar);
-                  const isFormatValid = aadhaarValidation.isValid;
-
-                  // 2. In-form duplicate check with other attendees and children
-                  const isThisPersonDuplicate =
-                    (rawAadhaar.length >= 4 &&
-                      allFilledAadhaars.filter((d) => d === rawAadhaar).length > 1);
-
-                  // 3. Database duplicate check
-                  const dbDuplicateCheck = isAadhaarFull
-                    ? checkDuplicateAadhaarInDb(rawAadhaar, registrations, activePendingRecord?.id || activePendingRecord?.passId)
-                    : { isDuplicate: false };
-                  const isDbDuplicate = dbDuplicateCheck.isDuplicate;
-
-                  const hasError = isThisPersonDuplicate || (isAadhaarFull && (!isFormatValid || isDbDuplicate));
-                  const isAadhaarSuccess = isAadhaarFull && isFormatValid && !isThisPersonDuplicate && !isDbDuplicate;
-
-                  let badgeText = `${rawAadhaar.length}/12 Digits`;
-                  let badgeClass = "bg-white/5 border-white/10 text-slate-400";
-
-                  if (isThisPersonDuplicate) {
-                    badgeText = "⚠️ SAME AADHAAR ERROR";
-                    badgeClass = "bg-rose-500/25 border-rose-500/50 text-rose-300 font-bold animate-pulse";
-                  } else if (isDbDuplicate) {
-                    badgeText = `⚠️ Already Registered (${dbDuplicateCheck.existingPass?.passId || "VIP"})`;
-                    badgeClass = "bg-rose-500/20 border-rose-500/40 text-rose-300 font-bold";
-                  } else if (isAadhaarFull && !isFormatValid) {
-                    badgeText = "⚠️ Invalid Checksum";
-                    badgeClass = "bg-rose-500/20 border-rose-500/40 text-rose-300 font-bold";
-                  } else if (isAadhaarSuccess) {
-                    badgeText = "✓ Unique & Verified";
-                    badgeClass = "bg-emerald-500/20 border-emerald-500/40 text-emerald-300 font-bold";
-                  } else if (rawAadhaar.length > 0) {
-                    badgeText = `${rawAadhaar.length}/12 Digits`;
-                    badgeClass = "bg-amber-500/15 border-amber-500/30 text-amber-300";
-                  }
 
                   return (
                     <div
                       key={idx}
-                      className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#180733] border space-y-2 shadow-md transition-all ${isThisPersonDuplicate
-                        ? "border-rose-500 bg-rose-950/25 ring-2 ring-rose-500/30"
-                        : isAadhaarSuccess
-                          ? "border-emerald-500/40 bg-emerald-950/10"
-                          : hasError
-                            ? "border-rose-500/40 bg-rose-950/10"
-                            : "border-amber-500/30"
-                        }`}
+                      className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#180733] border border-amber-500/30 space-y-2 shadow-md transition-all"
                     >
                       <div className="flex items-center justify-between text-xs font-bold text-slate-200">
                         <span className="flex items-center gap-1.5 text-amber-300 font-serif-royal text-[11px] sm:text-xs">
                           <Ticket className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 shrink-0" />
                           {personLabel}
                         </span>
-                        <span className={`text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-full border ${badgeClass}`}>
-                          {badgeText}
+                        <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-full border bg-white/5 border-white/10 text-slate-400">
+                          Pass Holder #{idx + 1}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {/* Attendee Name */}
-                        <div>
-                          <label className="block text-[9px] sm:text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
-                            Full Name ({idx === 0 ? "Person 1" : "Person 2"}) *
-                          </label>
+                      {/* Attendee Name */}
+                      <div>
+                        <label className="block text-[9px] sm:text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
+                          Full Name ({idx === 0 ? "Person 1" : "Person 2"}) *
+                        </label>
 
-                          <div className="relative">
-                            <User className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2 sm:top-2.5" />
-                            <input
-                              type="text"
-                              placeholder="Enter Full Name"
-                              value={att.name}
-                              onChange={(e) => handleAttendeeChange(idx, "name", e.target.value)}
-                              required
-                              className="w-full bg-[#0e0320] border border-white/15 rounded-xl pl-8 pr-2.5 py-1.5 sm:py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition-colors"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Attendee Aadhaar */}
-                        <div>
-                          <label className="block text-[9px] sm:text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider flex items-center justify-between">
-                            <span>12-Digit Aadhaar Card *</span>
-                            <span className="font-mono text-[8px] sm:text-[9px] text-slate-400">
-                              {rawAadhaar.length > 0 && formatAadhaar(rawAadhaar)}
-                            </span>
-                          </label>
-                          <div className="relative">
-                            <ShieldCheck
-                              className={`w-3.5 h-3.5 absolute left-2.5 top-2 sm:top-2.5 ${isThisPersonDuplicate || hasError
-                                ? "text-rose-400"
-                                : isAadhaarSuccess
-                                  ? "text-emerald-400"
-                                  : "text-slate-400"
-                                }`}
-                            />
-                            <input
-                              type="text"
-                              placeholder="12-digit Aadhaar No."
-                              value={att.aadhaar}
-                              onChange={(e) => handleAttendeeChange(idx, "aadhaar", e.target.value)}
-                              maxLength={12}
-                              required
-                              className={`w-full bg-[#0e0320] border rounded-xl pl-8 pr-2.5 py-1.5 sm:py-2 text-xs font-mono tracking-wider text-white placeholder-slate-500 focus:outline-none transition-colors ${isThisPersonDuplicate
-                                ? "border-rose-500 text-rose-200 bg-rose-950/40 ring-1 ring-rose-500"
-                                : isAadhaarSuccess
-                                  ? "border-emerald-500/60 text-emerald-300 bg-emerald-950/20"
-                                  : hasError
-                                    ? "border-rose-500/60 text-rose-300 bg-rose-950/20"
-                                    : "border-white/15 focus:border-amber-400"
-                                }`}
-                            />
-                          </div>
-
-                          {/* Realtime Inline Errors */}
-                          {isThisPersonDuplicate && (
-                            <p className="text-[9px] text-rose-400 mt-1 pl-1 font-bold flex items-center gap-1">
-                              <span>❌ Aadhaar Number cannot be duplicated across attendees or children!</span>
-                            </p>
-                          )}
-                          {isDbDuplicate && !isThisPersonDuplicate && (
-                            <p className="text-[9px] text-rose-400 mt-1 pl-1 font-semibold">
-                              🚫 Already registered for Pass ID: {dbDuplicateCheck.existingPass?.passId} ({dbDuplicateCheck.existingPass?.fullName})
-                            </p>
-                          )}
-                          {isAadhaarFull && !isFormatValid && !isDbDuplicate && !isThisPersonDuplicate && (
-                            <p className="text-[9px] text-rose-400 mt-1 pl-1 font-semibold">
-                              ⚠️ {aadhaarValidation.message}
-                            </p>
-                          )}
+                        <div className="relative">
+                          <User className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2 sm:top-2.5" />
+                          <input
+                            type="text"
+                            placeholder="Enter Full Name"
+                            value={att.name}
+                            onChange={(e) => handleAttendeeChange(idx, "name", e.target.value)}
+                            required
+                            className="w-full bg-[#0e0320] border border-white/15 rounded-xl pl-8 pr-2.5 py-1.5 sm:py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition-colors"
+                          />
                         </div>
                       </div>
                     </div>
@@ -1166,7 +963,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                 <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-amber-300">Child Policy (Max 1 Child): </strong>
-                  Only <span className="text-emerald-400 font-bold">1 child up to 5 years</span> is allowed per Couple Pass with 100% FREE ENTRY. Mandatory Child Full Name & 12-Digit Aadhaar Card required.
+                  Only <span className="text-emerald-400 font-bold">1 child up to 5 years</span> is allowed per Couple Pass with 100% FREE ENTRY. Mandatory Child Full Name & Age required.
                   <span className="text-rose-300 font-bold ml-1">⚠️ Children above 5 years or more than 1 child strictly NOT ALLOWED.</span>
                 </div>
               </div>
@@ -1199,59 +996,13 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                   <div className="space-y-2.5 pt-2 border-t border-white/10">
                     {childrenList.map((child, cIdx) => {
                       const isAgeInvalid = Number(child.age) > 5;
-                      const rawChildAadhaar = (child.aadhaar || "").replace(/\D/g, "");
-                      const isChildAadhaarFull = rawChildAadhaar.length === 12;
-
-                      // 1. Format & Verhoeff validation
-                      const childAadhaarValidation = validateAadhaar(rawChildAadhaar);
-                      const isChildFormatValid = childAadhaarValidation.isValid;
-
-                      // 2. In-form duplicate check with other attendees and other children
-                      const isThisChildDuplicate =
-                        (rawChildAadhaar.length >= 4 &&
-                          allFilledAadhaars.filter((d) => d === rawChildAadhaar).length > 1);
-
-                      // 3. Database duplicate check
-                      const childDbDuplicateCheck = isChildAadhaarFull
-                        ? checkDuplicateAadhaarInDb(rawChildAadhaar, registrations, activePendingRecord?.id || activePendingRecord?.passId)
-                        : { isDuplicate: false };
-                      const isChildDbDuplicate = childDbDuplicateCheck.isDuplicate;
-
-                      const hasChildError =
-                        isThisChildDuplicate || (isChildAadhaarFull && (!isChildFormatValid || isChildDbDuplicate));
-                      const isChildAadhaarSuccess =
-                        isChildAadhaarFull && isChildFormatValid && !isThisChildDuplicate && !isChildDbDuplicate;
-
-                      let childBadgeText = `${rawChildAadhaar.length}/12 Digits`;
-                      let childBadgeClass = "bg-white/5 border-white/10 text-slate-400";
-
-                      if (isThisChildDuplicate) {
-                        childBadgeText = "⚠️ SAME AADHAAR ERROR";
-                        childBadgeClass = "bg-rose-500/25 border-rose-500/50 text-rose-300 font-bold animate-pulse";
-                      } else if (isChildDbDuplicate) {
-                        childBadgeText = `⚠️ Already Registered (${childDbDuplicateCheck.existingPass?.passId || "VIP"})`;
-                        childBadgeClass = "bg-rose-500/20 border-rose-500/40 text-rose-300 font-bold";
-                      } else if (isChildAadhaarFull && !isChildFormatValid) {
-                        childBadgeText = "⚠️ Invalid Checksum";
-                        childBadgeClass = "bg-rose-500/20 border-rose-500/40 text-rose-300 font-bold";
-                      } else if (isChildAadhaarSuccess) {
-                        childBadgeText = "✓ Unique & Verified";
-                        childBadgeClass = "bg-emerald-500/20 border-emerald-500/40 text-emerald-300 font-bold";
-                      } else if (rawChildAadhaar.length > 0) {
-                        childBadgeText = `${rawChildAadhaar.length}/12 Digits`;
-                        childBadgeClass = "bg-amber-500/15 border-amber-500/30 text-amber-300";
-                      }
 
                       return (
                         <div
                           key={cIdx}
-                          className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#180733] border space-y-2 shadow-md transition-all ${isThisChildDuplicate
-                            ? "border-rose-500 bg-rose-950/25 ring-2 ring-rose-500/30"
-                            : isChildAadhaarSuccess
-                              ? "border-emerald-500/40 bg-emerald-950/10"
-                              : hasChildError || isAgeInvalid
-                                ? "border-rose-500/40 bg-rose-950/10"
-                                : "border-amber-500/30"
+                          className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#180733] border space-y-2 shadow-md transition-all ${isAgeInvalid
+                            ? "border-rose-500/40 bg-rose-950/10"
+                            : "border-amber-500/30"
                             }`}
                         >
                           <div className="flex items-center justify-between text-xs font-bold text-slate-200">
@@ -1259,8 +1010,8 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                               <Baby className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                               Child #{cIdx + 1} (Free Entry ≤ 5 Yrs)
                             </span>
-                            <span className={`text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-full border ${childBadgeClass}`}>
-                              {childBadgeText}
+                            <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-full border bg-emerald-500/20 border-emerald-500/30 text-emerald-300">
+                              Free Entry
                             </span>
                           </div>
 
@@ -1305,65 +1056,13 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                                 <option value="6">6+ Years (Not Allowed)</option>
                               </select>
                             </div>
-
-                            {/* Child Aadhaar Card Number */}
-                            <div className="sm:col-span-2">
-                              <label className="block text-[9px] sm:text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider flex items-center justify-between">
-                                <span>Child 12-Digit Aadhaar Card *</span>
-                                <span className="font-mono text-[8px] sm:text-[9px] text-slate-400">
-                                  {rawChildAadhaar.length > 0 && formatAadhaar(rawChildAadhaar)}
-                                </span>
-                              </label>
-                              <div className="relative">
-                                <ShieldCheck
-                                  className={`w-3.5 h-3.5 absolute left-2.5 top-2 sm:top-2.5 ${isThisChildDuplicate || hasChildError
-                                    ? "text-rose-400"
-                                    : isChildAadhaarSuccess
-                                      ? "text-emerald-400"
-                                      : "text-slate-400"
-                                    }`}
-                                />
-                                <input
-                                  type="text"
-                                  placeholder="Child 12-digit Aadhaar No."
-                                  value={child.aadhaar || ""}
-                                  onChange={(e) => handleChildFieldChange(cIdx, "aadhaar", e.target.value)}
-                                  maxLength={12}
-                                  required
-                                  className={`w-full bg-[#0e0320] border rounded-xl pl-8 pr-2.5 py-1.5 sm:py-2 text-xs font-mono tracking-wider text-white placeholder-slate-500 focus:outline-none transition-colors ${isThisChildDuplicate
-                                    ? "border-rose-500 text-rose-200 bg-rose-950/40 ring-1 ring-rose-500"
-                                    : isChildAadhaarSuccess
-                                      ? "border-emerald-500/60 text-emerald-300 bg-emerald-950/20"
-                                      : hasChildError
-                                        ? "border-rose-500/60 text-rose-300 bg-rose-950/20"
-                                        : "border-white/15 focus:border-amber-400"
-                                    }`}
-                                />
-                              </div>
-
-                              {/* Realtime Inline Errors for Child */}
-                              {isThisChildDuplicate && (
-                                <p className="text-[9px] text-rose-400 mt-1 pl-1 font-bold flex items-center gap-1">
-                                  <span>❌ Child Aadhaar cannot be the same as any attendee or other child!</span>
-                                </p>
-                              )}
-                              {isChildDbDuplicate && !isThisChildDuplicate && (
-                                <p className="text-[9px] text-rose-400 mt-1 pl-1 font-semibold">
-                                  🚫 Already registered for Pass ID: {childDbDuplicateCheck.existingPass?.passId} ({childDbDuplicateCheck.existingPass?.fullName})
-                                </p>
-                              )}
-                              {isChildAadhaarFull && !isChildFormatValid && !isChildDbDuplicate && !isThisChildDuplicate && (
-                                <p className="text-[9px] text-rose-400 mt-1 pl-1 font-semibold">
-                                  ⚠️ {childAadhaarValidation.message}
-                                </p>
-                              )}
-                              {isAgeInvalid && (
-                                <p className="text-[9px] sm:text-[10px] text-rose-400 mt-1 pl-1 font-bold flex items-center gap-1">
-                                  ❌ Children above 5 years of age are strictly NOT ALLOWED into the venue arena!
-                                </p>
-                              )}
-                            </div>
                           </div>
+
+                          {isAgeInvalid && (
+                            <p className="text-[9px] sm:text-[10px] text-rose-400 mt-1 pl-1 font-bold flex items-center gap-1">
+                              ❌ Children above 5 years of age are strictly NOT ALLOWED into the venue arena!
+                            </p>
+                          )}
                         </div>
                       );
                     })}
@@ -1442,8 +1141,8 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               )}
               <button
                 type="submit"
-                disabled={loading || isSoldOut || hasDuplicateAadhaarInEntireForm || hasInvalidChildAge}
-                className={`w-full py-3.5 sm:py-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 touch-manipulation ${isSoldOut || hasDuplicateAadhaarInEntireForm || hasInvalidChildAge
+                disabled={loading || isSoldOut || hasInvalidChildAge}
+                className={`w-full py-3.5 sm:py-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 touch-manipulation ${isSoldOut || hasInvalidChildAge
                   ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
                   : appliedCoupon
                     ? "text-black bg-gradient-to-r from-emerald-400 via-amber-300 to-amber-400 hover:opacity-95 shadow-xl shadow-amber-500/25"
@@ -1457,10 +1156,8 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                 )}
                 {isSoldOut
                   ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)`
-                  : hasDuplicateAadhaarInEntireForm
-                    ? "⚠️ FIX DUPLICATE AADHAAR TO PROCEED"
-                    : hasInvalidChildAge
-                      ? "⚠️ CHILD AGE ABOVE 5 NOT ALLOWED"
+                  : hasInvalidChildAge
+                    ? "⚠️ CHILD AGE ABOVE 5 NOT ALLOWED"
                       : loading
                         ? appliedCoupon
                           ? "Confirming VIP Free Pass..."
