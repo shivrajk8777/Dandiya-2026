@@ -27,7 +27,7 @@ export default function CouponManagerModal({ isOpen, onClose }) {
   const [coupons, setCoupons] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState("ALL"); // "ALL", "AVAILABLE", "REDEEMED"
-  const [selectedSponsor, setSelectedSponsor] = useState("ALL"); // "ALL", "MAHAVEER", "SHREEJI", "SKJ"
+  const [selectedSponsor, setSelectedSponsor] = useState("ALL"); // "ALL", "MAHAVEER", "SHREEJI", "SKJ", "AV"
   const [copiedCode, setCopiedCode] = useState(null);
   const [copiedAllMsg, setCopiedAllMsg] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
@@ -55,12 +55,14 @@ export default function CouponManagerModal({ isOpen, onClose }) {
   const mahaveerCount = coupons.filter((c) => (c.sponsor === "Mahaveer" || c.code.startsWith("MAHAVEER"))).length;
   const shreejiCount = coupons.filter((c) => (c.sponsor === "Shreeji" || c.code.startsWith("SHREEJI"))).length;
   const skjCount = coupons.filter((c) => (c.sponsor === "SKJ" || c.code.startsWith("SKJ"))).length;
+  const avCount = coupons.filter((c) => (c.sponsor === "AV" || c.code.startsWith("AV"))).length;
 
   // Filtered list
   const filteredCoupons = coupons.filter((c) => {
     if (selectedSponsor === "MAHAVEER" && !(c.sponsor === "Mahaveer" || c.code.startsWith("MAHAVEER"))) return false;
     if (selectedSponsor === "SHREEJI" && !(c.sponsor === "Shreeji" || c.code.startsWith("SHREEJI"))) return false;
     if (selectedSponsor === "SKJ" && !(c.sponsor === "SKJ" || c.code.startsWith("SKJ"))) return false;
+    if (selectedSponsor === "AV" && !(c.sponsor === "AV" || c.code.startsWith("AV"))) return false;
 
     if (filterTab === "AVAILABLE" && c.isUsed) return false;
     if (filterTab === "REDEEMED" && !c.isUsed) return false;
@@ -214,6 +216,16 @@ export default function CouponManagerModal({ isOpen, onClose }) {
           >
             ⭐ SKJ ({skjCount})
           </button>
+          <button
+            onClick={() => setSelectedSponsor("AV")}
+            className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${
+              selectedSponsor === "AV"
+                ? "bg-amber-400 text-black shadow-sm"
+                : "bg-white/5 text-slate-300 hover:text-white border border-white/10"
+            }`}
+          >
+            💎 AV ({avCount})
+          </button>
         </div>
 
         {/* Action Bar (Export, Add Code, Copy All, Filter Tabs) */}
@@ -294,7 +306,7 @@ export default function CouponManagerModal({ isOpen, onClose }) {
                 required
                 value={newCodeInput}
                 onChange={(e) => setNewCodeInput(e.target.value.toUpperCase())}
-                placeholder="Enter new code (e.g. MAHAVEERAGRO-... or SHREEJI-...)"
+                placeholder="Enter new code (e.g. MAHAVEER-..., SHREEJI-..., SKJ-..., AV-...)"
                 className="w-full bg-[#0a0214] border border-amber-500/40 rounded-xl px-3 py-2 text-xs text-white uppercase font-mono font-bold focus:outline-none focus:border-amber-400"
               />
             </div>
@@ -313,7 +325,7 @@ export default function CouponManagerModal({ isOpen, onClose }) {
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
-            placeholder="Search code (e.g. MAHAVEERAGRO-..., SHREEJI-..., SKJ-...) or guest name / phone..."
+            placeholder="Search code (e.g. MAHAVEER-..., SHREEJI-..., SKJ-..., AV-...) or guest name / phone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-[#0a0214] border border-white/15 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-sans"

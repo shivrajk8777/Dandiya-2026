@@ -25,13 +25,14 @@ export const getCouponSponsor = (code) => {
   if (upper.startsWith("MAHAVEER-") || upper.startsWith("MAHAVEER")) return "Mahaveer";
   if (upper.startsWith("SHREEJI-") || upper.startsWith("SHREEJI")) return "Shreeji";
   if (upper.startsWith("SKJ-") || upper.startsWith("SKJ")) return "SKJ";
+  if (upper.startsWith("AV-") || upper.startsWith("AV")) return "AV";
   return "VIP Guest";
 };
 
-// 175 Unique VIP Complimentary Codes Seed
-// Mahaveer: 50 | Shreeji: 100 | SKJ: 25
+// 245 Unique VIP Complimentary Codes Seed
+// Mahaveer: 100 | Shreeji: 100 | SKJ: 25 | AV: 20
 export const RAW_VIP_CODES = [
-  // Mahaveer (50 Coupons)
+  // Mahaveer (100 Coupons)
   "MAHAVEER-JAV2", "MAHAVEER-VWXK", "MAHAVEER-LV5K", "MAHAVEER-UZBN", "MAHAVEER-KCWW",
   "MAHAVEER-YL43", "MAHAVEER-WGPJ", "MAHAVEER-8UKD", "MAHAVEER-WRLY", "MAHAVEER-KP2B",
   "MAHAVEER-D5FF", "MAHAVEER-VGUF", "MAHAVEER-NBXV", "MAHAVEER-FAWT", "MAHAVEER-SXUS",
@@ -42,6 +43,16 @@ export const RAW_VIP_CODES = [
   "MAHAVEER-4HKH", "MAHAVEER-6JWQ", "MAHAVEER-JV5G", "MAHAVEER-S3VX", "MAHAVEER-A2VN",
   "MAHAVEER-P7WD", "MAHAVEER-EMVE", "MAHAVEER-SDG7", "MAHAVEER-2V57", "MAHAVEER-2QAQ",
   "MAHAVEER-VVAH", "MAHAVEER-VMXB", "MAHAVEER-5GBW", "MAHAVEER-S8EK", "MAHAVEER-BPXJ",
+  "MAHAVEER-K6CX", "MAHAVEER-L38A", "MAHAVEER-ARZE", "MAHAVEER-999S", "MAHAVEER-YUHT",
+  "MAHAVEER-8Q3N", "MAHAVEER-YNS7", "MAHAVEER-ABHF", "MAHAVEER-K3EH", "MAHAVEER-3JFK",
+  "MAHAVEER-ZGGV", "MAHAVEER-J3DW", "MAHAVEER-MTDZ", "MAHAVEER-W3SQ", "MAHAVEER-PMUB",
+  "MAHAVEER-74X5", "MAHAVEER-9TCD", "MAHAVEER-D3Z4", "MAHAVEER-C33C", "MAHAVEER-G9D4",
+  "MAHAVEER-KWDV", "MAHAVEER-LMWV", "MAHAVEER-N8XK", "MAHAVEER-EK8E", "MAHAVEER-NUZK",
+  "MAHAVEER-Q7NQ", "MAHAVEER-PP2H", "MAHAVEER-UX8L", "MAHAVEER-W7FC", "MAHAVEER-BFHC",
+  "MAHAVEER-995N", "MAHAVEER-4GY9", "MAHAVEER-L22G", "MAHAVEER-JZMD", "MAHAVEER-6MBP",
+  "MAHAVEER-FNR2", "MAHAVEER-6QKJ", "MAHAVEER-JMPW", "MAHAVEER-YTD3", "MAHAVEER-FP98",
+  "MAHAVEER-SRKD", "MAHAVEER-MD7A", "MAHAVEER-QEJR", "MAHAVEER-SZ3T", "MAHAVEER-7877",
+  "MAHAVEER-7HFW", "MAHAVEER-D6HE", "MAHAVEER-Z329", "MAHAVEER-2TJR", "MAHAVEER-C78V",
 
   // Shreeji (100 Coupons)
   "SHREEJI-QEDA", "SHREEJI-4L8S", "SHREEJI-7TX9", "SHREEJI-K9M5", "SHREEJI-8G7W",
@@ -70,7 +81,13 @@ export const RAW_VIP_CODES = [
   "SKJ-Y5UT", "SKJ-HDLT", "SKJ-AE9G", "SKJ-D2ES", "SKJ-GBXR",
   "SKJ-DGJA", "SKJ-HJC6", "SKJ-NJ5U", "SKJ-FB9L", "SKJ-MEFR",
   "SKJ-QKB8", "SKJ-MKNR", "SKJ-RL5M", "SKJ-PEWJ", "SKJ-EK2P",
-  "SKJ-BA37", "SKJ-G7MK", "SKJ-STS4", "SKJ-VRYA", "SKJ-Y6NV"
+  "SKJ-BA37", "SKJ-G7MK", "SKJ-STS4", "SKJ-VRYA", "SKJ-Y6NV",
+
+  // AV (20 Coupons)
+  "AV-QFRC", "AV-PQRB", "AV-67MD", "AV-MTVG", "AV-7Y44",
+  "AV-45YF", "AV-5LV8", "AV-UUKJ", "AV-RC56", "AV-HMKX",
+  "AV-GMEQ", "AV-2XUH", "AV-Y7TG", "AV-XBCG", "AV-FP7M",
+  "AV-SSK5", "AV-VZVA", "AV-H5ZR", "AV-F5NJ", "AV-U8G4"
 ];
 
 export const INITIAL_COUPONS = RAW_VIP_CODES.map((code) => ({
@@ -251,7 +268,7 @@ export const validateCoupon = async (inputCode) => {
   if (clean.startsWith("VIP26") || clean.startsWith("VIP-")) {
     return {
       valid: false,
-      message: `Old VIP26 codes are no longer active. Please use your valid Mahaveer, Shreeji, or SKJ coupon code.`
+      message: `Old VIP26 codes are no longer active. Please use your valid Mahaveer, Shreeji, SKJ, or AV coupon code.`
     };
   }
 

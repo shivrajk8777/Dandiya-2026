@@ -1,14 +1,15 @@
-# 🎟️ Rang Tarang Garba Mahotsav 2026 - 175 VIP Complimentary Coupon Codes
+# 🎟️ Rang Tarang Garba Mahotsav 2026 - 245 VIP Complimentary Coupon Codes
 
-Aapke request ke anusaar **Old VIP26- codes ko delete karke** naye 175 VIP Codes database me live create kar diye gaye hain:
-- 🌾 **Mahaveer:** 50 VIP Codes
+Aapke request ke anusaar database me live 245 VIP Codes create kar diye gaye hain:
+- 🌾 **Mahaveer:** 100 VIP Codes
 - 🪔 **Shreeji:** 100 VIP Codes
 - ⭐ **SKJ:** 25 VIP Codes
-- **Total:** 175 VIP Complimentary Codes (100% Free Entry - ₹0 Pass)
+- 💎 **AV:** 20 VIP Codes
+- **Total:** 245 VIP Complimentary Codes (100% Free Entry - ₹0 Pass)
 
 ---
 
-## 🌾 1. Mahaveer (50 VIP Codes)
+## 🌾 1. Mahaveer (100 VIP Codes)
 
 | S.No | VIP Code | Sponsor / Category | Discount | Status |
 |:---:|:---|:---|:---:|:---:|
@@ -62,6 +63,56 @@ Aapke request ke anusaar **Old VIP26- codes ko delete karke** naye 175 VIP Codes
 | 48 | `MAHAVEER-5GBW` | Mahaveer | 100% FREE PASS | Available |
 | 49 | `MAHAVEER-S8EK` | Mahaveer | 100% FREE PASS | Available |
 | 50 | `MAHAVEER-BPXJ` | Mahaveer | 100% FREE PASS | Available |
+| 51 | `MAHAVEER-K6CX` | Mahaveer | 100% FREE PASS | Available |
+| 52 | `MAHAVEER-L38A` | Mahaveer | 100% FREE PASS | Available |
+| 53 | `MAHAVEER-ARZE` | Mahaveer | 100% FREE PASS | Available |
+| 54 | `MAHAVEER-999S` | Mahaveer | 100% FREE PASS | Available |
+| 55 | `MAHAVEER-YUHT` | Mahaveer | 100% FREE PASS | Available |
+| 56 | `MAHAVEER-8Q3N` | Mahaveer | 100% FREE PASS | Available |
+| 57 | `MAHAVEER-YNS7` | Mahaveer | 100% FREE PASS | Available |
+| 58 | `MAHAVEER-ABHF` | Mahaveer | 100% FREE PASS | Available |
+| 59 | `MAHAVEER-K3EH` | Mahaveer | 100% FREE PASS | Available |
+| 60 | `MAHAVEER-3JFK` | Mahaveer | 100% FREE PASS | Available |
+| 61 | `MAHAVEER-ZGGV` | Mahaveer | 100% FREE PASS | Available |
+| 62 | `MAHAVEER-J3DW` | Mahaveer | 100% FREE PASS | Available |
+| 63 | `MAHAVEER-MTDZ` | Mahaveer | 100% FREE PASS | Available |
+| 64 | `MAHAVEER-W3SQ` | Mahaveer | 100% FREE PASS | Available |
+| 65 | `MAHAVEER-PMUB` | Mahaveer | 100% FREE PASS | Available |
+| 66 | `MAHAVEER-74X5` | Mahaveer | 100% FREE PASS | Available |
+| 67 | `MAHAVEER-9TCD` | Mahaveer | 100% FREE PASS | Available |
+| 68 | `MAHAVEER-D3Z4` | Mahaveer | 100% FREE PASS | Available |
+| 69 | `MAHAVEER-C33C` | Mahaveer | 100% FREE PASS | Available |
+| 70 | `MAHAVEER-G9D4` | Mahaveer | 100% FREE PASS | Available |
+| 71 | `MAHAVEER-KWDV` | Mahaveer | 100% FREE PASS | Available |
+| 72 | `MAHAVEER-LMWV` | Mahaveer | 100% FREE PASS | Available |
+| 73 | `MAHAVEER-N8XK` | Mahaveer | 100% FREE PASS | Available |
+| 74 | `MAHAVEER-EK8E` | Mahaveer | 100% FREE PASS | Available |
+| 75 | `MAHAVEER-NUZK` | Mahaveer | 100% FREE PASS | Available |
+| 76 | `MAHAVEER-Q7NQ` | Mahaveer | 100% FREE PASS | Available |
+| 77 | `MAHAVEER-PP2H` | Mahaveer | 100% FREE PASS | Available |
+| 78 | `MAHAVEER-UX8L` | Mahaveer | 100% FREE PASS | Available |
+| 79 | `MAHAVEER-W7FC` | Mahaveer | 100% FREE PASS | Available |
+| 80 | `MAHAVEER-BFHC` | Mahaveer | 100% FREE PASS | Available |
+| 81 | `MAHAVEER-995N` | Mahaveer | 100% FREE PASS | Available |
+| 82 | `MAHAVEER-4GY9` | Mahaveer | 100% FREE PASS | Available |
+| 83 | `MAHAVEER-L22G` | Mahaveer | 100% FREE PASS | Available |
+| 84 | `MAHAVEER-JZMD` | Mahaveer | 100% FREE PASS | Available |
+| 85 | `MAHAVEER-6MBP` | Mahaveer | 100% FREE PASS | Available |
+| 86 | `MAHAVEER-FNR2` | Mahaveer | 100% FREE PASS | Available |
+| 87 | `MAHAVEER-6QKJ` | Mahaveer | 100% FREE PASS | Available |
+| 88 | `MAHAVEER-JMPW` | Mahaveer | 100% FREE PASS | Available |
+| 89 | `MAHAVEER-YTD3` | Mahaveer | 100% FREE PASS | Available |
+| 90 | `MAHAVEER-FP98` | Mahaveer | 100% FREE PASS | Available |
+| 91 | `MAHAVEER-SRKD` | Mahaveer | 100% FREE PASS | Available |
+| 92 | `MAHAVEER-MD7A` | Mahaveer | 100% FREE PASS | Available |
+| 93 | `MAHAVEER-QEJR` | Mahaveer | 100% FREE PASS | Available |
+| 94 | `MAHAVEER-SZ3T` | Mahaveer | 100% FREE PASS | Available |
+| 95 | `MAHAVEER-7877` | Mahaveer | 100% FREE PASS | Available |
+| 96 | `MAHAVEER-7HFW` | Mahaveer | 100% FREE PASS | Available |
+| 97 | `MAHAVEER-D6HE` | Mahaveer | 100% FREE PASS | Available |
+| 98 | `MAHAVEER-Z329` | Mahaveer | 100% FREE PASS | Available |
+| 99 | `MAHAVEER-2TJR` | Mahaveer | 100% FREE PASS | Available |
+| 100 | `MAHAVEER-C78V` | Mahaveer | 100% FREE PASS | Available |
 
 ---
 
@@ -201,3 +252,30 @@ Aapke request ke anusaar **Old VIP26- codes ko delete karke** naye 175 VIP Codes
 | 23 | `SKJ-STS4` | SKJ | 100% FREE PASS | Available |
 | 24 | `SKJ-VRYA` | SKJ | 100% FREE PASS | Available |
 | 25 | `SKJ-Y6NV` | SKJ | 100% FREE PASS | Available |
+
+---
+
+## 💎 4. AV (20 VIP Codes)
+
+| S.No | VIP Code | Sponsor / Category | Discount | Status |
+|:---:|:---|:---|:---:|:---:|
+| 1 | `AV-QFRC` | AV | 100% FREE PASS | Available |
+| 2 | `AV-PQRB` | AV | 100% FREE PASS | Available |
+| 3 | `AV-67MD` | AV | 100% FREE PASS | Available |
+| 4 | `AV-MTVG` | AV | 100% FREE PASS | Available |
+| 5 | `AV-7Y44` | AV | 100% FREE PASS | Available |
+| 6 | `AV-45YF` | AV | 100% FREE PASS | Available |
+| 7 | `AV-5LV8` | AV | 100% FREE PASS | Available |
+| 8 | `AV-UUKJ` | AV | 100% FREE PASS | Available |
+| 9 | `AV-RC56` | AV | 100% FREE PASS | Available |
+| 10 | `AV-HMKX` | AV | 100% FREE PASS | Available |
+| 11 | `AV-GMEQ` | AV | 100% FREE PASS | Available |
+| 12 | `AV-2XUH` | AV | 100% FREE PASS | Available |
+| 13 | `AV-Y7TG` | AV | 100% FREE PASS | Available |
+| 14 | `AV-XBCG` | AV | 100% FREE PASS | Available |
+| 15 | `AV-FP7M` | AV | 100% FREE PASS | Available |
+| 16 | `AV-SSK5` | AV | 100% FREE PASS | Available |
+| 17 | `AV-VZVA` | AV | 100% FREE PASS | Available |
+| 18 | `AV-H5ZR` | AV | 100% FREE PASS | Available |
+| 19 | `AV-F5NJ` | AV | 100% FREE PASS | Available |
+| 20 | `AV-U8G4` | AV | 100% FREE PASS | Available |
