@@ -277,7 +277,53 @@ export const validateCoupon = async (inputCode) => {
   // 1. Direct Firestore Database Lookup (Live Cloud Database)
   if (isConnected && db) {
     try {
-      // Direct lookup by document ID (Document ID is the Code e.g. 'MAHAVEERAGRO-JAV2')
+      // A) CRITICAL CHECK: Verify if this coupon code is already attached to any booked ticket in 'dandiya_registrations'
+      const regCol = collection(db, "dandiya_registrations");
+      const qReg1 = query(regCol, where("couponCode", "==", clean));
+      const snapReg1 = await getDocs(qReg1);
+      let existingBooking = !snapReg1.empty ? snapReg1.docs[0].data() : null;
+
+      if (!existingBooking) {
+        const qReg2 = query(regCol, where("transactionRef", "==", `VIP_${clean}`));
+        const snapReg2 = await getDocs(qReg2);
+        if (!snapReg2.empty) {
+          existingBooking = snapReg2.docs[0].data();
+        }
+      }
+
+      if (existingBooking) {
+        const formattedDate = existingBooking.createdAt
+          ? new Date(existingBooking.createdAt).toLocaleDateString("en-IN")
+          : "earlier";
+        const bookedBy = existingBooking.fullName || "Guest";
+        const passNum = existingBooking.passId || "VIP";
+
+        // Auto-heal / sync to dandiya_coupons to ensure isUsed is true
+        try {
+          await setDoc(
+            doc(db, COLLECTION_NAME, clean),
+            {
+              code: clean,
+              isUsed: true,
+              usedBy: bookedBy,
+              usedPhone: existingBooking.phone || "",
+              passId: passNum,
+              usedAt: existingBooking.createdAt || new Date().toISOString()
+            },
+            { merge: true }
+          );
+        } catch (e) {
+          console.warn("Auto-sync coupon doc warning:", e);
+        }
+
+        return {
+          valid: false,
+          isUsed: true,
+          message: `🚫 Duplicate Booking Blocked: VIP Code "${clean}" has already been used to book Ticket #${passNum} for ${bookedBy} (${formattedDate})! Each coupon can only be used once.`
+        };
+      }
+
+      // B) Check 'dandiya_coupons' collection
       const docRef = doc(db, COLLECTION_NAME, clean);
       const snap = await getDoc(docRef);
 
@@ -303,7 +349,7 @@ export const validateCoupon = async (inputCode) => {
             valid: false,
             isUsed: true,
             coupon: couponData,
-            message: `This VIP Code (${clean}) has already been redeemed on ${formattedDate} by ${couponData.usedBy || "another guest"}! Each code can only be used once.`
+            message: `🚫 VIP Code "${clean}" was already redeemed on ${formattedDate} by ${couponData.usedBy || "another guest"} (Pass: ${couponData.passId || "VIP"})! Each code can only be used for ONE ticket.`
           };
         }
 
@@ -326,7 +372,28 @@ export const validateCoupon = async (inputCode) => {
     }
   }
 
-  // 2. Cached Database Fallback (when offline or network latency)
+  // 2. Cached / Local Database Fallback (when offline or network latency)
+  try {
+    const rawLocalRegs = typeof window !== "undefined" ? localStorage.getItem("dandiya_local_registrations") : null;
+    if (rawLocalRegs) {
+      const localRegs = JSON.parse(rawLocalRegs);
+      const localMatch = Array.isArray(localRegs) && localRegs.find(
+        (r) =>
+          (r.couponCode && r.couponCode.toUpperCase() === clean) ||
+          (r.transactionRef && r.transactionRef.toUpperCase() === `VIP_${clean}`)
+      );
+      if (localMatch) {
+        return {
+          valid: false,
+          isUsed: true,
+          message: `🚫 Duplicate Booking Blocked: VIP Code "${clean}" has already been used for Ticket #${localMatch.passId} (${localMatch.fullName || "Guest"})! Each code can only be used once.`
+        };
+      }
+    }
+  } catch (e) {
+    console.warn("Local registration read error in validateCoupon:", e);
+  }
+
   const cached = getCoupons();
   const found = cached.find((c) => c.code.toUpperCase() === clean);
 
@@ -345,7 +412,7 @@ export const validateCoupon = async (inputCode) => {
       valid: false,
       isUsed: true,
       coupon: found,
-      message: `This VIP Code (${clean}) was already redeemed on ${formattedDate} by ${found.usedBy || "another guest"}!`
+      message: `🚫 VIP Code "${clean}" was already redeemed on ${formattedDate} by ${found.usedBy || "another guest"}! Each code can only be used once.`
     };
   }
 
@@ -440,27 +507,44 @@ export const addCouponToDatabase = async (newCode, discountPercent = 100) => {
   return couponDoc;
 };
 
-// Reset all coupons in Firestore Database back to unredeemed
+// Reset only UNUSED coupons in Firestore Database back to unredeemed (protects coupons with booked tickets)
 export const resetAllCoupons = async () => {
   const { db, isConnected } = getFirebaseInstance();
   const list = getCoupons();
 
+  const protectedCodes = new Set();
+
   if (isConnected && db) {
     try {
+      // 1. Gather all coupon codes that have actual registrations in Firestore
+      const regSnap = await getDocs(collection(db, "dandiya_registrations"));
+      regSnap.forEach((d) => {
+        const data = d.data();
+        let c = data.couponCode;
+        if (!c && data.transactionRef && data.transactionRef.startsWith("VIP_")) {
+          c = data.transactionRef.replace("VIP_", "").trim();
+        }
+        if (c) protectedCodes.add(c.toUpperCase());
+      });
+
       const batch = writeBatch(db);
       list.forEach((c) => {
-        const ref = doc(db, COLLECTION_NAME, c.code);
-        batch.set(
-          ref,
-          {
-            isUsed: false,
-            usedBy: null,
-            usedPhone: null,
-            passId: null,
-            usedAt: null
-          },
-          { merge: true }
-        );
+        const upper = (c.code || "").toUpperCase();
+        // NEVER reset a coupon that is attached to a registered ticket!
+        if (!protectedCodes.has(upper)) {
+          const ref = doc(db, COLLECTION_NAME, c.code);
+          batch.set(
+            ref,
+            {
+              isUsed: false,
+              usedBy: null,
+              usedPhone: null,
+              passId: null,
+              usedAt: null
+            },
+            { merge: true }
+          );
+        }
       });
       await batch.commit();
     } catch (e) {
@@ -468,14 +552,40 @@ export const resetAllCoupons = async () => {
     }
   }
 
-  const resetList = list.map((c) => ({
-    ...c,
-    isUsed: false,
-    usedBy: null,
-    usedPhone: null,
-    passId: null,
-    usedAt: null
-  }));
+  // Also check local storage registrations to preserve redeemed status
+  try {
+    const rawLocal = typeof window !== "undefined" ? localStorage.getItem("dandiya_local_registrations") : null;
+    if (rawLocal) {
+      const parsed = JSON.parse(rawLocal);
+      if (Array.isArray(parsed)) {
+        parsed.forEach((r) => {
+          let c = r.couponCode;
+          if (!c && r.transactionRef && r.transactionRef.startsWith("VIP_")) {
+            c = r.transactionRef.replace("VIP_", "").trim();
+          }
+          if (c) protectedCodes.add(c.toUpperCase());
+        });
+      }
+    }
+  } catch (e) {
+    console.warn("Local storage check error in resetAllCoupons:", e);
+  }
+
+  const resetList = list.map((c) => {
+    const upper = (c.code || "").toUpperCase();
+    if (protectedCodes.has(upper)) {
+      // Keep as used
+      return c;
+    }
+    return {
+      ...c,
+      isUsed: false,
+      usedBy: null,
+      usedPhone: null,
+      passId: null,
+      usedAt: null
+    };
+  });
   saveCouponsLocal(resetList);
   return resetList;
 };

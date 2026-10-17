@@ -1,7 +1,9 @@
 import {
   collection,
   addDoc,
+  getDoc,
   getDocs,
+  setDoc,
   onSnapshot,
   updateDoc,
   deleteDoc,
@@ -141,8 +143,66 @@ export const registerAttendee = async (formData) => {
   const { db, isConnected } = getFirebaseInstance();
   const passId = generatePassId();
 
+  // Extract and normalize coupon code if present
+  let cleanCoupon = "";
+  if (formData.couponCode && typeof formData.couponCode === "string") {
+    cleanCoupon = formData.couponCode.trim().toUpperCase();
+  } else if (formData.transactionRef && formData.transactionRef.startsWith("VIP_")) {
+    cleanCoupon = formData.transactionRef.replace("VIP_", "").trim().toUpperCase();
+  } else if (formData.paymentMethod && formData.paymentMethod.includes("VIP Coupon (")) {
+    const match = formData.paymentMethod.match(/\(([^)]+)\)/);
+    if (match) cleanCoupon = match[1].trim().toUpperCase();
+  }
+
+  // STRICT DUPLICATE COUPON PROTECTION (Guarantees no duplicate tickets for the same coupon)
+  if (cleanCoupon) {
+    if (isConnected && db) {
+      // Check 1: Query registrations collection for existing ticket with this coupon
+      const qRegCode = query(collection(db, COLLECTION_NAME), where("couponCode", "==", cleanCoupon));
+      const snapRegCode = await getDocs(qRegCode);
+      if (!snapRegCode.empty) {
+        const dup = snapRegCode.docs[0].data();
+        throw new Error(
+          `🚫 Duplicate Booking Blocked: VIP Code "${cleanCoupon}" has already been used to book Ticket #${dup.passId || snapRegCode.docs[0].id} for ${dup.fullName || "another guest"}! Duplicate booking is strictly prohibited.`
+        );
+      }
+
+      const qRegTx = query(collection(db, COLLECTION_NAME), where("transactionRef", "==", `VIP_${cleanCoupon}`));
+      const snapRegTx = await getDocs(qRegTx);
+      if (!snapRegTx.empty) {
+        const dup = snapRegTx.docs[0].data();
+        throw new Error(
+          `🚫 Duplicate Booking Blocked: VIP Code "${cleanCoupon}" has already been used to book Ticket #${dup.passId || snapRegTx.docs[0].id} for ${dup.fullName || "another guest"}! Duplicate booking is strictly prohibited.`
+        );
+      }
+
+      // Check 2: Check dandiya_coupons collection
+      const couponDocRef = doc(db, "dandiya_coupons", cleanCoupon);
+      const couponDocSnap = await getDoc(couponDocRef);
+      if (couponDocSnap.exists() && couponDocSnap.data().isUsed) {
+        const cData = couponDocSnap.data();
+        throw new Error(
+          `🚫 Duplicate Booking Blocked: VIP Code "${cleanCoupon}" has already been redeemed by ${cData.usedBy || "another guest"} (Pass: ${cData.passId || "VIP"})! Duplicate booking is strictly prohibited.`
+        );
+      }
+    }
+
+    // Check 3: Check local registrations cache
+    const currentLocal = getLocalRegistrations();
+    const localDup = currentLocal.find(
+      (r) =>
+        (r.couponCode && r.couponCode.toUpperCase() === cleanCoupon) ||
+        (r.transactionRef && r.transactionRef.toUpperCase() === `VIP_${cleanCoupon}`)
+    );
+    if (localDup) {
+      throw new Error(
+        `🚫 Duplicate Booking Blocked: VIP Code "${cleanCoupon}" is already used for Ticket #${localDup.passId} (${localDup.fullName || "Guest"})! Duplicate booking is strictly prohibited.`
+      );
+    }
+  }
+
   const qty = Number(formData.quantity) || 1;
-  const unitPrice = Number(formData.unitPrice) || 1599;
+  const unitPrice = Number(formData.unitPrice) || (cleanCoupon ? 0 : 1599);
   const subtotal = Number(formData.subtotal) || unitPrice * qty;
   const taxPercent = Number(formData.taxPercent) || 0;
   const taxAmount = Number(formData.taxAmount) || 0;
@@ -161,8 +221,9 @@ export const registerAttendee = async (formData) => {
     taxPercent,
     taxAmount,
     totalAmount,
-    paymentMethod: formData.paymentMethod || "UPI",
-    transactionRef: formData.transactionRef?.trim() || "UPI-REF-" + Math.floor(100000 + Math.random() * 900000),
+    paymentMethod: formData.paymentMethod || (cleanCoupon ? `VIP Coupon (${cleanCoupon})` : "UPI"),
+    transactionRef: formData.transactionRef?.trim() || (cleanCoupon ? `VIP_${cleanCoupon}` : "UPI-REF-" + Math.floor(100000 + Math.random() * 900000)),
+    couponCode: cleanCoupon || null,
     status: formData.paymentStatus || "Approved",
     checkedIn: false,
     checkInTime: null,
@@ -178,11 +239,35 @@ export const registerAttendee = async (formData) => {
         ...registrationRecord,
         serverCreatedAt: serverTimestamp()
       });
+
+      // Synchronously mark coupon as redeemed in 'dandiya_coupons'
+      if (cleanCoupon) {
+        try {
+          await setDoc(
+            doc(db, "dandiya_coupons", cleanCoupon),
+            {
+              code: cleanCoupon,
+              isUsed: true,
+              usedBy: registrationRecord.fullName,
+              usedPhone: registrationRecord.phone,
+              passId: registrationRecord.passId,
+              usedAt: registrationRecord.createdAt
+            },
+            { merge: true }
+          );
+        } catch (cErr) {
+          console.warn("Could not mark coupon as used in registerAttendee:", cErr);
+        }
+      }
+
       const full = { success: true, id: docRef.id, ...registrationRecord };
       const current = getLocalRegistrations();
       saveLocalRegistrations([full, ...current]);
       return full;
     } catch (err) {
+      if (err.message && err.message.includes("Duplicate Booking Blocked")) {
+        throw err;
+      }
       console.warn("Firestore save failed, falling back to local:", err);
     }
   }

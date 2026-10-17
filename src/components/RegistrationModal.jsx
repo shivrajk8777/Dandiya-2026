@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import QRCode from "qrcode";
 import {
@@ -63,6 +63,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponValidationMsg, setCouponValidationMsg] = useState(null);
   const [couponValidating, setCouponValidating] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   useEffect(() => {
     const unsubDisc = subscribeToDiscountConfig((cfg) => setDiscountConfig(cfg));
@@ -361,16 +362,48 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
 
   const handleCouponPassConfirmation = async (coupon) => {
     setErrorMsg("");
+    if (loading || isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setLoading(true);
+
     try {
-      const code = coupon.code;
+      const code = (coupon.code || "").trim().toUpperCase();
+
+      // 1. Live state check against all currently loaded registrations
+      const alreadyBooked = registrations.some(
+        (r) =>
+          (r.couponCode && r.couponCode.toUpperCase() === code) ||
+          (r.transactionRef && r.transactionRef.toUpperCase() === `VIP_${code}`)
+      );
+      if (alreadyBooked) {
+        const msg = `🚫 Duplicate Booking Blocked: VIP Code "${code}" is already used for another ticket! Each coupon code can only be used once.`;
+        setErrorMsg(msg);
+        setCouponValidationMsg({ type: "error", text: msg });
+        setAppliedCoupon(null);
+        setLoading(false);
+        isSubmittingRef.current = false;
+        return;
+      }
+
+      // 2. Real-time direct Firestore verification before creating the pass
+      const liveCheck = await validateCoupon(code);
+      if (!liveCheck.valid) {
+        setErrorMsg(liveCheck.message);
+        setCouponValidationMsg({ type: "error", text: liveCheck.message });
+        setAppliedCoupon(null);
+        setLoading(false);
+        isSubmittingRef.current = false;
+        return;
+      }
+
+      // 3. Register attendee with strict 1 coupon = 1 couple pass (quantity 1)
       const finalPass = await registerAttendee({
         fullName: formData.fullName.trim(),
         phone: formData.phone.trim(),
         email: formData.email.trim(),
         city: formData.city.trim(),
         passType: selectedPass.name,
-        quantity,
+        quantity: 1, // Enforce 1 pass per coupon code
         unitPrice: 0,
         subtotal: 0,
         taxPercent: TAX_PERCENT,
@@ -393,7 +426,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
         }))
       });
 
-      // Mark coupon as redeemed in local & Firebase
+      // 4. Mark coupon as redeemed in local & Firebase
       await redeemCoupon(code, {
         fullName: formData.fullName.trim(),
         phone: formData.phone.trim(),
@@ -407,18 +440,21 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
       });
 
       setLoading(false);
+      isSubmittingRef.current = false;
       if (onSuccess) {
         onSuccess(finalPass);
       }
     } catch (err) {
       console.error("Coupon redemption error:", err);
       setLoading(false);
-      setErrorMsg("Failed to confirm pass with VIP code: " + err.message);
+      isSubmittingRef.current = false;
+      setErrorMsg(err.message || "Failed to confirm pass with VIP code");
     }
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    if (loading || isSubmittingRef.current) return;
     if (!validateStep1()) return;
 
     if (appliedCoupon || (bookingMode === "coupon" && couponCodeInput.trim())) {
@@ -1141,7 +1177,7 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
               )}
               <button
                 type="submit"
-                disabled={loading || isSoldOut || hasInvalidChildAge}
+                disabled={loading || couponValidating || isSoldOut || hasInvalidChildAge}
                 className={`w-full py-3.5 sm:py-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 touch-manipulation ${isSoldOut || hasInvalidChildAge
                   ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
                   : appliedCoupon
