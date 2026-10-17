@@ -132,7 +132,8 @@ export const addMoreTickets = async (countToAdd) => {
 };
 
 export const computeTicketStats = (inventoryConfig, registrations = []) => {
-  const maxTickets = Number(inventoryConfig?.maxTickets) || 300;
+  // STRICT REQUIREMENT: Max count displayed on home page must never exceed 300
+  const maxTickets = 300;
   const baseSold =
     inventoryConfig?.baseSoldTickets !== undefined
       ? Number(inventoryConfig.baseSoldTickets)
@@ -143,17 +144,26 @@ export const computeTicketStats = (inventoryConfig, registrations = []) => {
     .filter((r) => r.status === "Approved" && !r.id?.startsWith("dnd-demo-"))
     .reduce((sum, r) => sum + (Number(r.quantity) || 1), 0);
 
-  const soldPasses = Math.min(maxTickets, baseSold + realOnlineApproved);
-  const remainingTickets = Math.max(0, maxTickets - soldPasses);
-  const isSoldOut = soldPasses >= maxTickets;
-  const soldPercentage = maxTickets > 0 ? Math.min(100, Math.round((soldPasses / maxTickets) * 100)) : 0;
+  const rawTotalSold = baseSold + realOnlineApproved;
+
+  // STRICT REQUIREMENT: 300 se zyada count show nahi hona chahiye home page par
+  const soldPasses = Math.min(300, Math.max(0, rawTotalSold));
+  const remainingTickets = Math.max(0, 300 - soldPasses);
+
+  // STRICT REQUIREMENT: 300 pass soldout hone ke baad bhi pass book ho sakta hai
+  // isSoldOut must NEVER block booking!
+  const isSoldOut = false;
+  const hasReached300 = rawTotalSold >= 300;
+  const soldPercentage = Math.min(100, Math.round((soldPasses / 300) * 100));
 
   return {
-    maxTickets,
+    maxTickets: 300,
     baseSold,
+    rawTotalSold,
     soldPasses,
     remainingTickets,
-    isSoldOut,
+    isSoldOut: false, // Booking is never blocked
+    hasReached300,
     soldPercentage
   };
 };

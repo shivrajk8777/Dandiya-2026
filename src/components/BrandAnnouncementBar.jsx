@@ -28,9 +28,9 @@ export default function BrandAnnouncementBar({ onOpenRegister }) {
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
           <span className="font-bold tracking-wider uppercase text-amber-300 font-sans truncate flex items-center gap-1">
             <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            {stats.isSoldOut
-              ? `Passes Sold Out (${stats.soldPasses}/${stats.maxTickets})`
-              : `Live: ${stats.soldPasses} Passes Sold • Only ${stats.remainingTickets} Available!`}
+            {stats.remainingTickets > 0
+              ? `Live: ${stats.soldPasses} Passes Sold • Only ${stats.remainingTickets} Available!`
+              : `Live: ${stats.soldPasses} Passes Booked • VIP Access Open • Book Now!`}
           </span>
           <span className="text-slate-600 hidden md:inline">|</span>
           <span className="hidden md:inline text-slate-400 font-light truncate">
@@ -51,9 +51,7 @@ export default function BrandAnnouncementBar({ onOpenRegister }) {
             className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/40 text-[#fef08a] hover:text-white font-black transition-all shrink-0 animate-pulse"
           >
             <Sparkles className="w-3 h-3 text-amber-300 animate-spin" />
-            <span className="whitespace-nowrap font-black">
-              {stats.isSoldOut ? "Check Status" : "Book Pass Now"}
-            </span>
+            <span className="whitespace-nowrap font-black">Book Pass Now</span>
             <ArrowRight className="w-3 h-3 shrink-0" />
           </button>
         </div>

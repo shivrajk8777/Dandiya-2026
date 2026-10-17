@@ -48,7 +48,7 @@ export default function PassTiers({ onSelectPass }) {
   const maxTickets = stats.maxTickets;
   const soldPasses = stats.soldPasses;
   const remainingTickets = stats.remainingTickets;
-  const isSoldOut = stats.isSoldOut;
+  const isSoldOut = false; // Booking always allowed as per requirement
 
   return (
     <section id="passes" className="py-24 relative bg-[#07030e]">
@@ -88,9 +88,9 @@ export default function PassTiers({ onSelectPass }) {
                 <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold block">Passes Sold</span>
                 <span className="text-sm sm:text-lg font-black text-amber-400 font-sans">{soldPasses}</span>
               </div>
-              <div className={`p-2 sm:p-2.5 rounded-xl border ${isSoldOut ? "bg-rose-500/20 border-rose-500/40 text-rose-300" : "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"}`}>
+              <div className="p-2 sm:p-2.5 rounded-xl border bg-emerald-500/10 border-emerald-500/30 text-emerald-300">
                 <span className="text-[9px] sm:text-[10px] uppercase font-bold block">Available Left</span>
-                <span className="text-sm sm:text-lg font-black font-sans">{remainingTickets}</span>
+                <span className="text-sm sm:text-lg font-black font-sans">{remainingTickets > 0 ? remainingTickets : "VIP Open"}</span>
               </div>
             </div>
 
@@ -105,7 +105,7 @@ export default function PassTiers({ onSelectPass }) {
                 </div>
               </div>
               <div className="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
-                <span className="text-emerald-400 font-medium">⚡ {remainingTickets} Couple Passes Available</span>
+                <span className="text-emerald-400 font-medium">⚡ {remainingTickets > 0 ? `${remainingTickets} Couple Passes Available` : "VIP Passes Available • Final Access"}</span>
                 <span className="text-slate-300">{soldPasses} Passes Sold</span>
               </div>
             </div>
@@ -187,7 +187,7 @@ export default function PassTiers({ onSelectPass }) {
                     <div className="mt-3.5 p-2.5 rounded-xl bg-[#090214] border border-amber-500/30 flex items-center justify-between text-xs">
                       <span className="flex items-center gap-1.5 text-emerald-400 font-bold text-[11px]">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
-                        {remainingTickets} Available Left
+                        {remainingTickets > 0 ? `${remainingTickets} Available Left` : "VIP Access Open"}
                       </span>
                       <span className="text-[11px] text-amber-300 font-semibold font-mono">
                         {soldPasses} of {maxTickets} Sold

@@ -1170,15 +1170,10 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
 
             {/* Direct Proceed / Confirm Submit Button */}
             <div className="pt-2 sticky bottom-0 bg-[#110524]/95 backdrop-blur-md pb-1 z-20 space-y-1.5">
-              {isSoldOut && (
-                <div className="p-2 sm:p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center">
-                  🚫 OUT OF STOCK: All {maxTickets} VIP Passes for Rang Tarang Garba 2026 have been booked!
-                </div>
-              )}
               <button
                 type="submit"
-                disabled={loading || couponValidating || isSoldOut || hasInvalidChildAge}
-                className={`w-full py-3.5 sm:py-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 touch-manipulation ${isSoldOut || hasInvalidChildAge
+                disabled={loading || couponValidating || hasInvalidChildAge}
+                className={`w-full py-3.5 sm:py-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 touch-manipulation ${hasInvalidChildAge
                   ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
                   : appliedCoupon
                     ? "text-black bg-gradient-to-r from-emerald-400 via-amber-300 to-amber-400 hover:opacity-95 shadow-xl shadow-amber-500/25"
@@ -1190,35 +1185,31 @@ export default function RegistrationModal({ initialPass, isOpen, onClose, onSucc
                 ) : (
                   <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 )}
-                {isSoldOut
-                  ? `OUT OF STOCK (${soldPasses}/${maxTickets} SOLD)`
-                  : hasInvalidChildAge
-                    ? "⚠️ CHILD AGE ABOVE 5 NOT ALLOWED"
-                      : loading
-                        ? appliedCoupon
-                          ? "Confirming VIP Free Pass..."
-                          : "Launching Razorpay Gateway..."
-                        : appliedCoupon
-                          ? "CONFIRM FREE VIP PASS (₹0)"
-                          : bookingMode === "coupon"
-                            ? "CONFIRM WITH VIP CODE (₹0)"
-                            : `PROCEED TO PAY (₹${totalAmount.toLocaleString("en-IN")})`}
+                {hasInvalidChildAge
+                  ? "⚠️ CHILD AGE ABOVE 5 NOT ALLOWED"
+                  : loading
+                    ? appliedCoupon
+                      ? "Confirming VIP Free Pass..."
+                      : "Launching Razorpay Gateway..."
+                    : appliedCoupon
+                      ? "CONFIRM FREE VIP PASS (₹0)"
+                      : bookingMode === "coupon"
+                        ? "CONFIRM WITH VIP CODE (₹0)"
+                        : `PROCEED TO PAY (₹${totalAmount.toLocaleString("en-IN")})`}
               </button>
-              {!isSoldOut && (
-                <div className="text-center text-[9px] sm:text-[10px] text-slate-400 flex items-center justify-center gap-1.5">
-                  {appliedCoupon ? (
-                    <>
-                      <Sparkles className="w-3 h-3 text-amber-400" />
-                      <span>100% Complimentary VIP Access • Pass Confirmed with Code {appliedCoupon.code}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-3 h-3 text-emerald-400" />
-                      <span>Secured by Razorpay • Total Payable ₹{totalAmount.toLocaleString("en-IN")}</span>
-                    </>
-                  )}
-                </div>
-              )}
+              <div className="text-center text-[9px] sm:text-[10px] text-slate-400 flex items-center justify-center gap-1.5">
+                {appliedCoupon ? (
+                  <>
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    <span>100% Complimentary VIP Access • Pass Confirmed with Code {appliedCoupon.code}</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-3 h-3 text-emerald-400" />
+                    <span>Secured by Razorpay • Total Payable ₹{totalAmount.toLocaleString("en-IN")}</span>
+                  </>
+                )}
+              </div>
             </div>
           </form>
         </div>

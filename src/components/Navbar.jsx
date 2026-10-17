@@ -91,7 +91,7 @@ export default function Navbar({ onOpenRegister, onOpenLookup, onOpenAdmin }) {
             <span className="whitespace-nowrap font-black">Book Passes</span>
             <span className="hidden sm:inline-flex px-1.5 py-0.5 rounded-full text-[9px] font-black bg-black/25 text-black border border-black/20">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-600 mr-1 animate-blink-dot" />
-              {stats.remainingTickets} Left
+              {stats.remainingTickets > 0 ? `${stats.remainingTickets} Left` : "VIP Open"}
             </span>
           </button>
 

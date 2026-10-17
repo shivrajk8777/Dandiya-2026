@@ -184,11 +184,8 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${stats.isSoldOut
-                ? "bg-rose-500/20 border-rose-500/40 text-rose-300"
-                : "bg-amber-500/15 border-amber-500/30 text-amber-300"
-                }`}>
-                {stats.isSoldOut ? "Sold Out" : `${stats.soldPercentage}% Passes Booked`}
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border bg-amber-500/15 border-amber-500/30 text-amber-300">
+                {stats.soldPercentage}% Passes Booked
               </span>
             </div>
           </div>
@@ -211,15 +208,12 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
                 {stats.soldPasses}
               </span>
             </div>
-            <div className={`p-2 sm:p-3 rounded-2xl border ${stats.isSoldOut
-              ? "bg-rose-500/15 border-rose-500/30 text-rose-300"
-              : "bg-emerald-500/15 border-emerald-500/30 text-emerald-300"
-              }`}>
+            <div className="p-2 sm:p-3 rounded-2xl border bg-emerald-500/15 border-emerald-500/30 text-emerald-300">
               <span className="text-[9px] sm:text-[10px] uppercase font-bold block mb-0.5">
                 Available Left
               </span>
-              <span className={`text-base sm:text-2xl font-black font-sans ${stats.isSoldOut ? "text-rose-400" : "text-emerald-400"}`}>
-                {stats.remainingTickets}
+              <span className="text-base sm:text-2xl font-black font-sans text-emerald-400">
+                {stats.remainingTickets > 0 ? stats.remainingTickets : "VIP Open"}
               </span>
             </div>
           </div>
@@ -237,7 +231,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
             <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-medium pt-0.5">
               <span className="flex items-center gap-1 text-emerald-400">
                 <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <strong className="text-white font-mono">{stats.remainingTickets}</strong> Couple Passes Available
+                <strong className="text-white font-mono">{stats.remainingTickets > 0 ? stats.remainingTickets : "VIP"}</strong> Couple Passes Available
               </span>
               <span className="text-slate-300">
                 <strong className="text-amber-300 font-mono">{stats.soldPasses}</strong> Sold ({stats.soldPercentage}%)
@@ -314,7 +308,7 @@ export default function Hero({ onOpenRegister, onOpenLookup }) {
 
           <div className="p-3 sm:p-4 rounded-2xl editorial-card flex items-center gap-2.5 sm:gap-3">
             <div className="text-base sm:text-lg text-emerald-400 font-black shrink-0">
-              {stats.remainingTickets}
+              {stats.remainingTickets > 0 ? stats.remainingTickets : "VIP"}
             </div>
             <div className="text-[11px] sm:text-xs text-slate-300">
               <strong className="block text-white font-semibold">Passes Available</strong>
